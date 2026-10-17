@@ -1,0 +1,407 @@
+import type {
+  Account,
+  LikeType,
+  Match,
+  Message,
+  Profile,
+  QuizResult,
+  ReportRequest,
+  ReportStatus,
+  SessionUser,
+  WyrChoice,
+} from '../types'
+import type { SafetyReport } from '../types/safetyReport'
+import { demoLikesYou, demoProfiles, demoReplies, demoWyrAnswers } from '../fixtures/demoProfiles'
+import { buildDemoReport } from '../fixtures/demoReports'
+import { matchIdFor, type Backend } from './backend'
+import { filterDiscover } from './discoverFilter'
+
+// In-browser backend backed by localStorage. Used when Firebase isn't configured
+// or the player picks "Try demo mode". Demo profiles reply and play automatically.
+
+const STORAGE_KEY = 'vetted:demo:v1'
+const DEMO_UID = 'demo-you'
+
+interface DemoState {
+  signedIn: boolean
+  accounts: Record<string, Account>
+  profiles: Record<string, Profile>
+  likes: Record<string, { from: string; to: string; type: LikeType }>
+  matches: Record<string, Match>
+  messages: Record<string, Message[]>
+  quizResults: Record<string, QuizResult>
+  wyr: Record<string, Record<string, WyrChoice>>
+  reportRequests: Record<string, ReportRequest>
+  reports: Record<string, SafetyReport>
+  blocks: Record<string, string[]>
+  userReports: { from: string; about: string; reason: string; details: string; at: number }[]
+}
+
+function freshState(): DemoState {
+  const now = Date.now()
+  const profiles: DemoState['profiles'] = {}
+  const wyr: DemoState['wyr'] = {}
+  const likes: DemoState['likes'] = {}
+  for (const profile of demoProfiles) {
+    profiles[profile.uid] = { ...profile, updatedAt: now }
+    wyr[profile.uid] = demoWyrAnswers(profile.uid)
+    if (demoLikesYou.has(profile.uid)) {
+      likes[`${profile.uid}_${DEMO_UID}`] = { from: profile.uid, to: DEMO_UID, type: 'like' }
+    }
+  }
+  // Start with one existing match so chat is easy to try.
+  const starterId = matchIdFor(DEMO_UID, 'demo-sam')
+  likes[`${DEMO_UID}_demo-sam`] = { from: DEMO_UID, to: 'demo-sam', type: 'like' }
+  return {
+    signedIn: false,
+    accounts: {},
+    profiles,
+    likes,
+    matches: {
+      [starterId]: {
+        id: starterId,
+        users: [DEMO_UID, 'demo-sam'].sort() as [string, string],
+        createdAt: now - 3600_000,
+        lastMessageAt: now - 3000_000,
+        lastMessagePreview: 'Hey! Your Mario Kart claim is bold 😄',
+      },
+    },
+    messages: {
+      [starterId]: [
+        { id: 'm1', matchId: starterId, senderId: 'system', type: 'system', text: 'You matched! Say hi 👋', createdAt: now - 3600_000 },
+        { id: 'm2', matchId: starterId, senderId: 'demo-sam', type: 'text', text: 'Hey! Your Mario Kart claim is bold 😄', createdAt: now - 3000_000 },
+      ],
+    },
+    quizResults: {},
+    wyr,
+    reportRequests: {},
+    reports: {},
+    blocks: {},
+    userReports: [],
+  }
+}
+
+let state: DemoState = load()
+
+function load(): DemoState {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) return JSON.parse(raw) as DemoState
+  } catch {
+    // Corrupt or unavailable storage: start fresh.
+  }
+  return freshState()
+}
+
+const listeners = new Set<() => void>()
+
+function commit(mutator: (draft: DemoState) => void) {
+  mutator(state)
+  state = { ...state }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  } catch {
+    // Storage full or blocked; keep working in memory.
+  }
+  for (const listener of listeners) listener()
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener)
+  listener()
+  return () => listeners.delete(listener)
+}
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+let idCounter = 0
+const newId = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${(idCounter++).toString(36)}`
+
+const sessionUser = (): SessionUser => ({ uid: DEMO_UID, email: 'demo@vetted.test', displayName: 'Demo Player' })
+
+function pushMessage(matchId: string, message: Omit<Message, 'id' | 'matchId' | 'createdAt'>) {
+  commit((draft) => {
+    const full: Message = { ...message, id: newId('msg'), matchId, createdAt: Date.now() }
+    draft.messages[matchId] = [...(draft.messages[matchId] ?? []), full]
+    const match = draft.matches[matchId]
+    if (match) {
+      draft.matches[matchId] = {
+        ...match,
+        lastMessageAt: full.createdAt,
+        lastMessagePreview: full.type === 'game_share' ? '🎰 Would You Rather' : full.text,
+      }
+    }
+  })
+}
+
+function scheduleDemoReply(matchId: string, partnerUid: string) {
+  setTimeout(() => {
+    if (!state.matches[matchId]) return
+    const reply = demoReplies[Math.floor(Math.random() * demoReplies.length)]
+    pushMessage(matchId, { senderId: partnerUid, type: 'text', text: reply })
+  }, 1400 + Math.random() * 1200)
+}
+
+function scheduleDemoGameAnswer(matchId: string, messageId: string, partnerUid: string, promptId: string) {
+  setTimeout(() => {
+    commit((draft) => {
+      const list = draft.messages[matchId]
+      if (!list) return
+      draft.messages[matchId] = list.map((message) =>
+        message.id === messageId && message.game
+          ? { ...message, game: { ...message.game, answers: { ...message.game.answers, [partnerUid]: draft.wyr[partnerUid]?.[promptId] ?? 'a' } } }
+          : message,
+      )
+    })
+  }, 1800)
+}
+
+function runDemoPipeline(requestId: string) {
+  const steps: [number, ReportStatus][] = [[600, 'searching'], [1800, 'verifying'], [3000, 'analyzing'], [4200, 'complete']]
+  for (const [delay, status] of steps) {
+    setTimeout(() => {
+      commit((draft) => {
+        const request = draft.reportRequests[requestId]
+        if (!request) return
+        if (status === 'complete') {
+          const report = buildDemoReport({
+            reportId: requestId,
+            subjectUid: request.subjectUid,
+            nameProvided: request.subjectName,
+            context: request.context,
+          })
+          draft.reports[requestId] = report
+          const finalStatus: ReportStatus = report.scope.search_completed && report.errors.length === 0 ? 'complete' : 'incomplete'
+          draft.reportRequests[requestId] = { ...request, status: finalStatus }
+        } else {
+          draft.reportRequests[requestId] = { ...request, status }
+        }
+      })
+    }, delay)
+  }
+}
+
+export const demoBackend: Backend = {
+  kind: 'demo',
+
+  onAuthChange(callback) {
+    let last: boolean | undefined
+    return subscribe(() => {
+      if (state.signedIn === last) return
+      last = state.signedIn
+      callback(state.signedIn ? sessionUser() : null)
+    })
+  },
+  async signInWithGoogle() {
+    await demoBackend.signInDemo()
+  },
+  async signInWithEmail() {
+    await demoBackend.signInDemo()
+  },
+  async signInDemo() {
+    await wait(250)
+    commit((draft) => {
+      draft.signedIn = true
+    })
+  },
+  async signOut() {
+    commit((draft) => {
+      draft.signedIn = false
+    })
+  },
+
+  async getAccount(uid) {
+    return state.accounts[uid] ?? null
+  },
+  async saveAccount(uid, patch) {
+    commit((draft) => {
+      const current = draft.accounts[uid] ?? {
+        uid,
+        email: sessionUser().email,
+        onboardingStep: 'basics',
+        settings: { discoverable: true, sounds: false },
+        createdAt: Date.now(),
+      }
+      draft.accounts[uid] = { ...current, ...patch, settings: { ...current.settings, ...patch.settings } }
+    })
+  },
+  async getProfile(uid) {
+    return state.profiles[uid] ?? null
+  },
+  async saveProfile(uid, patch) {
+    const defaults: Profile = {
+      uid,
+      displayName: '',
+      birthdate: '',
+      gender: '',
+      interestedIn: [],
+      city: '',
+      bio: '',
+      prompts: [],
+      photos: [],
+      interests: [],
+      discoverable: true,
+      updatedAt: 0,
+    }
+    commit((draft) => {
+      draft.profiles[uid] = { ...defaults, ...draft.profiles[uid], ...patch, uid, updatedAt: Date.now() }
+    })
+  },
+  async uploadPhoto(_uid, file) {
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(String(reader.result))
+      reader.onerror = () => reject(new Error('Could not read the photo.'))
+      reader.readAsDataURL(file)
+    })
+  },
+
+  async listDiscover(uid) {
+    await wait(300)
+    const blocked = new Set(state.blocks[uid] ?? [])
+    const seen = new Set(Object.values(state.likes).filter((like) => like.from === uid).map((like) => like.to))
+    const candidates = Object.values(state.profiles).filter((profile) => profile.uid !== uid)
+    return filterDiscover(state.profiles[uid] ?? null, candidates, seen, blocked)
+  },
+  async setLike(uid, targetUid, type) {
+    await wait(120)
+    let matchId: string | undefined
+    commit((draft) => {
+      draft.likes[`${uid}_${targetUid}`] = { from: uid, to: targetUid, type }
+      const theirs = draft.likes[`${targetUid}_${uid}`]
+      if (type === 'like' && theirs?.type === 'like') {
+        matchId = matchIdFor(uid, targetUid)
+        if (!draft.matches[matchId]) {
+          const now = Date.now()
+          draft.matches[matchId] = { id: matchId, users: [uid, targetUid].sort() as [string, string], createdAt: now }
+          draft.messages[matchId] = [
+            { id: newId('msg'), matchId, senderId: 'system', type: 'system', text: 'You matched! Say hi 👋', createdAt: now },
+          ]
+        }
+      }
+    })
+    return { matchId }
+  },
+
+  subscribeMatches(uid, callback) {
+    return subscribe(() => {
+      const blocked = new Set(state.blocks[uid] ?? [])
+      callback(
+        Object.values(state.matches)
+          .filter((match) => match.users.includes(uid) && !match.users.some((user) => blocked.has(user)))
+          .sort((a, b) => (b.lastMessageAt ?? b.createdAt) - (a.lastMessageAt ?? a.createdAt)),
+      )
+    })
+  },
+  async unmatch(_uid, matchId) {
+    commit((draft) => {
+      delete draft.matches[matchId]
+      delete draft.messages[matchId]
+    })
+  },
+  subscribeMessages(matchId, callback) {
+    return subscribe(() => callback(state.messages[matchId] ?? []))
+  },
+  async sendMessage(matchId, message) {
+    const match = state.matches[matchId]
+    if (!match) throw new Error('This match no longer exists.')
+    pushMessage(matchId, message)
+    const partner = match.users.find((user) => user !== message.senderId)
+    if (!partner?.startsWith('demo-') || partner === DEMO_UID) return
+    if (message.type === 'game_share' && message.game) {
+      const sent = state.messages[matchId].at(-1)
+      if (sent) scheduleDemoGameAnswer(matchId, sent.id, partner, message.game.promptId)
+    } else {
+      scheduleDemoReply(matchId, partner)
+    }
+  },
+  async answerGameShare(matchId, messageId, uid, choice) {
+    commit((draft) => {
+      draft.messages[matchId] = (draft.messages[matchId] ?? []).map((message) =>
+        message.id === messageId && message.game
+          ? { ...message, game: { ...message.game, answers: { ...message.game.answers, [uid]: choice } } }
+          : message,
+      )
+    })
+  },
+
+  async saveQuizResult(uid, result) {
+    commit((draft) => {
+      draft.quizResults[uid] = result
+    })
+  },
+  async getWyrAnswers(uid) {
+    return state.wyr[uid] ?? {}
+  },
+  async saveWyrAnswer(uid, promptId, choice) {
+    commit((draft) => {
+      draft.wyr[uid] = { ...draft.wyr[uid], [promptId]: choice }
+    })
+  },
+  async getWyrAnswersFor(uids) {
+    return Object.fromEntries(uids.map((uid) => [uid, state.wyr[uid] ?? {}]))
+  },
+
+  async requestSafetyReport(uid, input) {
+    if (!input.confirmedScope) throw new Error('Please confirm you understand the limits of this report.')
+    const id = newId('report')
+    commit((draft) => {
+      draft.reportRequests[id] = {
+        id,
+        requesterUid: uid,
+        subjectUid: input.subjectUid,
+        subjectName: input.subjectName.trim(),
+        context: input.context?.trim() || undefined,
+        status: 'queued',
+        createdAt: Date.now(),
+      }
+    })
+    runDemoPipeline(id)
+    return id
+  },
+  subscribeReportRequest(requestId, callback) {
+    return subscribe(() => {
+      const request = state.reportRequests[requestId]
+      callback(request && request.requesterUid === DEMO_UID ? request : null)
+    })
+  },
+  async getSafetyReport(requestId) {
+    const request = state.reportRequests[requestId]
+    if (!request || request.requesterUid !== DEMO_UID) throw new Error('Report not found.')
+    const report = state.reports[requestId]
+    if (!report) throw new Error('This report is not ready yet.')
+    return report
+  },
+  async listMyReportRequests(uid) {
+    return Object.values(state.reportRequests)
+      .filter((request) => request.requesterUid === uid)
+      .sort((a, b) => b.createdAt - a.createdAt)
+  },
+
+  async block(uid, otherUid) {
+    commit((draft) => {
+      draft.blocks[uid] = [...new Set([...(draft.blocks[uid] ?? []), otherUid])]
+    })
+  },
+  async unblock(uid, otherUid) {
+    commit((draft) => {
+      draft.blocks[uid] = (draft.blocks[uid] ?? []).filter((id) => id !== otherUid)
+    })
+  },
+  async listBlocked(uid) {
+    return state.blocks[uid] ?? []
+  },
+  async reportUser(uid, otherUid, reason, details) {
+    commit((draft) => {
+      draft.userReports.push({ from: uid, about: otherUid, reason, details, at: Date.now() })
+    })
+  },
+  async deleteMyData() {
+    state = freshState()
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+    } catch {
+      // ignore
+    }
+    for (const listener of listeners) listener()
+  },
+}
