@@ -1,0 +1,28 @@
+# Environment files with real values (commit only the *.example templates)
+.env
+.env.*
+!.env.example
+*.local
+!*.local.example
+.secret.local
+
+# Firebase service account keys
+*-firebase-adminsdk-*.json
+service-account*.json
+
+# Dependencies and build output
+node_modules/
+dist/
+functions/lib/
+
+# Firebase local tooling
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
