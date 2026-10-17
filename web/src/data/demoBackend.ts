@@ -231,7 +231,7 @@ export const demoBackend: Backend = {
     const defaults: Profile = {
       uid,
       displayName: '',
-      birthdate: '',
+      age: 0,
       gender: '',
       interestedIn: [],
       city: '',

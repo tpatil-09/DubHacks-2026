@@ -1,14 +1,13 @@
 import type { Profile } from '../types'
-import { ageFrom } from './age'
 
 export type ProfileDraft = Pick<
   Profile,
-  'displayName' | 'birthdate' | 'gender' | 'interestedIn' | 'city' | 'bio' | 'prompts' | 'photos' | 'interests'
+  'displayName' | 'age' | 'gender' | 'interestedIn' | 'city' | 'bio' | 'prompts' | 'photos' | 'interests'
 >
 
 export const emptyDraft: ProfileDraft = {
   displayName: '',
-  birthdate: '',
+  age: 0,
   gender: '',
   interestedIn: [],
   city: '',
@@ -20,16 +19,15 @@ export const emptyDraft: ProfileDraft = {
 
 export const LIMITS = { name: 30, city: 40, bio: 300, promptAnswer: 120, minInterests: 3, maxInterests: 10, maxPhotos: 6 }
 
-export function validateBasics(draft: ProfileDraft, today?: Date): string | null {
+export function validateBasics(draft: ProfileDraft): string | null {
   if (!draft.displayName.trim()) return 'Add the name you want people to see.'
   if (draft.displayName.trim().length > LIMITS.name) return `Names can be up to ${LIMITS.name} characters.`
-  const age = ageFrom(draft.birthdate, today)
-  if (age === null) return 'Add a valid birthdate.'
-  if (age < 18) return 'You need to be 18 or older to use Vetted.'
-  if (age > 120) return 'Please double-check your birthdate.'
+  if (!Number.isInteger(draft.age) || draft.age < 18) return 'You need to be 18 or older to use Vetted.'
+  if (draft.age > 120) return 'Please enter an age no greater than 120.'
   if (!draft.gender) return 'Pick the gender that fits you best.'
   if (draft.interestedIn.length === 0) return 'Pick who you’d like to meet.'
-  if (draft.city.trim().length > LIMITS.city) return `City can be up to ${LIMITS.city} characters.`
+  if (draft.city.trim().length < 2) return 'Add the city or region where you live.'
+  if (draft.city.trim().length > LIMITS.city) return `Location can be up to ${LIMITS.city} characters.`
   return null
 }
 
@@ -52,7 +50,7 @@ export function draftFromProfile(profile: Profile | null): ProfileDraft {
   if (!profile) return { ...emptyDraft }
   return {
     displayName: profile.displayName,
-    birthdate: profile.birthdate,
+    age: profile.age,
     gender: profile.gender,
     interestedIn: profile.interestedIn,
     city: profile.city,

@@ -35,8 +35,8 @@ export interface ProfilePrompt {
 export interface Profile {
   uid: string
   displayName: string
-  /** YYYY-MM-DD */
-  birthdate: string
+  /** Self-reported age in years; no birthdate is collected. */
+  age: number
   gender: string
   interestedIn: string[]
   city: string

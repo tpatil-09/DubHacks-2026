@@ -11,7 +11,6 @@ import { BlockReportModal } from '../components/profile/BlockReport'
 import { MatchModal } from '../components/discover/MatchModal'
 import { useProfile } from '../hooks/data'
 import { backend } from '../data'
-import { ageFrom } from '../lib/age'
 import { vibePercent } from '../lib/vibe'
 import { useSession } from '../store/session'
 import { toast } from '../store/toast'
@@ -31,7 +30,7 @@ export default function ProfileDetail() {
   if (loading) return <PageLoader />
   if (!profile) return <EmptyState title="Profile not found" body="This player may have left the arcade." mood="thinking" />
 
-  const age = ageFrom(profile.birthdate)
+  const age = profile.age
   const vibe = me?.quiz && profile.quiz ? vibePercent(me.quiz.axes, profile.quiz.axes) : null
   const isMe = profile.uid === myUid
 
