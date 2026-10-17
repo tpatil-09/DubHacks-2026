@@ -1,0 +1,9 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Add explicit per-user paths, size limits, and content-type checks before uploads.
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}
