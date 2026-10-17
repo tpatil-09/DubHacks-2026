@@ -1,0 +1,139 @@
+{
+  "description": "SYNTHETIC demo for frontend development (used by `--mock` by default). Placeholder person; all URLs use reserved .example domains. Produces one flagged verified record, one same-name mismatch, and one unverified allegation.",
+  "query": {
+    "full_name": "Jane Example",
+    "middle_name": "Q",
+    "location": "Seattle, WA",
+    "age_min": 28,
+    "age_max": 32
+  },
+  "investigator": {
+    "search_queries_run": [
+      "\"Jane Example\" Seattle, WA court case conviction",
+      "\"Jane Example\" Seattle, WA sex offender registry",
+      "\"Jane Example\" Seattle, WA domestic violence OR assault charged"
+    ],
+    "sources_checked": [
+      {"url": "https://courts.wa.example/case/22-1-00451", "title": "State v. Jane Q. Example", "source_type": "official_court_record", "accessible": true},
+      {"url": "https://courts.or.example/case/1998-3321", "title": "State v. Jane Example (1998)", "source_type": "official_court_record", "accessible": true},
+      {"url": "https://forum.example/thread/4411", "title": "Public forum thread", "source_type": "social_post", "accessible": true}
+    ],
+    "findings": [
+      {
+        "source_url": "https://courts.wa.example/case/22-1-00451",
+        "source_title": "State v. Jane Q. Example",
+        "source_type": "official_court_record",
+        "excerpt": "Jane Q. Example, DOB 1995, Seattle. Judgment: guilty of assault in the second degree (domestic violence).",
+        "claim": "Official court record states Jane Q. Example of Seattle was convicted of second-degree assault (domestic violence) in 2022.",
+        "record_stage": "conviction",
+        "offense_category": "domestic_violence",
+        "event_date": "2022-11-03",
+        "jurisdiction": "King County Superior Court, WA",
+        "case_identifier": "22-1-00451",
+        "disposition": "Guilty",
+        "identity_evidence": ["full name with middle initial Q", "Seattle", "born 1995"],
+        "relevance": "high",
+        "source_quality": "high"
+      },
+      {
+        "source_url": "https://courts.or.example/case/1998-3321",
+        "source_title": "State v. Jane Example (1998)",
+        "source_type": "official_court_record",
+        "excerpt": "Jane Example, age 47, Portland, OR. Convicted: assault IV.",
+        "claim": "Court record states a Jane Example, age 47, of Portland was convicted of fourth-degree assault in 1998.",
+        "record_stage": "conviction",
+        "offense_category": "other_serious_violent",
+        "event_date": "1998-05-20",
+        "jurisdiction": "Multnomah County, OR",
+        "case_identifier": "1998-3321",
+        "identity_evidence": ["same first and last name", "age 47 in 1998", "Portland, OR"],
+        "relevance": "low",
+        "source_quality": "high"
+      },
+      {
+        "source_url": "https://forum.example/thread/4411",
+        "source_type": "social_post",
+        "excerpt": "Someone named Jane Example threatened [victim] at a bar, be careful.",
+        "claim": "An anonymous public forum post alleges that someone named Jane Example threatened a person.",
+        "record_stage": "allegation",
+        "offense_category": "other_serious_violent",
+        "identity_evidence": ["name only"],
+        "relevance": "medium",
+        "source_quality": "low"
+      }
+    ],
+    "access_failures": [
+      {"target": "https://sor.wa.example/search", "kind": "access_denied", "detail": "Registry search requires CAPTCHA; not bypassed."}
+    ]
+  },
+  "verifier": {
+    "search_queries_run": ["\"22-1-00451\" appeal", "\"Jane Example\" Seattle dismissed OR acquitted"],
+    "by_source_url": {
+      "https://courts.wa.example/case/22-1-00451": {
+        "source_accessible": true,
+        "evidence_status": "verified",
+        "identity_match": "strong_match",
+        "identity_basis": ["full_name", "middle_name_or_initial", "location", "age_or_birth_year"],
+        "identity_rationale": "Name, middle initial, city, and birth year match the supplied details.",
+        "source_reliability": "high",
+        "reliability_rationale": "Official county superior court record.",
+        "record_stage": "conviction",
+        "offense_category": "domestic_violence",
+        "case_outcome": "Guilty; no appeal located",
+        "outcome_checked": true,
+        "supporting_evidence": [{"url": "https://courts.wa.example/case/22-1-00451", "source_type": "official_court_record", "excerpt": "Judgment: guilty of assault in the second degree (domestic violence)."}],
+        "contradictory_evidence": [],
+        "missing_information": [],
+        "rationale": "Official judgment confirms the conviction; identifiers match; no appeal or reversal found."
+      },
+      "https://courts.or.example/case/1998-3321": {
+        "source_accessible": true,
+        "evidence_status": "verified",
+        "identity_match": "mismatch",
+        "identity_basis": ["full_name"],
+        "identity_rationale": "Record subject was 47 in 1998; queried person is 28-32 today.",
+        "source_reliability": "high",
+        "record_stage": "conviction",
+        "offense_category": "other_serious_violent",
+        "case_outcome": "Convicted",
+        "outcome_checked": true,
+        "supporting_evidence": [{"url": "https://courts.or.example/case/1998-3321", "source_type": "official_court_record"}],
+        "contradictory_evidence": [],
+        "missing_information": [],
+        "rationale": "Genuine record about a different, older individual."
+      },
+      "https://forum.example/thread/4411": {
+        "source_accessible": true,
+        "evidence_status": "unverified",
+        "identity_match": "weak_match",
+        "identity_basis": ["full_name"],
+        "source_reliability": "low",
+        "record_stage": "allegation",
+        "offense_category": "other_serious_violent",
+        "case_outcome": null,
+        "outcome_checked": true,
+        "supporting_evidence": [],
+        "contradictory_evidence": [],
+        "missing_information": ["No police report, charge, or court record located."],
+        "rationale": "Anonymous allegation; no corroborating record found."
+      }
+    }
+  },
+  "synthesizer": {
+    "summaries_by_source_url": {
+      "https://courts.wa.example/case/22-1-00451": "An official King County court record shows a 2022 conviction for second-degree assault (domestic violence). Identifiers strongly match and no appeal was found.",
+      "https://forum.example/thread/4411": "An anonymous forum post makes an unverified allegation. No official record was found and the post may concern a different person with the same name."
+    }
+  },
+  "pages": {
+    "https://courts.wa.example/case/22-1-00451": {"status": 200, "text": "Case 22-1-00451. Jane Q. Example, DOB 1995, Seattle. Judgment: guilty of assault in the second degree (domestic violence)."},
+    "https://courts.or.example/case/1998-3321": {"status": 200, "text": "Jane Example, age 47, Portland, OR. Convicted: assault IV."},
+    "https://forum.example/thread/4411": {"status": 200, "text": "Someone named Jane Example threatened [victim] at a bar, be careful."}
+  },
+  "expected": {
+    "record_tier": "verified_record_requires_attention",
+    "overall_status": "records_require_attention",
+    "verified_record_flag": true,
+    "verified_records": 1, "unresolved_findings": 1, "contradicted_findings": 1
+  }
+}

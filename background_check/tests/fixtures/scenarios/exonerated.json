@@ -1,0 +1,63 @@
+{
+  "description": "SYNTHETIC. An old conviction later vacated after exoneration; record is in another state than the supplied location. The mock model labels it 'conviction' — the guard must convert it to 'vacated' and nothing may flag.",
+  "query": {
+    "full_name": "Robin Exonerée Example",
+    "location": "Portland, Oregon",
+    "age_min": 54,
+    "age_max": 56
+  },
+  "investigator": {
+    "search_queries_run": ["\"Robin Exonerée Example\" exonerated OR \"wrongful conviction\" OR \"innocence project\""],
+    "sources_checked": [
+      {"url": "https://innocence.example/stories/robin-example", "title": "Robin Example exonerated", "source_type": "secondary_source", "accessible": true}
+    ],
+    "findings": [
+      {
+        "source_url": "https://innocence.example/stories/robin-example",
+        "source_type": "secondary_source",
+        "excerpt": "In 1992, 21-year-old Robin Example was wrongly convicted in New York. In 2018 the conviction was vacated after DNA testing; Robin now lives in Portland, Oregon.",
+        "claim": "Innocence organization states Robin Example was wrongly convicted in New York in 1992 and exonerated in 2018.",
+        "record_stage": "conviction",
+        "offense_category": "sexual_offense",
+        "event_date": "1992",
+        "jurisdiction": "New York County, NY",
+        "identity_evidence": ["full name", "age 21 in 1992", "now lives in Portland, Oregon"],
+        "relevance": "high",
+        "source_quality": "medium"
+      }
+    ],
+    "access_failures": []
+  },
+  "verifier": {
+    "by_source_url": {
+      "https://innocence.example/stories/robin-example": {
+        "source_accessible": true,
+        "evidence_status": "verified",
+        "identity_match": "strong_match",
+        "identity_basis": ["full_name", "location", "age_or_birth_year"],
+        "source_reliability": "high",
+        "record_stage": "conviction",
+        "offense_category": "sexual_offense",
+        "case_outcome": "Wrongfully convicted 1992; exonerated and conviction vacated in 2018",
+        "outcome_checked": true,
+        "supporting_evidence": [{"url": "https://innocence.example/stories/robin-example", "source_type": "secondary_source"}],
+        "contradictory_evidence": [],
+        "missing_information": [],
+        "rationale": "The source documents the conviction and its later vacatur after exoneration."
+      }
+    }
+  },
+  "synthesizer": {
+    "tldr_headline": "Records show Robin Example was convicted in New York in 1992, but was exonerated in 2018 and the conviction was vacated; no standing conviction was found."
+  },
+  "pages": {
+    "https://innocence.example/stories/robin-example": {"status": 200, "text": "In 1992, 21-year-old Robin Example was wrongly convicted in New York. In 2018 the conviction was vacated after DNA testing; Robin now lives in Portland, Oregon."}
+  },
+  "expected": {
+    "record_tier": "cleared_outcomes_only",
+    "overall_status": "findings_require_review",
+    "verified_record_flag": false,
+    "verified_records": 1, "unresolved_findings": 0, "contradicted_findings": 0,
+    "finding_stage": "vacated", "case_outcomes": 1
+  }
+}

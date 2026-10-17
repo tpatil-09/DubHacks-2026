@@ -1,0 +1,14 @@
+{
+  "description": "SYNTHETIC. The Investigator session fails on every attempt (e.g. CLI auth error). The report must be partial with an explicit failure.",
+  "query": {
+    "full_name": "Pat Failure Example"
+  },
+  "investigator": {"__error__": "investigator session error: simulated failure"},
+  "verifier": {"by_source_url": {}},
+  "expected": {
+    "record_tier": "insufficient_information",
+    "overall_status": "partial",
+    "verified_record_flag": false,
+    "verified_records": 0, "unresolved_findings": 0, "contradicted_findings": 0
+  }
+}

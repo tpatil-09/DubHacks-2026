@@ -1,0 +1,879 @@
+{
+  "$defs": {
+    "CaseOutcome": {
+      "additionalProperties": false,
+      "properties": {
+        "finding_id": {
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "record_stage": {
+          "$ref": "#/$defs/RecordStage"
+        },
+        "disposition": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Disposition"
+        },
+        "case_identifier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Case Identifier"
+        },
+        "jurisdiction": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Jurisdiction"
+        },
+        "outcome_source_type": {
+          "$ref": "#/$defs/SourceType"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        }
+      },
+      "required": [
+        "finding_id",
+        "source_url",
+        "record_stage",
+        "outcome_source_type",
+        "evidence_status"
+      ],
+      "title": "CaseOutcome",
+      "type": "object"
+    },
+    "ErrorKind": {
+      "enum": [
+        "search_failed",
+        "access_denied",
+        "fetch_failed",
+        "agent_failed",
+        "blocked_by_policy",
+        "record_requires_formal_request"
+      ],
+      "title": "ErrorKind",
+      "type": "string"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "source_type": {
+          "$ref": "#/$defs/SourceType",
+          "default": "unknown"
+        },
+        "excerpt": {
+          "anyOf": [
+            {
+              "maxLength": 800,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Excerpt"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 400,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "EvidenceStatus": {
+      "enum": [
+        "verified",
+        "unverified",
+        "contradicted",
+        "inconclusive"
+      ],
+      "title": "EvidenceStatus",
+      "type": "string"
+    },
+    "IdentityAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "overall_identity_match": {
+          "$ref": "#/$defs/IdentityMatch"
+        },
+        "distinct_individuals_suspected": {
+          "title": "Distinct Individuals Suspected",
+          "type": "boolean"
+        },
+        "findings_by_identity_match": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Findings By Identity Match",
+          "type": "object"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "overall_identity_match",
+        "distinct_individuals_suspected",
+        "findings_by_identity_match"
+      ],
+      "title": "IdentityAssessment",
+      "type": "object"
+    },
+    "IdentityMatch": {
+      "enum": [
+        "strong_match",
+        "possible_match",
+        "weak_match",
+        "mismatch",
+        "inconclusive"
+      ],
+      "title": "IdentityMatch",
+      "type": "string"
+    },
+    "OffenseCategory": {
+      "enum": [
+        "sexual_offense",
+        "domestic_violence",
+        "other_serious_violent",
+        "other",
+        "unknown"
+      ],
+      "title": "OffenseCategory",
+      "type": "string"
+    },
+    "OverallStatus": {
+      "enum": [
+        "records_require_attention",
+        "findings_require_review",
+        "no_relevant_records_found_in_scope",
+        "partial",
+        "inconclusive"
+      ],
+      "title": "OverallStatus",
+      "type": "string"
+    },
+    "PipelineMode": {
+      "enum": [
+        "live",
+        "mock"
+      ],
+      "title": "PipelineMode",
+      "type": "string"
+    },
+    "RecordStage": {
+      "enum": [
+        "allegation",
+        "arrest",
+        "charge",
+        "conviction",
+        "registry_entry",
+        "dismissed",
+        "acquitted",
+        "vacated",
+        "unknown"
+      ],
+      "title": "RecordStage",
+      "type": "string"
+    },
+    "RecordTier": {
+      "description": "How serious the records LINKED to the person are, from most to least serious.\n\nComputed deterministically from verified findings (never by the model). It\ndescribes the evidence found, not the person; there is still no risk score.",
+      "enum": [
+        "verified_record_requires_attention",
+        "reported_conviction_unconfirmed",
+        "unresolved_allegations_or_charges",
+        "cleared_outcomes_only",
+        "no_linked_records",
+        "insufficient_information"
+      ],
+      "title": "RecordTier",
+      "type": "string"
+    },
+    "Reliability": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ],
+      "title": "Reliability",
+      "type": "string"
+    },
+    "ReportFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "finding_id": {
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "source_type": {
+          "$ref": "#/$defs/SourceType"
+        },
+        "claim": {
+          "title": "Claim",
+          "type": "string"
+        },
+        "why_unresolved": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Unverified/inconclusive findings only: why, in plain language. Also the first sentence of summary.",
+          "title": "Why Unresolved"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "identity_match": {
+          "$ref": "#/$defs/IdentityMatch"
+        },
+        "record_stage": {
+          "$ref": "#/$defs/RecordStage"
+        },
+        "offense_category": {
+          "$ref": "#/$defs/OffenseCategory"
+        },
+        "source_reliability": {
+          "$ref": "#/$defs/Reliability"
+        },
+        "historical_report_only": {
+          "title": "Historical Report Only",
+          "type": "boolean"
+        },
+        "publication_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publication Date"
+        },
+        "event_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Date"
+        },
+        "jurisdiction": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Jurisdiction"
+        },
+        "case_identifier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Case Identifier"
+        },
+        "disposition": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Disposition"
+        },
+        "supporting_urls": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Supporting Urls",
+          "type": "array"
+        },
+        "contradictory_evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Contradictory Evidence",
+          "type": "array"
+        },
+        "missing_information": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Information",
+          "type": "array"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "finding_id",
+        "source_url",
+        "source_type",
+        "claim",
+        "summary",
+        "evidence_status",
+        "identity_match",
+        "record_stage",
+        "offense_category",
+        "source_reliability",
+        "historical_report_only",
+        "rationale"
+      ],
+      "title": "ReportFinding",
+      "type": "object"
+    },
+    "ReportMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "report_id": {
+          "title": "Report Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "generated_at": {
+          "title": "Generated At",
+          "type": "string"
+        },
+        "subject": {
+          "$ref": "#/$defs/SubjectSummary"
+        },
+        "pipeline_mode": {
+          "$ref": "#/$defs/PipelineMode"
+        },
+        "model_provider": {
+          "title": "Model Provider",
+          "type": "string"
+        },
+        "search_provider": {
+          "title": "Search Provider",
+          "type": "string"
+        },
+        "is_test_fixture": {
+          "title": "Is Test Fixture",
+          "type": "boolean"
+        },
+        "disclaimer": {
+          "title": "Disclaimer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "report_id",
+        "generated_at",
+        "subject",
+        "pipeline_mode",
+        "model_provider",
+        "search_provider",
+        "is_test_fixture",
+        "disclaimer"
+      ],
+      "title": "ReportMetadata",
+      "type": "object"
+    },
+    "ReportTLDR": {
+      "additionalProperties": false,
+      "description": "Top-of-report summary: a deterministic tier plus a checked plain-language headline.",
+      "properties": {
+        "record_tier": {
+          "$ref": "#/$defs/RecordTier"
+        },
+        "tier_label": {
+          "title": "Tier Label",
+          "type": "string"
+        },
+        "headline": {
+          "title": "Headline",
+          "type": "string"
+        },
+        "key_points": {
+          "items": {
+            "$ref": "#/$defs/TLDRPoint"
+          },
+          "title": "Key Points",
+          "type": "array"
+        },
+        "caveats": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Caveats",
+          "type": "array"
+        },
+        "written_by": {
+          "description": "'model' if the headline was model-written and passed checks, else 'template'",
+          "title": "Written By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_tier",
+        "tier_label",
+        "headline",
+        "written_by"
+      ],
+      "title": "ReportTLDR",
+      "type": "object"
+    },
+    "RetrievalError": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/ErrorKind"
+        },
+        "target": {
+          "description": "URL or search query that failed",
+          "title": "Target",
+          "type": "string"
+        },
+        "detail": {
+          "maxLength": 500,
+          "title": "Detail",
+          "type": "string"
+        },
+        "stage": {
+          "description": "investigator | verifier | synthesizer",
+          "title": "Stage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "target",
+        "detail",
+        "stage"
+      ],
+      "title": "RetrievalError",
+      "type": "object"
+    },
+    "SafetyIndicator": {
+      "additionalProperties": false,
+      "properties": {
+        "finding_id": {
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "label": {
+          "default": "Verified record requiring attention",
+          "title": "Label",
+          "type": "string"
+        },
+        "rule_id": {
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "basis": {
+          "title": "Basis",
+          "type": "string"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "record_stage": {
+          "$ref": "#/$defs/RecordStage"
+        },
+        "offense_category": {
+          "$ref": "#/$defs/OffenseCategory"
+        }
+      },
+      "required": [
+        "finding_id",
+        "rule_id",
+        "basis",
+        "source_url",
+        "record_stage",
+        "offense_category"
+      ],
+      "title": "SafetyIndicator",
+      "type": "object"
+    },
+    "SafetyIndicators": {
+      "additionalProperties": false,
+      "properties": {
+        "verified_record_flag": {
+          "title": "Verified Record Flag",
+          "type": "boolean"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "indicators": {
+          "items": {
+            "$ref": "#/$defs/SafetyIndicator"
+          },
+          "title": "Indicators",
+          "type": "array"
+        },
+        "rules_version": {
+          "title": "Rules Version",
+          "type": "string"
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "verified_record_flag",
+        "rules_version",
+        "note"
+      ],
+      "title": "SafetyIndicators",
+      "type": "object"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "source_type": {
+          "$ref": "#/$defs/SourceType"
+        },
+        "accessible": {
+          "title": "Accessible",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "url",
+        "source_type",
+        "accessible"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    },
+    "SourceSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "total_sources_checked": {
+          "title": "Total Sources Checked",
+          "type": "integer"
+        },
+        "accessible_sources": {
+          "title": "Accessible Sources",
+          "type": "integer"
+        },
+        "inaccessible_sources": {
+          "title": "Inaccessible Sources",
+          "type": "integer"
+        },
+        "sources_by_type": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Sources By Type",
+          "type": "object"
+        },
+        "search_queries_run": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Search Queries Run",
+          "type": "array"
+        },
+        "search_failures": {
+          "items": {
+            "$ref": "#/$defs/RetrievalError"
+          },
+          "title": "Search Failures",
+          "type": "array"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "total_sources_checked",
+        "accessible_sources",
+        "inaccessible_sources",
+        "sources_by_type",
+        "search_queries_run",
+        "search_failures",
+        "sources"
+      ],
+      "title": "SourceSummary",
+      "type": "object"
+    },
+    "SourceType": {
+      "enum": [
+        "official_court_record",
+        "official_registry",
+        "news_report",
+        "social_post",
+        "secondary_source",
+        "unknown"
+      ],
+      "title": "SourceType",
+      "type": "string"
+    },
+    "SubjectSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "full_name": {
+          "title": "Full Name",
+          "type": "string"
+        },
+        "middle_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Middle Name"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "age_min": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Age Min"
+        },
+        "age_max": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Age Max"
+        }
+      },
+      "required": [
+        "full_name"
+      ],
+      "title": "SubjectSummary",
+      "type": "object"
+    },
+    "TLDRPoint": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "finding_ids": {
+          "description": "Findings this point is based on",
+          "items": {
+            "type": "string"
+          },
+          "title": "Finding Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "finding_ids"
+      ],
+      "title": "TLDRPoint",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "tldr": {
+      "$ref": "#/$defs/ReportTLDR"
+    },
+    "report_metadata": {
+      "$ref": "#/$defs/ReportMetadata"
+    },
+    "identity_assessment": {
+      "$ref": "#/$defs/IdentityAssessment"
+    },
+    "verified_records": {
+      "items": {
+        "$ref": "#/$defs/ReportFinding"
+      },
+      "title": "Verified Records",
+      "type": "array"
+    },
+    "unresolved_findings": {
+      "items": {
+        "$ref": "#/$defs/ReportFinding"
+      },
+      "title": "Unresolved Findings",
+      "type": "array"
+    },
+    "contradicted_findings": {
+      "items": {
+        "$ref": "#/$defs/ReportFinding"
+      },
+      "title": "Contradicted Findings",
+      "type": "array"
+    },
+    "case_outcomes": {
+      "items": {
+        "$ref": "#/$defs/CaseOutcome"
+      },
+      "title": "Case Outcomes",
+      "type": "array"
+    },
+    "source_summary": {
+      "$ref": "#/$defs/SourceSummary"
+    },
+    "safety_indicators": {
+      "$ref": "#/$defs/SafetyIndicators"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "overall_status": {
+      "$ref": "#/$defs/OverallStatus"
+    }
+  },
+  "required": [
+    "tldr",
+    "report_metadata",
+    "identity_assessment",
+    "verified_records",
+    "unresolved_findings",
+    "contradicted_findings",
+    "case_outcomes",
+    "source_summary",
+    "safety_indicators",
+    "limitations",
+    "overall_status"
+  ],
+  "title": "SafeMatch Background Check Report",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safematch.local/schemas/report-1.0.json"
+}

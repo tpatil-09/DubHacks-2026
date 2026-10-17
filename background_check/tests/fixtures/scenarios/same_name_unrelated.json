@@ -1,0 +1,63 @@
+{
+  "description": "SYNTHETIC. A conviction record exists for a different person with the same name (different state, different age).",
+  "query": {
+    "full_name": "Jordan Sample",
+    "location": "Lakeside, Westexample",
+    "age_min": 25,
+    "age_max": 29
+  },
+  "investigator": {
+    "search_queries_run": ["\"Jordan Sample\" court case conviction"],
+    "sources_checked": [
+      {"url": "https://courts.eastexample.example/docket/2001-778", "title": "People v. Jordan Sample", "source_type": "official_court_record", "accessible": true}
+    ],
+    "findings": [
+      {
+        "source_url": "https://courts.eastexample.example/docket/2001-778",
+        "source_title": "People v. Jordan Sample",
+        "source_type": "official_court_record",
+        "excerpt": "Jordan Sample, age 52, of Harbor City, Eastexample, convicted of aggravated assault (domestic).",
+        "claim": "Court record states a Jordan Sample, age 52, of Harbor City was convicted of domestic aggravated assault in 2001.",
+        "record_stage": "conviction",
+        "offense_category": "domestic_violence",
+        "event_date": "2001-03-14",
+        "jurisdiction": "Eastexample County Court",
+        "case_identifier": "2001-778",
+        "identity_evidence": ["same first and last name", "age 52 in 2001", "Harbor City, Eastexample"],
+        "relevance": "medium",
+        "source_quality": "high"
+      }
+    ],
+    "access_failures": []
+  },
+  "verifier": {
+    "by_source_url": {
+      "https://courts.eastexample.example/docket/2001-778": {
+        "source_accessible": true,
+        "evidence_status": "verified",
+        "identity_match": "mismatch",
+        "identity_basis": ["full_name"],
+        "identity_rationale": "Record subject was 52 in 2001 and lived in another state; queried person is 25-29 in Westexample.",
+        "source_reliability": "high",
+        "reliability_rationale": "Official court docket.",
+        "record_stage": "conviction",
+        "offense_category": "domestic_violence",
+        "case_outcome": "Convicted",
+        "outcome_checked": true,
+        "supporting_evidence": [{"url": "https://courts.eastexample.example/docket/2001-778", "source_type": "official_court_record"}],
+        "contradictory_evidence": [],
+        "missing_information": [],
+        "rationale": "The record is genuine but its subject's age and state are incompatible with the queried person."
+      }
+    }
+  },
+  "pages": {
+    "https://courts.eastexample.example/docket/2001-778": {"status": 200, "text": "Jordan Sample, age 52, of Harbor City, Eastexample, convicted of aggravated assault (domestic)."}
+  },
+  "expected": {
+    "record_tier": "no_linked_records",
+    "overall_status": "no_relevant_records_found_in_scope",
+    "verified_record_flag": false,
+    "verified_records": 0, "unresolved_findings": 0, "contradicted_findings": 1
+  }
+}

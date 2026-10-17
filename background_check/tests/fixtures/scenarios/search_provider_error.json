@@ -1,0 +1,23 @@
+{
+  "description": "SYNTHETIC. The supplementary search provider fails and the agent reports a failed search. The report must be partial, not clear.",
+  "query": {
+    "full_name": "Drew Outage Example",
+    "location": "Stormtown, Exampleland"
+  },
+  "search": {"fail_with": "Tavily returned HTTP 503"},
+  "investigator": {
+    "search_queries_run": [],
+    "sources_checked": [],
+    "findings": [],
+    "access_failures": [
+      {"target": "\"Drew Outage Example\" court", "kind": "search_failed", "detail": "WebSearch unavailable"}
+    ]
+  },
+  "verifier": {"by_source_url": {}},
+  "expected": {
+    "record_tier": "insufficient_information",
+    "overall_status": "partial",
+    "verified_record_flag": false,
+    "verified_records": 0, "unresolved_findings": 0, "contradicted_findings": 0
+  }
+}

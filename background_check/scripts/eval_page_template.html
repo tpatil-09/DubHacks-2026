@@ -1,0 +1,269 @@
+<title>SafeMatch Pipeline Evaluation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: lab-report column — summary strip, case tabs, then the three pipeline stages in order as stacked panels */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --ink: #17202b; --muted: #5b6676; --line: #d8dce3;
+  --accent: #2f5d8a; --accent-soft: #e3ecf5;
+  --pass: #1d7a4a; --pass-soft: #e2f3ea; --fail: #b4322c; --fail-soft: #fbe6e4; --warn: #9a6a00; --warn-soft: #fbf1d9;
+  --planted: #7a3fa0; --planted-soft: #f1e8f7;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161c; --surface: #1a2029; --sunken: #222a35; --ink: #e4e8ee; --muted: #9aa5b4; --line: #313b48;
+  --accent: #8db6e0; --accent-soft: #1f3247;
+  --pass: #5cc98e; --pass-soft: #173327; --fail: #f08a82; --fail-soft: #3d1d1b; --warn: #e3b552; --warn-soft: #3a2e12;
+  --planted: #c9a0e6; --planted-soft: #2f2139; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161c; --surface: #1a2029; --sunken: #222a35; --ink: #e4e8ee; --muted: #9aa5b4; --line: #313b48;
+  --accent: #8db6e0; --accent-soft: #1f3247;
+  --pass: #5cc98e; --pass-soft: #173327; --fail: #f08a82; --fail-soft: #3d1d1b; --warn: #e3b552; --warn-soft: #3a2e12;
+  --planted: #c9a0e6; --planted-soft: #2f2139; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--f-body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 22px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; text-wrap: balance; margin: 0; letter-spacing: .005em; }
+h1 { font-size: 2rem; line-height: 1.15; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.05rem; }
+p { margin: 0; max-width: 72ch; }
+a { color: var(--accent); word-break: break-all; }
+code, .mono { font-family: var(--f-mono); font-size: .82rem; }
+.eyebrow { font: 500 .72rem/1 var(--f-mono); letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+
+header { display: flex; flex-direction: column; gap: 10px; }
+.note { background: var(--warn-soft); border-left: 3px solid var(--warn); padding: 10px 14px; border-radius: 4px; font-size: .9rem; max-width: none; }
+
+.scoreboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.score { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.score .big { font: 600 1.7rem/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
+.score .big.ok { color: var(--pass); } .score .big.bad { color: var(--fail); }
+.score .sub { font-size: .83rem; color: var(--muted); }
+
+nav.tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--line); }
+nav.tabs button { font: 500 .92rem var(--f-body); color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent;
+  padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.panel { display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.stage-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; }
+.stage-num { font: 600 .78rem var(--f-mono); color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 4px; }
+.cmd { background: var(--sunken); border-radius: 6px; padding: 8px 10px; overflow-x: auto; white-space: pre; }
+
+.pill { display: inline-flex; align-items: center; gap: 4px; font: 500 .72rem/1 var(--f-mono); padding: 4px 7px; border-radius: 999px;
+  background: var(--sunken); color: var(--muted); white-space: nowrap; }
+.pill.pass, .pill.verified, .pill.strong_match { background: var(--pass-soft); color: var(--pass); }
+.pill.fail, .pill.contradicted, .pill.mismatch { background: var(--fail-soft); color: var(--fail); }
+.pill.unverified, .pill.inconclusive, .pill.weak_match, .pill.possible_match, .pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.planted { background: var(--planted-soft); color: var(--planted); }
+.pill.flag { background: var(--fail); color: var(--surface); }
+
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: .88rem; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 .72rem var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--sunken); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; text-align: right; }
+.check-row.failed td { background: var(--fail-soft); }
+
+details.finding { border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+details.finding.is-planted { border-color: var(--planted); }
+details.finding > summary { list-style: none; cursor: pointer; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+details.finding > summary::-webkit-details-marker { display: none; }
+details.finding > summary::before { content: "▸"; color: var(--muted); font-size: .8rem; transition: transform .15s; }
+details.finding[open] > summary::before { transform: rotate(90deg); }
+details.finding .claim { flex-basis: 100%; font-size: .9rem; }
+details.finding .body { padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); }
+blockquote { margin: 0; padding: 8px 12px; border-left: 3px solid var(--line); background: var(--sunken); border-radius: 0 4px 4px 0; font-size: .87rem; }
+ul.tight { margin: 0; padding-left: 18px; font-size: .87rem; display: flex; flex-direction: column; gap: 3px; }
+.guard { font-family: var(--f-mono); font-size: .78rem; color: var(--warn); }
+.stack { display: flex; flex-direction: column; gap: 8px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.grid2 > * { min-width: 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">SafeMatch · background_check · evaluation</span>
+    <h1>SafeMatch Pipeline Evaluation</h1>
+    <p class="muted" id="generated"></p>
+    <p class="note">The live cases use real public news reporting about a person named in a 2019 ProPublica investigation, including allegations that did not end in convictions. Read every item in its status. This page is private evaluation output and should not be shared as a profile.</p>
+  </header>
+
+  <section class="scoreboard" id="scoreboard" aria-label="Summary"></section>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <main id="panels"></main>
+</div>
+
+<script id="eval-data" type="application/json">__EVAL_DATA__</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("eval-data").textContent);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const pill = (txt, cls) => `<span class="pill ${esc(cls || txt)}">${esc(String(txt).replace(/_/g, " "))}</span>`;
+  const link = (u) => u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>` : "—";
+  const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return u; } };
+  const kv = (rows) => `<dl class="kv">${rows.filter(r => r[1] !== undefined && r[1] !== null && r[1] !== "").map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join("")}</dl>`;
+
+  const fmt = (t) => t.replace("T", " ").replace("+00:00", " UTC");
+  document.getElementById("generated").textContent = D.live.original_run
+    ? `Full live run ${fmt(D.live.original_run)} (${Math.round(D.live.original_seconds / 60)} min). Synthesizer stage re-run alone on the saved Verifier output at ${fmt(D.live.generated_at)} after a summary-filter fix. Every stage ran separately through the CLI with real Claude Code sessions.`
+    : `Live run ${fmt(D.live.generated_at)} · ${Math.round(D.live.total_seconds / 60)} min wall clock · each stage run separately through the CLI with real Claude Code sessions.`;
+
+  // ---------- scoreboard
+  const liveFail = D.live.total - D.live.passed;
+  const mockFail = D.mocked.failed + D.mocked.errors;
+  document.getElementById("scoreboard").innerHTML = [
+    ["Live checks", `${D.live.passed}/${D.live.total}`, liveFail ? "bad" : "ok", `${D.live.cases.length} designed cases, real web searches`],
+    ["Mocked tests", `${D.mocked.passed}/${D.mocked.total}`, mockFail ? "bad" : "ok", `${D.mocked.skipped} live tests skipped in this suite`],
+    ["Planted false claims", `${D.planted.caught}/${D.planted.total} caught`, D.planted.caught === D.planted.total ? "ok" : "bad", "Injected between Investigator and Verifier"],
+    ["Flags raised (live)", String(D.live.flags), D.live.flags ? "bad" : "ok", "No official record was publicly reachable"],
+  ].map(([l, v, c, s]) => `<div class="score"><span class="eyebrow">${esc(l)}</span><span class="big ${c}">${esc(v)}</span><span class="sub">${esc(s)}</span></div>`).join("");
+
+  // ---------- tabs
+  const tabs = D.live.cases.map(c => ({ id: c.name, label: c.title, fails: c.checks.filter(x => !x.passed).length }))
+    .concat([{ id: "mocked", label: "Mocked suite", fails: mockFail }]);
+  const tabsEl = document.getElementById("tabs"), panelsEl = document.getElementById("panels");
+  tabsEl.innerHTML = tabs.map((t, i) =>
+    `<button role="tab" id="tab-${t.id}" aria-controls="panel-${t.id}" aria-selected="${i === 0}">${esc(t.label)} ${t.fails ? pill(t.fails + " fail", "fail") : pill("pass", "pass")}</button>`).join("");
+  panelsEl.innerHTML = D.live.cases.map(renderCase).join("") + renderMocked();
+  function select(id) {
+    tabs.forEach(t => {
+      document.getElementById("tab-" + t.id).setAttribute("aria-selected", String(t.id === id));
+      document.getElementById("panel-" + t.id).hidden = t.id !== id;
+    });
+    try { localStorage.setItem("safematch-eval-tab", id); } catch (e) {}
+  }
+  tabsEl.addEventListener("click", (e) => { const b = e.target.closest("button[role=tab]"); if (b) select(b.id.slice(4)); });
+  let start = tabs[0].id;
+  try { const s = localStorage.getItem("safematch-eval-tab"); if (s && tabs.some(t => t.id === s)) start = s; } catch (e) {}
+  if (location.hash && tabs.some(t => t.id === location.hash.slice(1))) start = location.hash.slice(1);
+  select(start);
+
+  // ---------- renderers
+  function checksTable(checks) {
+    return `<div class="tablewrap"><table><thead><tr><th>Stage</th><th>ID</th><th>Check</th><th>Result</th><th>Detail</th></tr></thead><tbody>${
+      checks.map(c => `<tr class="check-row ${c.passed ? "" : "failed"}"><td>${esc(c.stage)}</td><td class="mono">${esc(c.id)}</td><td>${esc(c.description)}</td><td>${pill(c.passed ? "pass" : "fail")}</td><td class="muted">${esc(c.detail)}</td></tr>`).join("")
+    }</tbody></table></div>`;
+  }
+
+  function stageHead(n, name, st) {
+    return `<div class="stage-head"><span class="stage-num">Stage ${n}</span><h2>${esc(name)}</h2>${st ? `<span class="muted mono">${st.seconds}s · exit ${st.returncode}</span>` : ""}</div>${
+      st ? `<div class="cmd mono">$ ${esc(st.cmd)}</div>` : ""}${
+      st && st.stderr_tail && st.stderr_tail.length ? `<div class="stack"><span class="eyebrow">Warnings logged</span><ul class="tight">${st.stderr_tail.map(l => `<li class="mono">${esc(l.replace(/^\d\d:\d\d:\d\d /, ""))}</li>`).join("")}</ul></div>` : ""}`;
+  }
+
+  function renderCase(c) {
+    const inv = c.investigator, ver = c.verifier, rep = c.report;
+    const planted = new Set(Object.values(c.planted_ids || {}));
+    const ground = {}; ((c.stages.investigator || {}).excerpt_grounding || []).forEach(g => ground[g.finding_id] = g.confirmed);
+    const q = c.query;
+
+    let html = `<section class="panel" role="tabpanel" id="panel-${esc(c.name)}" aria-labelledby="tab-${esc(c.name)}">
+      <div class="card"><h2>${esc(c.title)}</h2><p>${esc(c.purpose)}</p>
+        ${kv([["Query name", esc(q.full_name)], ["Location", esc(q.location)], ["Age range", q.age_min ? `${q.age_min}–${q.age_max}` : "not supplied"],
+              ["Search budget", `${q.scope.max_searches} searches · ${q.scope.max_findings} findings`]])}</div>
+      <div class="card"><h3>Checks</h3>${checksTable(c.checks)}</div>`;
+
+    // Stage 1
+    html += `<div class="card">${stageHead(1, "Investigator", c.stages.investigator)}`;
+    if (inv) {
+      html += `<p class="muted">Claude Code session with WebSearch + WebFetch only. Finds sources and extracts candidate claims; does not judge guilt or identity.</p>
+        <div class="grid2">
+          <div class="stack"><span class="eyebrow">Searches run (${inv.search_queries_run.length})</span><ul class="tight">${inv.search_queries_run.map(s => `<li class="mono">${esc(s)}</li>`).join("") || "<li>none</li>"}</ul></div>
+          <div class="stack"><span class="eyebrow">Sources checked (${inv.sources_checked.length})</span><ul class="tight">${inv.sources_checked.map(s =>
+            `<li>${pill(s.source_type)} ${s.accessible ? "" : pill("not accessible", "fail")} <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title || host(s.url))}</a></li>`).join("") || "<li>none</li>"}</ul></div>
+        </div>`;
+      if (inv.retrieval_errors.length) html += `<div class="stack"><span class="eyebrow">Recorded access/search failures</span><ul class="tight">${inv.retrieval_errors.map(e => `<li>${pill(e.kind, "warn")} ${esc(e.target)} — <span class="muted">${esc(e.detail)}</span></li>`).join("")}</ul></div>`;
+      html += `<div class="stack"><span class="eyebrow">Candidate findings (${inv.candidate_findings.length})</span>${
+        inv.candidate_findings.map(f => `<details class="finding"><summary>${pill(f.record_stage, "")}${pill(f.source_type, "")}${
+          ground[f.finding_id] === true ? pill("excerpt on page", "pass") : ground[f.finding_id] === false ? pill("excerpt NOT on page", "fail") : pill("page not fetchable", "warn")}
+          <span class="mono muted">${esc(f.finding_id)}</span><span class="claim">${esc(f.claim)}</span></summary>
+          <div class="body"><blockquote>${esc(f.excerpt)}</blockquote>${kv([["Source", link(f.source_url)], ["Offense", esc(f.offense_category)], ["Event date", esc(f.event_date)], ["Jurisdiction", esc(f.jurisdiction)],
+            ["Case ID", esc(f.case_identifier)], ["Identity details in source", esc((f.identity_evidence || []).join("; "))],
+            ["Provisional labels", `relevance ${esc(f.provisional_relevance)} · quality ${esc(f.provisional_source_quality)} (hidden from Verifier)`]])}</div></details>`).join("") || `<p class="muted">No candidate findings.</p>`}</div>`;
+      html += `<div class="stack"><span class="eyebrow">Limitations recorded</span><ul class="tight">${inv.limitations.map(l => `<li>${esc(l)}</li>`).join("")}</ul></div>`;
+    }
+    html += `</div>`;
+
+    // Planting
+    if (planted.size) {
+      html += `<div class="card"><div class="stage-head"><span class="stage-num" style="color:var(--planted);background:var(--planted-soft)">Between stages</span><h2>Planted false claims</h2></div>
+        <p>Two fabricated findings were added to <code>investigator_with_planted.json</code> before the Verifier ran. They cite the real ProPublica URL, so a lazy verifier that trusts the URL would accept them.</p>
+        <ul class="tight">${D.planted.items.filter(p => planted.has(p.finding_id)).map(p => `<li>${pill("planted", "planted")} <strong>${esc(p.label)}</strong>: “${esc(p.claim)}”</li>`).join("")}</ul></div>`;
+    }
+
+    // Stage 2
+    html += `<div class="card">${stageHead(2, "Verifier", c.stages.verifier)}`;
+    if (ver) {
+      const counts = {}; ver.findings.forEach(f => { const s = f.verification.evidence_status; counts[s] = (counts[s] || 0) + 1; });
+      html += `<p class="muted">Separate Claude Code session. Gets only claims, excerpts and URLs (not the Investigator's labels), re-opens sources and searches for outcomes. Python guards then downgrade where rules require, and a Python fetch checks each excerpt is really on the page.</p>
+        <div>${Object.entries(counts).map(([k, v]) => pill(`${v} ${k}`, k)).join(" ")}</div>
+        <div class="stack">${ver.findings.map(f => {
+          const v = f.verification, isP = planted.has(f.candidate.finding_id);
+          return `<details class="finding ${isP ? "is-planted" : ""}"><summary>${isP ? pill("planted", "planted") : ""}${pill(v.evidence_status)}${pill(v.identity_match)}${pill(v.record_stage, "")}${pill("reliability " + v.source_reliability, "")}
+            ${v.excerpt_confirmed === false ? pill("excerpt not on page", "fail") : ""}${v.guard_adjustments.length ? pill(v.guard_adjustments.length + " guard override", "warn") : ""}${v.flag_eligible ? pill("flag eligible", "flag") : ""}
+            <span class="claim">${esc(f.candidate.claim)}</span></summary>
+            <div class="body">
+              ${kv([["Rationale", esc(v.rationale)], ["Identity basis", esc((v.identity_basis || []).join(", ") || "none")], ["Identity reasoning", esc(v.identity_rationale)],
+                    ["Reliability reasoning", esc(v.reliability_rationale)], ["Case outcome", esc(v.case_outcome || "unknown")], ["Outcome checked", v.outcome_checked ? "yes" : "no"],
+                    ["Source opened", v.source_accessible ? "yes" : "no"], ["Excerpt on page (Python)", v.excerpt_confirmed === null ? "could not check" : v.excerpt_confirmed ? "yes" : "no"],
+                    ["Registry current as of", esc(v.registry_current_as_of)]])}
+              ${v.guard_adjustments.length ? `<div class="stack"><span class="eyebrow">Deterministic guard overrides</span>${v.guard_adjustments.map(g => `<div class="guard">${esc(g)}</div>`).join("")}</div>` : ""}
+              ${v.supporting_evidence.length ? `<div class="stack"><span class="eyebrow">Supporting evidence</span><ul class="tight">${v.supporting_evidence.map(e => `<li>${pill(e.source_type, "")} ${link(e.url)}${e.excerpt ? `<br><span class="muted">“${esc(e.excerpt)}”</span>` : ""}</li>`).join("")}</ul></div>` : ""}
+              ${v.contradictory_evidence.length ? `<div class="stack"><span class="eyebrow">Contradictory evidence</span><ul class="tight">${v.contradictory_evidence.map(e => `<li>${pill(e.source_type, "")} ${link(e.url)}${e.excerpt ? `<br><span class="muted">“${esc(e.excerpt)}”</span>` : ""}${e.note ? `<br><span class="muted">${esc(e.note)}</span>` : ""}</li>`).join("")}</ul></div>` : ""}
+              ${v.missing_information.length ? `<div class="stack"><span class="eyebrow">Missing information</span><ul class="tight">${v.missing_information.map(m => `<li>${esc(m)}</li>`).join("")}</ul></div>` : ""}
+              <div class="stack"><span class="eyebrow">Why no flag</span><ul class="tight">${(v.flag_rule_failures || []).map(r => `<li class="mono">${esc(r)}</li>`).join("") || "<li>All flag rules passed</li>"}</ul></div>
+            </div></details>`; }).join("") || `<p class="muted">Nothing to verify.</p>`}</div>`;
+    }
+    html += `</div>`;
+
+    // Stage 3
+    html += `<div class="card">${stageHead(3, "Synthesizer → report.json", c.stages.synthesizer)}`;
+    if (rep) {
+      const fs = [["Verified records", rep.verified_records], ["Unresolved findings", rep.unresolved_findings], ["Contradicted findings", rep.contradicted_findings]];
+      html += `<p class="muted">Structure, buckets, flags and status are computed in Python. The model only writes the one-line summaries, which are rejected if they overstate anything. ${c.stages.synthesizer && c.stages.synthesizer.llm_summaries !== undefined ? `${c.stages.synthesizer.llm_summaries} of ${fs.reduce((a, b) => a + b[1].length, 0)} summaries were model-written; the rest used safe templates.` : ""}</p>
+        ${kv([["overall_status", pill(rep.overall_status, rep.overall_status === "records_require_attention" ? "fail" : rep.overall_status === "partial" ? "warn" : "")],
+              ["verified_record_flag", rep.safety_indicators.verified_record_flag ? pill("true", "flag") : pill("false", "pass")],
+              ["Identity assessment", `${pill(rep.identity_assessment.overall_identity_match)} ${esc(rep.identity_assessment.notes.join(" "))}`],
+              ["Sources", `${rep.source_summary.total_sources_checked} checked · ${rep.source_summary.inaccessible_sources} inaccessible · ${rep.source_summary.search_queries_run.length} queries`],
+              ["Case outcomes", String(rep.case_outcomes.length)]])}`;
+      fs.forEach(([label, list]) => {
+        html += `<div class="stack"><span class="eyebrow">${label} (${list.length})</span>${list.length ? `<div class="tablewrap"><table><thead><tr><th>Summary shown to frontend</th><th>Status</th><th>Stage</th><th>Source</th></tr></thead><tbody>${
+          list.map(f => `<tr><td>${planted.has(f.finding_id) ? pill("planted", "planted") + " " : ""}${esc(f.summary)}</td><td>${pill(f.evidence_status)}<br>${pill(f.identity_match)}</td><td>${pill(f.record_stage, "")}${f.historical_report_only ? "<br>" + pill("historical report", "warn") : ""}</td><td><a href="${esc(f.source_url)}" target="_blank" rel="noopener">${esc(host(f.source_url))}</a></td></tr>`).join("")
+        }</tbody></table></div>` : `<p class="muted">None.</p>`}</div>`;
+      });
+      html += `<div class="stack"><span class="eyebrow">Limitations in report</span><ul class="tight">${rep.limitations.map(l => `<li>${esc(l)}</li>`).join("")}</ul></div>`;
+    }
+    html += `</div></section>`;
+    return html;
+  }
+
+  function renderMocked() {
+    const groups = {};
+    D.mocked.tests.forEach(t => { (groups[t.file] = groups[t.file] || []).push(t); });
+    return `<section class="panel" role="tabpanel" id="panel-mocked" aria-labelledby="tab-mocked" hidden>
+      <div class="card"><h2>Mocked suite</h2><p>These run without network or model access. The “AI outputs” are synthetic fixtures I wrote, so they test the Python logic (guards, flag rules, schema, CLI, SSRF protection, secret scrubbing), not how the real agents behave. Several fixtures make the fake model over-claim on purpose to prove the guards hold.</p>
+      ${kv([["Command", "<code>pytest</code>"], ["Result", `${D.mocked.passed} passed · ${D.mocked.failed} failed · ${D.mocked.skipped} skipped (live) · ${D.mocked.time}s`]])}</div>
+      ${Object.entries(groups).map(([file, ts]) => `<div class="card"><div class="stage-head"><h3 class="mono">${esc(file)}</h3><span class="muted">${ts.filter(t => t.outcome === "passed").length}/${ts.length} passed</span></div>
+        <div class="tablewrap"><table><thead><tr><th>Test</th><th>Result</th><th class="num">ms</th></tr></thead><tbody>${
+          ts.map(t => `<tr><td class="mono">${esc(t.name)}</td><td>${pill(t.outcome === "passed" ? "pass" : t.outcome, t.outcome === "passed" ? "pass" : t.outcome === "skipped" ? "" : "fail")}</td><td class="num">${(t.time * 1000).toFixed(0)}</td></tr>`).join("")
+        }</tbody></table></div></div>`).join("")}
+    </section>`;
+  }
+})();
+</script>
