@@ -54,9 +54,9 @@ export function BasicsFields({ draft, onChange }: FieldsProps) {
         <input id="displayName" className="input-arcade" maxLength={LIMITS.name} value={draft.displayName} onChange={(event) => onChange({ displayName: event.target.value })} />
       </div>
       <div>
-        <label htmlFor="birthdate" className="label-arcade">Birthdate</label>
-        <input id="birthdate" type="date" className="input-arcade" value={draft.birthdate} onChange={(event) => onChange({ birthdate: event.target.value })} />
-        <p className="mt-1 text-xs text-ink-soft">Only your age is shown on your profile. You must be 18+.</p>
+        <label htmlFor="age" className="label-arcade">Age</label>
+        <input id="age" type="number" inputMode="numeric" min={18} max={120} step={1} required className="input-arcade" value={draft.age || ''} onChange={(event) => onChange({ age: Number(event.target.value) || 0 })} />
+        <p className="mt-1 text-xs text-ink-soft">Your age appears on your profile. Vetted is for adults 18 and older.</p>
       </div>
       <fieldset>
         <legend className="label-arcade">I am a…</legend>
@@ -79,8 +79,9 @@ export function BasicsFields({ draft, onChange }: FieldsProps) {
         </div>
       </fieldset>
       <div>
-        <label htmlFor="city" className="label-arcade">City <span className="font-normal text-ink-soft">(optional)</span></label>
-        <input id="city" className="input-arcade" maxLength={LIMITS.city} placeholder="Seattle, WA" value={draft.city} onChange={(event) => onChange({ city: event.target.value })} />
+        <label htmlFor="city" className="label-arcade">Location <span className="font-normal text-ink-soft">(city or region)</span></label>
+        <input id="city" className="input-arcade" autoComplete="address-level2" maxLength={LIMITS.city} placeholder="Seattle, WA" required value={draft.city} onChange={(event) => onChange({ city: event.target.value })} />
+        <p className="mt-1 text-xs text-ink-soft">Enter a city or region only, not a street address or precise location.</p>
       </div>
     </div>
   )

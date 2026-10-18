@@ -21,6 +21,8 @@ To reset demo data, sign out and clear the site's localStorage.
 3. In Firebase Authentication, enable the Google and Email/Password providers, and add your Hosting domain to Authorized domains.
 4. Create a Firestore database and a Storage bucket, then deploy the rules (see below).
 
+During onboarding, users enter a self-reported age (18+) and a city or region. The profile stores the age only; it does not collect a birthdate or precise location. Firestore lets signed-in users discover profiles, while only each profile owner can change their profile.
+
 | Variable | Purpose |
 | --- | --- |
 | `VITE_FIREBASE_*` | Public Firebase web config |
@@ -50,6 +52,14 @@ firebase emulators:start --only auth,firestore,storage
 ```
 
 In a second terminal, run the Vite app from `web/` with `npm run dev`. The web SDK will connect to local emulators only in development mode when the opt-in variable is set. Keep that variable off for a live Firebase project.
+
+To seed 36 synthetic Firestore profiles in the local emulator, run this from the repository root while the Firestore emulator is running:
+
+```sh
+node scripts/seed-demo-users.mjs
+```
+
+The script only connects to `127.0.0.1:8080` and refuses Firebase project IDs that do not begin with `demo-`. These are demo profile documents, not authentication accounts, and are never added to production.
 
 ## Deploy
 

@@ -8,7 +8,6 @@ import { ProfilePhoto } from '../components/ui/ProfilePhoto'
 import { PersonaBadge } from '../components/ui/Badges'
 import { InterestStickers } from '../components/ui/Sticker'
 import { draftFromProfile, validateAbout, validateBasics, validatePhotos, type ProfileDraft } from '../lib/profileValidation'
-import { ageFrom } from '../lib/age'
 import { arcadeVars } from '../lib/colors'
 import { useSession } from '../store/session'
 import { toast } from '../store/toast'
@@ -54,7 +53,7 @@ export default function MyProfile() {
     }
   }
 
-  const age = profile ? ageFrom(profile.birthdate) : null
+  const age = profile?.age ?? null
 
   return (
     <div className="mx-auto max-w-2xl pb-10">

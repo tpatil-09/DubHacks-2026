@@ -1,0 +1,90 @@
+{
+  "description": "SYNTHETIC. A blog claims a conviction; the official docket shows an acquittal. The mock model still says 'verified' — guards must not let it through.",
+  "query": {
+    "full_name": "Riley Mockperson",
+    "location": "Bayport, Exampleland",
+    "age_min": 40,
+    "age_max": 45
+  },
+  "investigator": {
+    "search_queries_run": ["\"Riley Mockperson\" Bayport convicted"],
+    "sources_checked": [
+      {"url": "https://blog.example/riley-mockperson", "title": "Local blog", "source_type": "secondary_source", "accessible": true},
+      {"url": "https://courts.exampleland.example/cases/CR-2019-1200", "title": "Docket CR-2019-1200", "source_type": "official_court_record", "accessible": true}
+    ],
+    "findings": [
+      {
+        "source_url": "https://blog.example/riley-mockperson",
+        "source_type": "secondary_source",
+        "excerpt": "Riley Mockperson of Bayport was convicted of assault in 2019.",
+        "claim": "A blog states Riley Mockperson of Bayport was convicted of assault in 2019.",
+        "record_stage": "conviction",
+        "offense_category": "other_serious_violent",
+        "case_identifier": "CR-2019-1200",
+        "identity_evidence": ["name", "Bayport"],
+        "relevance": "high",
+        "source_quality": "low"
+      },
+      {
+        "source_url": "https://courts.exampleland.example/cases/CR-2019-1200",
+        "source_type": "official_court_record",
+        "excerpt": "CR-2019-1200 State v. Riley Mockperson. Verdict: Not guilty.",
+        "claim": "Official docket CR-2019-1200 records a not-guilty verdict for Riley Mockperson.",
+        "record_stage": "acquitted",
+        "offense_category": "other_serious_violent",
+        "case_identifier": "CR-2019-1200",
+        "jurisdiction": "Exampleland Superior Court",
+        "disposition": "Not guilty",
+        "identity_evidence": ["name", "case number"],
+        "relevance": "high",
+        "source_quality": "high"
+      }
+    ],
+    "access_failures": []
+  },
+  "verifier": {
+    "by_source_url": {
+      "https://blog.example/riley-mockperson": {
+        "source_accessible": true,
+        "evidence_status": "verified",
+        "identity_match": "possible_match",
+        "identity_basis": ["full_name", "location"],
+        "source_reliability": "medium",
+        "record_stage": "conviction",
+        "offense_category": "other_serious_violent",
+        "case_outcome": "Docket shows the defendant was acquitted (not guilty)",
+        "outcome_checked": true,
+        "supporting_evidence": [{"url": "https://blog.example/riley-mockperson", "source_type": "secondary_source"}],
+        "contradictory_evidence": [{"url": "https://courts.exampleland.example/cases/CR-2019-1200", "source_type": "official_court_record", "excerpt": "Verdict: Not guilty."}],
+        "missing_information": [],
+        "rationale": "Blog claim conflicts with the official docket."
+      },
+      "https://courts.exampleland.example/cases/CR-2019-1200": {
+        "source_accessible": true,
+        "evidence_status": "verified",
+        "identity_match": "possible_match",
+        "identity_basis": ["full_name", "case_identifier"],
+        "source_reliability": "high",
+        "record_stage": "acquitted",
+        "offense_category": "other_serious_violent",
+        "case_outcome": "Not guilty",
+        "outcome_checked": true,
+        "supporting_evidence": [{"url": "https://courts.exampleland.example/cases/CR-2019-1200", "source_type": "official_court_record"}],
+        "contradictory_evidence": [],
+        "missing_information": ["Age of defendant not shown on docket."],
+        "rationale": "Official docket records an acquittal."
+      }
+    }
+  },
+  "pages": {
+    "https://blog.example/riley-mockperson": {"status": 200, "text": "Riley Mockperson of Bayport was convicted of assault in 2019."},
+    "https://courts.exampleland.example/cases/CR-2019-1200": {"status": 200, "text": "CR-2019-1200 State v. Riley Mockperson. Verdict: Not guilty."}
+  },
+  "expected": {
+    "record_tier": "cleared_outcomes_only",
+    "overall_status": "findings_require_review",
+    "verified_record_flag": false,
+    "verified_records": 1, "unresolved_findings": 1, "contradicted_findings": 0,
+    "no_conviction_verified": true
+  }
+}

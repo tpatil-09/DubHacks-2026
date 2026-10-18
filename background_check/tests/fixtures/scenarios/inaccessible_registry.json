@@ -1,0 +1,65 @@
+{
+  "description": "SYNTHETIC. A search snippet suggests a registry entry, but the registry requires a formal request (403). The mock model over-claims — guards must keep it unverified.",
+  "query": {
+    "full_name": "Sam Registrytest",
+    "location": "Northfield, Exampleland",
+    "age_min": 45,
+    "age_max": 55
+  },
+  "investigator": {
+    "search_queries_run": ["\"Sam Registrytest\" sex offender registry Exampleland"],
+    "sources_checked": [
+      {"url": "https://registry.exampleland.example/offender/55123", "title": "Exampleland Sex Offender Registry", "source_type": "official_registry", "accessible": false, "access_note": "HTTP 403; records released only by formal request"}
+    ],
+    "findings": [
+      {
+        "source_url": "https://registry.exampleland.example/offender/55123",
+        "source_type": "secondary_source",
+        "excerpt": "Sam Registrytest - Level 2 - Northfield",
+        "claim": "A search-result snippet suggests a registry listing for a Sam Registrytest in Northfield.",
+        "record_stage": "registry_entry",
+        "offense_category": "sexual_offense",
+        "jurisdiction": "Exampleland",
+        "identity_evidence": ["name", "Northfield"],
+        "relevance": "high",
+        "source_quality": "unknown"
+      }
+    ],
+    "access_failures": [
+      {"target": "https://registry.exampleland.example/offender/55123", "kind": "record_requires_formal_request", "detail": "Registry page returned 403; state releases details only via formal request."}
+    ]
+  },
+  "verifier": {
+    "access_failures": [
+      {"target": "https://registry.exampleland.example/offender/55123", "kind": "access_denied", "detail": "HTTP 403"}
+    ],
+    "by_source_url": {
+      "https://registry.exampleland.example/offender/55123": {
+        "source_accessible": false,
+        "evidence_status": "verified",
+        "identity_match": "possible_match",
+        "identity_basis": ["full_name", "location"],
+        "source_reliability": "high",
+        "record_stage": "registry_entry",
+        "offense_category": "sexual_offense",
+        "case_outcome": null,
+        "outcome_checked": false,
+        "registry_current_as_of": "2026-10-01",
+        "supporting_evidence": [],
+        "contradictory_evidence": [],
+        "missing_information": ["Registry page could not be opened."],
+        "rationale": "Snippet suggests a listing but the page could not be retrieved."
+      }
+    }
+  },
+  "pages": {
+    "https://registry.exampleland.example/offender/55123": {"status": 403}
+  },
+  "expected": {
+    "record_tier": "reported_conviction_unconfirmed",
+    "overall_status": "findings_require_review",
+    "verified_record_flag": false,
+    "verified_records": 0, "unresolved_findings": 1, "contradicted_findings": 0,
+    "finding_status": "unverified", "limitation_contains": "formal request"
+  }
+}

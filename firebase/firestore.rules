@@ -17,18 +17,32 @@ service cloud.firestore {
     // Discoverable profiles: any signed-in user can read; only the owner can write.
     match /profiles/{uid} {
       function validProfile(data) {
-        return data.uid == uid
-          && data.displayName is string && data.displayName.size() <= 30
+        return data.keys().hasAll(['uid', 'displayName', 'age', 'gender', 'interestedIn', 'city', 'bio', 'prompts', 'photos', 'interests', 'discoverable', 'updatedAt'])
+          && data.keys().hasOnly(['uid', 'displayName', 'age', 'gender', 'interestedIn', 'city', 'bio', 'prompts', 'photos', 'interests', 'quiz', 'discoverable', 'updatedAt'])
+          && data.uid == uid
+          && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 30
+          && data.age is int && data.age >= 18 && data.age <= 120
+          && data.gender in ['woman', 'man', 'nonbinary']
+          && data.interestedIn is list && data.interestedIn.size() <= 3
           && data.bio is string && data.bio.size() <= 300
+          && data.city is string && data.city.size() >= 2 && data.city.size() <= 40
           && data.photos is list && data.photos.size() <= 6
           && data.interests is list && data.interests.size() <= 10
           && data.prompts is list && data.prompts.size() <= 3
           && data.discoverable is bool
+          && data.updatedAt is timestamp
+          && !('birthdate' in data)
           && !('isDemo' in data);
       }
       allow read: if signedIn();
       allow create, update: if isMe(uid) && validProfile(request.resource.data);
       allow delete: if isMe(uid);
+    }
+
+    // Synthetic records are read-only; seed them only in the local emulator.
+    match /demoProfiles/{demoId} {
+      allow read: if signedIn();
+      allow write: if false;
     }
 
     // likes/{fromUid_toUid}. Firebase UIDs never contain "_".

@@ -16,18 +16,18 @@ describe('ageFrom', () => {
 })
 
 describe('validateBasics', () => {
-  const draft = { ...emptyDraft, displayName: 'Alex', birthdate: '2000-01-01', gender: 'woman', interestedIn: ['men'], city: 'Seattle' }
+  const draft = { ...emptyDraft, displayName: 'Alex', age: 26, gender: 'woman', interestedIn: ['men'], city: 'Seattle' }
 
   it('accepts a complete adult profile', () => {
-    expect(validateBasics(draft, today)).toBeNull()
+    expect(validateBasics(draft)).toBeNull()
   })
 
   it('rejects anyone under 18', () => {
-    expect(validateBasics({ ...draft, birthdate: '2008-10-18' }, today)).toMatch(/18/)
+    expect(validateBasics({ ...draft, age: 17 })).toMatch(/18/)
   })
 
   it('requires a name', () => {
-    expect(validateBasics({ ...draft, displayName: '  ' }, today)).not.toBeNull()
+    expect(validateBasics({ ...draft, displayName: '  ' })).not.toBeNull()
   })
 })
 

@@ -1,0 +1,66 @@
+{
+  "description": "SYNTHETIC. Official court record of a sexual-offense conviction; strong identity match; outcome checked; excerpt present on page.",
+  "query": {
+    "full_name": "Alex Fixture Doe",
+    "middle_name": "R",
+    "location": "Springfield, Exampleland",
+    "age_min": 34,
+    "age_max": 38
+  },
+  "investigator": {
+    "search_queries_run": ["\"Alex Fixture Doe\" Springfield court case conviction"],
+    "sources_checked": [
+      {"url": "https://courts.exampleland.example/cases/CR-2015-0042", "title": "State v. Alex R. Fixture Doe", "source_type": "official_court_record", "accessible": true}
+    ],
+    "findings": [
+      {
+        "source_url": "https://courts.exampleland.example/cases/CR-2015-0042",
+        "source_title": "State v. Alex R. Fixture Doe",
+        "source_type": "official_court_record",
+        "excerpt": "Defendant Alex R. Fixture Doe, born 1989, of Springfield, was found guilty of sexual assault in the second degree.",
+        "claim": "Official court record states Alex R. Fixture Doe of Springfield was convicted of second-degree sexual assault in 2015.",
+        "record_stage": "conviction",
+        "offense_category": "sexual_offense",
+        "event_date": "2015-06-01",
+        "jurisdiction": "Exampleland Superior Court",
+        "case_identifier": "CR-2015-0042",
+        "disposition": "Guilty; sentenced",
+        "identity_evidence": ["full name with middle initial R", "Springfield", "born 1989"],
+        "relevance": "high",
+        "source_quality": "high"
+      }
+    ],
+    "access_failures": []
+  },
+  "verifier": {
+    "search_queries_run": ["\"CR-2015-0042\" appeal OR overturned"],
+    "by_source_url": {
+      "https://courts.exampleland.example/cases/CR-2015-0042": {
+        "source_accessible": true,
+        "evidence_status": "verified",
+        "identity_match": "strong_match",
+        "identity_basis": ["full_name", "middle_name_or_initial", "location", "age_or_birth_year"],
+        "identity_rationale": "Name, middle initial, city and birth year all match the supplied details.",
+        "source_reliability": "high",
+        "reliability_rationale": "Official state court docket.",
+        "record_stage": "conviction",
+        "offense_category": "sexual_offense",
+        "case_outcome": "Convicted; sentence imposed; no appeal found",
+        "outcome_checked": true,
+        "supporting_evidence": [{"url": "https://courts.exampleland.example/cases/CR-2015-0042", "source_type": "official_court_record", "excerpt": "found guilty of sexual assault in the second degree"}],
+        "contradictory_evidence": [],
+        "missing_information": [],
+        "rationale": "Official docket confirms the conviction; identifiers match; no appeal or reversal found."
+      }
+    }
+  },
+  "pages": {
+    "https://courts.exampleland.example/cases/CR-2015-0042": {"status": 200, "text": "Docket CR-2015-0042. Defendant Alex R. Fixture Doe, born 1989, of Springfield, was found guilty of sexual assault in the second degree. Sentence imposed."}
+  },
+  "expected": {
+    "record_tier": "verified_record_requires_attention",
+    "overall_status": "records_require_attention",
+    "verified_record_flag": true,
+    "verified_records": 1, "unresolved_findings": 0, "contradicted_findings": 0
+  }
+}

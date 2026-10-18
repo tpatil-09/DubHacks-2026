@@ -4,7 +4,6 @@ import { animate, motion, useMotionValue, useReducedMotion, useTransform, type P
 import { ProfilePhoto } from '../ui/ProfilePhoto'
 import { InterestStickers, DemoTag } from '../ui/Sticker'
 import { PersonaBadge, VibeMeter } from '../ui/Badges'
-import { ageFrom } from '../../lib/age'
 import { arcadeVars } from '../../lib/colors'
 import type { LikeType, Profile } from '../../types'
 
@@ -46,7 +45,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
     else animate(x, 0, { type: 'spring', stiffness: 400, damping: 25 })
   }
 
-  const age = ageFrom(profile.birthdate)
+  const age = profile.age
 
   return (
     <motion.div

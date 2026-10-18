@@ -92,15 +92,10 @@ const seeds: DemoSeed[] = [
   },
 ]
 
-function birthdateForAge(age: number): string {
-  const now = new Date()
-  return `${now.getFullYear() - age}-03-14`
-}
-
 export const demoProfiles: Profile[] = seeds.map((seed) => ({
   uid: seed.uid,
   displayName: seed.displayName,
-  birthdate: birthdateForAge(seed.age),
+  age: seed.age,
   gender: seed.gender,
   interestedIn: ['women', 'men', 'nonbinary'],
   city: seed.city,
