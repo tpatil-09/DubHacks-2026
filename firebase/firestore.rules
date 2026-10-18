@@ -107,6 +107,60 @@ service cloud.firestore {
       allow write: if isMe(uid);
     }
 
+    function validNote(text) {
+      return text is string && text.size() > 0 && text.size() <= 180;
+    }
+    function validDesign(design) {
+      return design.keys().hasOnly(['color', 'ink', 'accent', 'pattern'])
+        && design.pattern in ['solid', 'dots', 'stripes', 'grid', 'stars', 'waves', 'plaid', 'confetti']
+        && design.color is string && design.color.size() <= 20
+        && design.ink is string && design.ink.size() <= 20
+        && design.accent is string && design.accent.size() <= 20;
+    }
+    function validReply(reply) {
+      return reply.keys().hasOnly(['fromUid', 'text', 'createdAt'])
+        && reply.fromUid == request.auth.uid
+        && validNote(reply.text)
+        && reply.createdAt is timestamp;
+    }
+
+    // Sender's copy. The catcher's id is not stored here, so the sender cannot read who received it.
+    match /paperPlanes/{planeId} {
+      allow read: if signedIn() && resource.data.fromUid == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['fromUid', 'design', 'text', 'createdAt'])
+        && request.resource.data.fromUid == request.auth.uid
+        && validNote(request.resource.data.text)
+        && validDesign(request.resource.data.design)
+        && request.resource.data.createdAt is timestamp;
+      allow update: if signedIn()
+        && !('reply' in resource.data)
+        && onlyChanges(['reply'])
+        && validReply(request.resource.data.reply)
+        && exists(/databases/$(database)/documents/paperInboxes/$(request.auth.uid)/planes/$(planeId));
+      allow delete: if signedIn() && resource.data.fromUid == request.auth.uid;
+    }
+
+    // Recipient's copy. Only they can read it, which is what keeps the catcher hidden from the sender.
+    match /paperInboxes/{uid}/planes/{planeId} {
+      allow read: if isMe(uid);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['fromUid', 'toUid', 'design', 'text', 'createdAt', 'planeId'])
+        && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.toUid == uid
+        && request.resource.data.toUid != request.resource.data.fromUid
+        && request.resource.data.planeId == planeId
+        && validNote(request.resource.data.text)
+        && validDesign(request.resource.data.design)
+        && exists(/databases/$(database)/documents/paperPlanes/$(planeId))
+        && get(/databases/$(database)/documents/paperPlanes/$(planeId)).data.fromUid == request.auth.uid;
+      allow update: if isMe(uid)
+        && !('reply' in resource.data)
+        && onlyChanges(['reply'])
+        && validReply(request.resource.data.reply);
+      allow delete: if isMe(uid);
+    }
+
     // screenings/{uid}: the member's background check (report.json from background_check), written only by
     // the screening Cloud Function after the member consents at onboarding (Admin SDK bypasses rules).
     // Every signed-in member can read it; the UI shows only findings linked to the person.

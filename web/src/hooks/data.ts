@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { backend } from '../data'
-import type { Match, Message, Profile } from '../types'
+import type { Match, Message, PaperAirplane, Profile } from '../types'
 import { parseSafetyReport, type SafetyReport } from '../types/safetyReport'
 
 const profileCache = new Map<string, Promise<Profile | null>>()
@@ -57,6 +57,19 @@ export function useMatches(uid: string | undefined) {
     } catch (error) {
       setState({ matches: [], loading: false, error: error instanceof Error ? error.message : 'Could not load matches.' })
     }
+  }, [uid])
+  return state
+}
+
+export function useAirplanes(uid: string | undefined) {
+  const [state, setState] = useState<{ inbox: PaperAirplane[]; sent: PaperAirplane[]; loading: boolean }>({
+    inbox: [],
+    sent: [],
+    loading: true,
+  })
+  useEffect(() => {
+    if (!uid) return
+    return backend().subscribeAirplanes(uid, (planes) => setState({ ...planes, loading: false }))
   }, [uid])
   return state
 }

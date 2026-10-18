@@ -25,7 +25,8 @@ import {
 } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { auth, db, functions, storage } from '../lib/firebase'
-import type { Account, GameAnswers, Match, Message, Profile, QuizResult, WyrChoice } from '../types'
+import type { Account, GameAnswers, Match, Message, PaperAirplane, PaperDesign, Profile, QuizResult, WyrChoice } from '../types'
+import { assertDesign, cleanNote } from '../games/paperAirplane/papers'
 import { matchIdFor, type Backend } from './backend'
 import { filterDiscover } from './discoverFilter'
 
@@ -51,6 +52,20 @@ function millis(value: unknown): number {
 /** Firestore rejects `undefined`, so drop those keys before writing. */
 function clean<T extends object>(value: T): DocumentData {
   return Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined))
+}
+
+function toPlane(id: string, data: DocumentData): PaperAirplane {
+  const replyData = data.reply as { fromUid?: string; text?: string; createdAt?: unknown } | undefined
+  return {
+    id,
+    fromUid: String(data.fromUid ?? ''),
+    design: data.design as PaperDesign,
+    text: String(data.text ?? ''),
+    createdAt: millis(data.createdAt),
+    reply: replyData?.text
+      ? { fromUid: String(replyData.fromUid ?? ''), text: String(replyData.text), createdAt: millis(replyData.createdAt) }
+      : undefined,
+  }
 }
 
 function toMatch(id: string, data: DocumentData): Match {
@@ -221,6 +236,65 @@ export const firebaseBackend: Backend = {
     return Object.fromEntries(entries)
   },
 
+  async throwPaperAirplane(fromUid, design: PaperDesign, text) {
+    const note = cleanNote(text)
+    assertDesign(design)
+    const [profilesSnap, blocked] = await Promise.all([
+      getDocs(query(collection(fb.db, 'profiles'), where('discoverable', '==', true), limit(100))),
+      blockedSet(fromUid),
+    ])
+    const candidates = profilesSnap.docs.map((entry) => entry.id).filter((id) => id !== fromUid && !blocked.has(id))
+    if (candidates.length === 0) throw new Error('Nobody is around to catch a plane right now.')
+    const toUid = candidates[Math.floor(Math.random() * candidates.length)]
+    const id = crypto.randomUUID()
+    const payload = { fromUid, design, text: note, createdAt: serverTimestamp() }
+    const planeRef = doc(fb.db, 'paperPlanes', id)
+    await setDoc(planeRef, payload)
+    try {
+      await setDoc(doc(fb.db, 'paperInboxes', toUid, 'planes', id), { ...payload, toUid, planeId: id })
+    } catch (error) {
+      await deleteDoc(planeRef).catch(() => undefined)
+      throw error
+    }
+  },
+  subscribeAirplanes(uid, callback) {
+    let sent: PaperAirplane[] = []
+    let inbox: PaperAirplane[] = []
+    const emit = () => callback({
+      sent: [...sent].sort((a, b) => b.createdAt - a.createdAt),
+      inbox: [...inbox].sort((a, b) => b.createdAt - a.createdAt),
+    })
+    const stopSent = onSnapshot(
+      query(collection(fb.db, 'paperPlanes'), where('fromUid', '==', uid)),
+      (snapshot) => {
+        sent = snapshot.docs.map((entry) => toPlane(entry.id, entry.data({ serverTimestamps: 'estimate' })))
+        emit()
+      },
+      () => emit(),
+    )
+    const stopInbox = onSnapshot(
+      collection(fb.db, 'paperInboxes', uid, 'planes'),
+      (snapshot) => {
+        inbox = snapshot.docs.map((entry) => toPlane(entry.id, entry.data({ serverTimestamps: 'estimate' })))
+        emit()
+      },
+      () => emit(),
+    )
+    return () => {
+      stopSent()
+      stopInbox()
+    }
+  },
+  async replyToAirplane(uid, planeId, text) {
+    const note = cleanNote(text)
+    const inboxRef = doc(fb.db, 'paperInboxes', uid, 'planes', planeId)
+    const inbox = await getDoc(inboxRef)
+    if (!inbox.exists() || inbox.data().reply) throw new Error('That airplane isn’t yours to answer.')
+    const reply = { fromUid: uid, text: note, createdAt: serverTimestamp() }
+    await updateDoc(inboxRef, { reply })
+    await updateDoc(doc(fb.db, 'paperPlanes', planeId), { reply })
+  },
+
   async getGameAnswers(uid) {
     const snapshot = await getDoc(doc(fb.db, 'gameAnswers', uid))
     return (snapshot.data() as Record<string, GameAnswers> | undefined) ?? {}
@@ -271,7 +345,13 @@ export const firebaseBackend: Backend = {
     })
   },
   async deleteMyData(uid) {
+    const [sent, inbox] = await Promise.all([
+      getDocs(query(collection(fb.db, 'paperPlanes'), where('fromUid', '==', uid))),
+      getDocs(collection(fb.db, 'paperInboxes', uid, 'planes')),
+    ])
     await Promise.all([
+      ...sent.docs.map((entry) => deleteDoc(entry.ref)),
+      ...inbox.docs.map((entry) => deleteDoc(entry.ref)),
       deleteDoc(doc(fb.db, 'profiles', uid)),
       deleteDoc(doc(fb.db, 'quizResults', uid)),
       deleteDoc(doc(fb.db, 'wyrAnswers', uid)),

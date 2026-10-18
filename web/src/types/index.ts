@@ -67,6 +67,34 @@ export interface Match {
 
 export type WyrChoice = 'a' | 'b'
 
+export type PaperPattern = 'solid' | 'dots' | 'stripes' | 'grid' | 'stars' | 'waves' | 'plaid' | 'confetti'
+
+export interface PaperDesign {
+  color: string
+  ink: string
+  accent: string
+  pattern: PaperPattern
+}
+
+export interface PaperReply {
+  fromUid: string
+  text: string
+  createdAt: number
+}
+
+/**
+ * A paper airplane as the UI is allowed to see it.
+ * The catcher's id is omitted until they write back (`reply.fromUid`).
+ */
+export interface PaperAirplane {
+  id: string
+  fromUid: string
+  design: PaperDesign
+  text: string
+  createdAt: number
+  reply?: PaperReply
+}
+
 /** Fun-game answers: question id (or `picks` for a puzzle) to the chosen option ids. */
 export type GameAnswers = Record<string, string[]>
 

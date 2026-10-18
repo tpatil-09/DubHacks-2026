@@ -4,6 +4,8 @@ import type {
   LikeType,
   Match,
   Message,
+  PaperAirplane,
+  PaperDesign,
   Profile,
   QuizResult,
   SessionUser,
@@ -11,6 +13,7 @@ import type {
 } from '../types'
 import { demoLikesYou, demoProfiles, demoReplies, demoWyrAnswers } from '../fixtures/demoProfiles'
 import { buildScreeningReport } from '../fixtures/demoReports'
+import { assertDesign, cleanNote } from '../games/paperAirplane/papers'
 import { matchIdFor, type Backend } from './backend'
 import { filterDiscover } from './discoverFilter'
 import { ageFrom } from '../lib/age'
@@ -35,6 +38,33 @@ interface DemoState {
   games?: Record<string, Record<string, GameAnswers>>
   blocks: Record<string, string[]>
   userReports: { from: string; about: string; reason: string; details: string; at: number }[]
+  airplanes?: StoredPlane[]
+}
+
+interface StoredPlane extends PaperAirplane {
+  toUid: string
+}
+
+const catchLines = [
+  'Caught it. This is the best thing in my pocket today.',
+  'It landed on my desk. Hi — writing back.',
+  'Unfolded it twice. Hi, it was me.',
+]
+
+function welcomePlane(now: number): StoredPlane {
+  return {
+    id: 'plane-welcome',
+    fromUid: 'demo-jules',
+    toUid: DEMO_UID,
+    design: { color: '#efe8ff', ink: '#2c2450', accent: '#7c6bb8', pattern: 'stars' },
+    text: 'If this reaches you, the third-floor vending machine owes me a dollar. Write back?',
+    createdAt: now - 86_400_000,
+  }
+}
+
+function presentPlane(plane: StoredPlane): PaperAirplane {
+  const { toUid: _hidden, ...visible } = plane
+  return visible
 }
 
 function freshState(): DemoState {
@@ -76,6 +106,7 @@ function freshState(): DemoState {
     wyr,
     blocks: {},
     userReports: [],
+    airplanes: [welcomePlane(now)],
   }
 }
 
@@ -88,6 +119,7 @@ function load(): DemoState {
       const saved = JSON.parse(raw) as DemoState
       // Keep demo profiles in sync with the seed data (e.g. new demo photos) without resetting the player's progress.
       for (const profile of demoProfiles) saved.profiles[profile.uid] = { ...saved.profiles[profile.uid], ...profile }
+      if (!Array.isArray(saved.airplanes)) saved.airplanes = [welcomePlane(Date.now())]
       return saved
     }
   } catch {
@@ -142,6 +174,18 @@ function scheduleDemoReply(matchId: string, partnerUid: string) {
     const reply = demoReplies[Math.floor(Math.random() * demoReplies.length)]
     pushMessage(matchId, { senderId: partnerUid, type: 'text', text: reply })
   }, 1400 + Math.random() * 1200)
+}
+
+function scheduleDemoCatch(planeId: string, catcherUid: string) {
+  if (!catcherUid.startsWith('demo-') || catcherUid === DEMO_UID) return
+  setTimeout(() => {
+    const line = catchLines[Math.floor(Math.random() * catchLines.length)]
+    commit((draft) => {
+      const plane = draft.airplanes?.find((entry) => entry.id === planeId)
+      if (!plane || plane.reply || plane.toUid !== catcherUid) return
+      plane.reply = { fromUid: catcherUid, text: line, createdAt: Date.now() }
+    })
+  }, 8000)
 }
 
 function scheduleDemoGameAnswer(matchId: string, messageId: string, partnerUid: string, promptId: string) {
@@ -318,6 +362,46 @@ export const demoBackend: Backend = {
   },
   async getWyrAnswersFor(uids) {
     return Object.fromEntries(uids.map((uid) => [uid, state.wyr[uid] ?? {}]))
+  },
+
+  async throwPaperAirplane(fromUid, design: PaperDesign, text) {
+    const note = cleanNote(text)
+    assertDesign(design)
+    const blocked = new Set(state.blocks[fromUid] ?? [])
+    const candidates = Object.values(state.profiles).filter(
+      (profile) => profile.uid !== fromUid && profile.discoverable && !blocked.has(profile.uid),
+    )
+    if (candidates.length === 0) throw new Error('Nobody is around to catch a plane right now.')
+    const catcher = candidates[Math.floor(Math.random() * candidates.length)]
+    const id = newId('plane')
+    commit((draft) => {
+      draft.airplanes = [
+        ...(draft.airplanes ?? []),
+        { id, fromUid, toUid: catcher.uid, design, text: note, createdAt: Date.now() },
+      ]
+    })
+    scheduleDemoCatch(id, catcher.uid)
+  },
+  subscribeAirplanes(uid, callback) {
+    return subscribe(() => {
+      const planes = state.airplanes ?? []
+      const byNewest = (a: StoredPlane, b: StoredPlane) => b.createdAt - a.createdAt
+      callback({
+        inbox: planes.filter((plane) => plane.toUid === uid).sort(byNewest).map(presentPlane),
+        sent: planes.filter((plane) => plane.fromUid === uid).sort(byNewest).map(presentPlane),
+      })
+    })
+  },
+  async replyToAirplane(uid, planeId, text) {
+    const note = cleanNote(text)
+    let delivered = false
+    commit((draft) => {
+      const plane = draft.airplanes?.find((entry) => entry.id === planeId && entry.toUid === uid)
+      if (!plane || plane.reply) return
+      plane.reply = { fromUid: uid, text: note, createdAt: Date.now() }
+      delivered = true
+    })
+    if (!delivered) throw new Error('That airplane isn’t yours to answer.')
   },
 
   async getGameAnswers(uid) {
