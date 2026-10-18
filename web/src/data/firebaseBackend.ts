@@ -29,6 +29,8 @@ import type { Account, GameAnswers, Match, Message, NewMessage, Profile, QuizRes
 import { matchIdFor, type Backend } from './backend'
 import { filterDiscover } from './discoverFilter'
 import { ageFrom } from '../lib/age'
+import { buildScreeningReport } from '../fixtures/demoReports'
+import { legacyNameAndAge } from '../lib/legacyProfile'
 
 function required<T>(service: T | undefined, name: string): T {
   if (!service) throw new Error(`Firebase ${name} is not configured. Add your web app config to web/.env.`)
@@ -56,7 +58,15 @@ function profileFrom(value: unknown, uid?: string): Profile | null {
   if (!value || typeof value !== 'object') return null
   const data = value as Record<string, unknown>
   if (typeof (data.uid ?? uid) !== 'string') return null
-  return { ...data, uid: String(data.uid ?? uid), updatedAt: typeof data.updatedAt === 'number' ? data.updatedAt : Date.now() } as Profile
+  return {
+    ...data,
+    ...legacyNameAndAge(data),
+    prompts: Array.isArray(data.prompts) ? data.prompts : [],
+    photos: Array.isArray(data.photos) ? data.photos : [],
+    interests: Array.isArray(data.interests) ? data.interests : [],
+    uid: String(data.uid ?? uid),
+    updatedAt: typeof data.updatedAt === 'number' ? data.updatedAt : Date.now(),
+  } as Profile
 }
 
 function matchFrom(id: string, data: Record<string, unknown>): Match {
@@ -333,7 +343,18 @@ export const firebaseBackend: Backend = {
   },
 
   async getScreening(subjectUid) {
-    if (fb.auth.currentUser?.uid !== subjectUid) return null
+    if (fb.auth.currentUser?.uid !== subjectUid) {
+      // Real members' reports are private to them (see firestore.rules). Fictional demo
+      // members get the same clearly labeled synthetic report as in demo mode.
+      const profile = profileFrom((await getDoc(profileRef(subjectUid))).data() ?? null, subjectUid)
+      if (!profile?.isDemo) return null
+      const years = ageFrom(profile.birthdate)
+      return buildScreeningReport({
+        subjectUid,
+        nameProvided: `${profile.firstName} ${profile.lastName}`.trim(),
+        context: [profile.city, years ? `age ${years}` : ''].filter(Boolean).join(', ') || undefined,
+      })
+    }
     const snapshot = await getDoc(doc(fb.db, 'screenings', subjectUid))
     if (!snapshot.exists()) return null
     const data = snapshot.data() as { report?: unknown }
