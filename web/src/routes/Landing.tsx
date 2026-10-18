@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 import { motion } from 'motion/react'
-import { ArrowRight, Asterisk, Heart, MapPin, ShieldCheck, X } from 'lucide-react'
+import { ArrowRight, Heart, MapPin, ShieldCheck, X } from 'lucide-react'
 
 const steps = [
   { title: 'Make your profile', body: 'Photos, interests, and a bio that sounds like you.' },
@@ -12,8 +12,8 @@ export default function Landing() {
   return (
     <div className="min-h-dvh bg-cream">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
-        <span className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight">
-          <Asterisk className="size-6 text-bubblegum" strokeWidth={2.75} aria-hidden /> SafeMatch
+        <span className="font-title flex items-center gap-2 text-2xl">
+          <img src="/favicon.svg" alt="" className="size-8" /> SafeMatch
         </span>
         <Link to="/login" className="font-semibold text-ink-soft hover:text-ink">
           Sign in
@@ -47,14 +47,14 @@ export default function Landing() {
           transition={{ type: 'spring', stiffness: 180, damping: 22 }}
           aria-label="Example profile card"
         >
-          <div className="relative aspect-[19/22] overflow-hidden rounded-2xl shadow-[0_28px_56px_-28px_rgba(35,26,27,.55)]" style={{ background: 'radial-gradient(circle at 30% 25%, #fff 0%, #fdede6 30%, #f6b9a3 100%)' }}>
-            <span className="absolute inset-0 grid -translate-y-[16%] place-items-center text-[8rem]" aria-hidden>🦊</span>
+          <div className="relative aspect-[19/22] overflow-hidden rounded-2xl bg-pearl shadow-[0_28px_56px_-28px_rgba(35,26,27,.55)]">
+            <img src="/demo-photos/maya.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
             <span className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-lg bg-white px-3.5 py-2 text-sm font-bold shadow-[0_6px_16px_-8px_rgba(35,26,27,.5)]">
               <ShieldCheck className="size-4 text-mint-deep" strokeWidth={2.5} aria-hidden /> No records linked
             </span>
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent px-6 pb-6 pt-24 text-white">
               <p className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90"><span className="size-2 rounded-full bg-mint" aria-hidden /> 92% vibe match</p>
-              <p className="text-4xl font-extrabold tracking-tight">Maya <span className="font-medium">27</span></p>
+              <p className="font-title text-4xl">Maya <span className="ml-1">27</span></p>
               <p className="mt-2 flex items-center gap-2 text-white/90"><MapPin className="size-5" aria-hidden /> Seattle, WA</p>
               <div className="mt-4 flex gap-2">
                 {['Ceramics', 'Ramen', 'Mario Kart'].map((tag) => (

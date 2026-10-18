@@ -31,8 +31,8 @@ export function AppShell() {
 
 function Wordmark({ className = '' }: { className?: string }) {
   return (
-    <NavLink to="/discover" className={`flex items-center gap-1.5 text-xl font-extrabold tracking-tight ${className}`}>
-      <Asterisk className="size-6 text-bubblegum" strokeWidth={2.75} aria-hidden />
+    <NavLink to="/discover" className={`font-title flex items-center gap-2 text-2xl ${className}`}>
+      <img src="/favicon.svg" alt="" className="size-8" />
       SafeMatch
     </NavLink>
   )

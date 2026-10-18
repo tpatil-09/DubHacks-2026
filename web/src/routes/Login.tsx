@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react'
-import { Asterisk } from 'lucide-react'
 import { Link } from 'react-router'
 import { AmbientBackground } from '../components/layout/AmbientBackground'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
@@ -44,8 +43,8 @@ export default function Login() {
     <div className="relative grid min-h-dvh place-items-center px-4 py-10">
       <AmbientBackground />
       <div className="w-full max-w-md">
-        <Link to="/" className="mx-auto mb-8 flex w-fit items-center gap-1.5 text-2xl font-extrabold tracking-tight">
-          <Asterisk className="size-7 text-bubblegum" strokeWidth={2.75} aria-hidden /> SafeMatch
+        <Link to="/" className="font-title mx-auto mb-8 flex w-fit items-center gap-2 text-3xl">
+          <img src="/favicon.svg" alt="" className="size-9" /> SafeMatch
         </Link>
         <div className="gloss-card p-8">
           <h1 className="text-center text-3xl">{creatingAccount ? 'Create your account' : 'Welcome back'}</h1>

@@ -79,7 +79,12 @@ let state: DemoState = load()
 function load(): DemoState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw) as DemoState
+    if (raw) {
+      const saved = JSON.parse(raw) as DemoState
+      // Keep demo profiles in sync with the seed data (e.g. new demo photos) without resetting the player's progress.
+      for (const profile of demoProfiles) saved.profiles[profile.uid] = { ...saved.profiles[profile.uid], ...profile }
+      return saved
+    }
   } catch {
     // Corrupt or unavailable storage: start fresh.
   }

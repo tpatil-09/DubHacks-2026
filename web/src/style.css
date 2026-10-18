@@ -26,7 +26,8 @@
 
   --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
   --font-display: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-serif: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
+  /* Titles: bold Playfair Display. Everything else: Plus Jakarta Sans. */
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
 
   --radius-card: 16px;
 }
@@ -45,7 +46,7 @@ html { scroll-padding: 5rem 0 8rem; }
 @media (min-width: 64rem) { html { scroll-padding: 1rem 0; } }
 body { margin: 0; min-width: 320px; min-height: 100dvh; background: var(--color-cream); }
 .font-display { font-weight: 600; }
-h1, h2, h3 { font-weight: 800; letter-spacing: -0.035em; line-height: 1.04; }
+h1, h2, h3, .font-title { font-family: var(--font-serif); font-weight: 800; letter-spacing: -0.012em; line-height: 1.06; }
 h1, h2 { text-wrap: balance; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
