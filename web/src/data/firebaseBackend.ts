@@ -456,9 +456,10 @@ export const firebaseBackend: Backend = {
   async block(uid, otherUid) {
     own(uid, 'blocking a profile')
     const blockRef = doc(fb.db, 'blocks', blockId(uid, otherUid))
-    if (!(await getDoc(blockRef)).exists()) {
-      await setDoc(blockRef, { blockerUid: uid, blockedUid: otherUid, createdAt: Date.now() })
-    }
+    // Don't read the block doc first: the rules deny reading a block that doesn't exist yet
+    // (the read rule dereferences resource.data), so an existence check throws. Creating it is
+    // idempotent enough for the UI, since blocked users don't resurface to be re-blocked.
+    await setDoc(blockRef, { blockerUid: uid, blockedUid: otherUid, createdAt: Date.now() })
     const match = await getDoc(matchRef(sharedMatchId(uid, otherUid)))
     if (match.exists() && match.data().status === 'active') {
       await updateDoc(match.ref, { status: 'closed', updatedAt: Date.now() })
