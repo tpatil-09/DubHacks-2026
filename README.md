@@ -4,9 +4,11 @@ SafeMatch is a dating app built with React, TypeScript, and Vite. Firebase Authe
 
 ## Run the web app
 
-Local app URL: <http://127.0.0.1:5173/>
+Local app URL: <http://localhost:5173/> (use `localhost`, not `127.0.0.1`: Firebase sign-in only allows `localhost` by default)
 
-From `web/`, run `npm install` and `npm run dev`.
+From `web/`, run `npm install`, then `npm run env:firebase` once, then `npm run dev`.
+
+`npm run env:firebase` writes the project's public Firebase web config into `web/.env` (it reads it from the deployed site, `https://dubhacks-2026.web.app/__/firebase/init.json`). Without it, `web/.env` doesn't exist and the app silently falls back to demo mode, so sign-in won't work locally.
 
 ### Demo mode (no Firebase needed)
 
