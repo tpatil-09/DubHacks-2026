@@ -1,24 +1,25 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { MapPin, Settings as SettingsIcon } from 'lucide-react'
-import { AboutFields, BasicsFields, PhotosFields } from '../components/profile/ProfileFields'
+import { AboutFields, BasicsFields, PhotosFields, PreferencesFields } from '../components/profile/ProfileFields'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
 import { ArcadeCard } from '../components/ui/ArcadeCard'
 import { ProfilePhoto } from '../components/ui/ProfilePhoto'
 import { PersonaBadge } from '../components/ui/Badges'
 import { InterestStickers } from '../components/ui/Sticker'
 import { BackgroundCheck, TierChip } from '../components/safety/BackgroundCheck'
-import { draftFromProfile, validateAbout, validateBasics, validatePhotos, type ProfileDraft } from '../lib/profileValidation'
+import { draftFromProfile, validateAbout, validateBasics, validatePhotos, validatePreferences, type ProfileDraft } from '../lib/profileValidation'
 import { ageFrom } from '../lib/age'
 import { arcadeVars } from '../lib/colors'
 import { useSession } from '../store/session'
 import { toast } from '../store/toast'
 
-type Tab = 'preview' | 'basics' | 'photos' | 'about'
+type Tab = 'preview' | 'basics' | 'preferences' | 'photos' | 'about'
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'preview', label: 'Preview' },
   { id: 'basics', label: 'Basics' },
+  { id: 'preferences', label: 'Preferences' },
   { id: 'photos', label: 'Photos' },
   { id: 'about', label: 'About' },
 ]
@@ -32,7 +33,7 @@ export default function MyProfile() {
   const [saving, setSaving] = useState(false)
 
   async function save() {
-    const problem = validateBasics(draft) ?? validatePhotos(draft) ?? validateAbout(draft)
+    const problem = validateBasics(draft) ?? validatePreferences(draft) ?? validatePhotos(draft) ?? validateAbout(draft)
     if (problem) {
       setError(problem)
       return
@@ -96,6 +97,7 @@ export default function MyProfile() {
               {age !== null && <span className="font-medium text-ink-soft">, {age}</span>}
             </h2>
             {profile.city && <p className="flex items-center gap-1 text-ink-soft"><MapPin className="size-4 shrink-0" aria-hidden /> {profile.city}</p>}
+            {profile.pronouns && <p className="text-ink-soft">{profile.pronouns}</p>}
             <TierChip uid={profile.uid} size="md" />
             {profile.quiz ? (
               <PersonaBadge personaId={profile.quiz.personaId} />
@@ -118,6 +120,7 @@ export default function MyProfile() {
       ) : (
         <div className="gloss-card p-6">
           {tab === 'basics' && <BasicsFields draft={draft} onChange={(patch) => setDraft({ ...draft, ...patch })} />}
+          {tab === 'preferences' && <PreferencesFields draft={draft} onChange={(patch) => setDraft({ ...draft, ...patch })} />}
           {tab === 'photos' && <PhotosFields draft={draft} onChange={(patch) => setDraft((current) => ({ ...current, ...patch }))} />}
           {tab === 'about' && <AboutFields draft={draft} onChange={(patch) => setDraft({ ...draft, ...patch })} />}
           {error && <p role="alert" className="mt-5 rounded-2xl bg-peach/40 p-3 text-sm">{error}</p>}

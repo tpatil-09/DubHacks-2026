@@ -1,0 +1,12 @@
+{
+  "name": "safematch-firestore-seed",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node --import tsx seed.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.4.0",
+    "tsx": "^4.19.0"
+  }
+}

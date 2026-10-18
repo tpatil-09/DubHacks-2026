@@ -28,6 +28,7 @@ export const useSession = create<SessionState>((set, get) => ({
       }
       set({ status: 'loading', user })
       try {
+        await backend().migrateLegacyData()
         let account = await backend().getAccount(user.uid)
         if (!account) {
           await backend().saveAccount(user.uid, { onboardingStep: 'basics' })

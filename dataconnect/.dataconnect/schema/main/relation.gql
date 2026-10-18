@@ -1,0 +1,337 @@
+extend type DemoProfile {
+  """
+  Implicit metadata field that cannot be written. It provides extra information about query results.
+  """
+  _metadata: _Metadata @fdc_generated(from: "DemoProfile", purpose: METADATA_FIELD)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table.
+  """
+  _count: Int! @fdc_generated(from: "DemoProfile.", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `age` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  age_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.age", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `authUid` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  authUid_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.authUid", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `avatarColor` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  avatarColor_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.avatarColor", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `avatarEmoji` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  avatarEmoji_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.avatarEmoji", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `bio` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  bio_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.bio", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `city` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  city_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.city", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `discoverable` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  discoverable_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.discoverable", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `displayName` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  displayName_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.displayName", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `email` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  email_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.email", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `gender` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  gender_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.gender", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `isDemo` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  isDemo_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.isDemo", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `likesYou` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  likesYou_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.likesYou", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `prompts` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  prompts_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.prompts", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `quiz` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  quiz_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.quiz", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `uid` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  uid_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.uid", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoProfile` table where the `updatedAt` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  updatedAt_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile.updatedAt", purpose: QUERY_COUNT)
+  """
+  ✨ Sum the `age` field in the `DemoProfile` table.
+  """
+  age_sum(
+    """
+    Set to true to sum the distinct values.
+    """
+    distinct: Boolean = false
+  ): Int @fdc_generated(from: "DemoProfile.age", purpose: QUERY_SUM)
+  """
+  ✨ Average the `age` field in the `DemoProfile` table.
+  """
+  age_avg(
+    """
+    Set to true to average the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "DemoProfile.age", purpose: QUERY_AVG)
+  """
+  ✨ Minimum of the `age` field in the `DemoProfile` table.
+  """
+  age_min: Int @fdc_generated(from: "DemoProfile.age", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `prompts` field in the `DemoProfile` table.
+  """
+  prompts_min: Any @fdc_generated(from: "DemoProfile.prompts", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `quiz` field in the `DemoProfile` table.
+  """
+  quiz_min: Any @fdc_generated(from: "DemoProfile.quiz", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `updatedAt` field in the `DemoProfile` table.
+  """
+  updatedAt_min: Timestamp @fdc_generated(from: "DemoProfile.updatedAt", purpose: QUERY_MIN)
+  """
+  ✨ Maximum of the `age` field in the `DemoProfile` table.
+  """
+  age_max: Int @fdc_generated(from: "DemoProfile.age", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `prompts` field in the `DemoProfile` table.
+  """
+  prompts_max: Any @fdc_generated(from: "DemoProfile.prompts", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `quiz` field in the `DemoProfile` table.
+  """
+  quiz_max: Any @fdc_generated(from: "DemoProfile.quiz", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `updatedAt` field in the `DemoProfile` table.
+  """
+  updatedAt_max: Timestamp @fdc_generated(from: "DemoProfile.updatedAt", purpose: QUERY_MAX)
+  """
+  A generated field that is used for caching results in SDKs.
+  """
+  _id: ID! @fdc_generated(from: "DemoProfile.uid", purpose: ENTITY_ID)
+}
+extend type DemoReport {
+  """
+  Implicit metadata field that cannot be written. It provides extra information about query results.
+  """
+  _metadata: _Metadata @fdc_generated(from: "DemoReport", purpose: METADATA_FIELD)
+  """
+  ✨ Count the number of rows in the `DemoReport` table.
+  """
+  _count: Int! @fdc_generated(from: "DemoReport.", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `contextProvided` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  contextProvided_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.contextProvided", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `findings` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  findings_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.findings", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `generatedAt` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  generatedAt_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.generatedAt", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `humanReviewRequired` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  humanReviewRequired_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.humanReviewRequired", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `isSynthetic` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  isSynthetic_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.isSynthetic", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `reportId` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  reportId_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.reportId", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `schemaVersion` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  schemaVersion_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.schemaVersion", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `searchCompleted` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  searchCompleted_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.searchCompleted", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `subjectNameProvided` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  subjectNameProvided_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.subjectNameProvided", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `subjectUid` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  subjectUid_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.subjectUid", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DemoReport` table where the `summary` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  summary_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport.summary", purpose: QUERY_COUNT)
+  """
+  ✨ Minimum of the `findings` field in the `DemoReport` table.
+  """
+  findings_min: Any @fdc_generated(from: "DemoReport.findings", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `generatedAt` field in the `DemoReport` table.
+  """
+  generatedAt_min: Timestamp @fdc_generated(from: "DemoReport.generatedAt", purpose: QUERY_MIN)
+  """
+  ✨ Maximum of the `findings` field in the `DemoReport` table.
+  """
+  findings_max: Any @fdc_generated(from: "DemoReport.findings", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `generatedAt` field in the `DemoReport` table.
+  """
+  generatedAt_max: Timestamp @fdc_generated(from: "DemoReport.generatedAt", purpose: QUERY_MAX)
+  """
+  A generated field that is used for caching results in SDKs.
+  """
+  _id: ID! @fdc_generated(from: "DemoReport.reportId", purpose: ENTITY_ID)
+}

@@ -16,6 +16,9 @@ export function filterDiscover(
       profile.discoverable &&
       !seen.has(profile.uid) &&
       !blocked.has(profile.uid) &&
-      (wants.size === 0 || wants.has(genderGroup[profile.gender] ?? profile.gender)),
+      (wants.size === 0 || wants.has(genderGroup[profile.gender] ?? profile.gender)) &&
+      (!me?.ageRange || (profile.age >= me.ageRange.min && profile.age <= me.ageRange.max)) &&
+      (!profile.ageRange || !me?.age || (me.age >= profile.ageRange.min && me.age <= profile.ageRange.max)) &&
+      (!me?.relationshipIntent || !profile.relationshipIntent || me.relationshipIntent === profile.relationshipIntent || me.relationshipIntent === 'open' || profile.relationshipIntent === 'open'),
   )
 }

@@ -2,17 +2,18 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { AnimatePresence, motion } from 'motion/react'
 import { AmbientBackground } from '../components/layout/AmbientBackground'
-import { AboutFields, BasicsFields, PhotosFields } from '../components/profile/ProfileFields'
+import { AboutFields, BasicsFields, PhotosFields, PreferencesFields } from '../components/profile/ProfileFields'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
 import { Capsule } from '../components/ui/Capsule'
 import { Mascot } from '../components/ui/Mascot'
-import { draftFromProfile, validateAbout, validateBasics, validatePhotos, type ProfileDraft } from '../lib/profileValidation'
+import { draftFromProfile, validateAbout, validateBasics, validatePhotos, validatePreferences, type ProfileDraft } from '../lib/profileValidation'
 import { useSession } from '../store/session'
 import type { OnboardingStep } from '../types'
 import type { PastelColor } from '../lib/colors'
 
 const steps: { id: Exclude<OnboardingStep, 'complete'>; title: string; subtitle: string; color: PastelColor }[] = [
   { id: 'basics', title: 'The basics', subtitle: 'Let’s set up your profile.', color: 'bubblegum' },
+  { id: 'preferences', title: 'Your preferences', subtitle: 'Choose what feels right; you can update this later.', color: 'sky' },
   { id: 'photos', title: 'Your photos', subtitle: 'Add 1–6 photos. The first one is your cover.', color: 'peach' },
   { id: 'about', title: 'About you', subtitle: 'Stickers and prompts make great conversation starters.', color: 'lilac' },
   { id: 'quiz', title: 'Last step', subtitle: 'Agree to your background check, then start matching.', color: 'mint' },
@@ -35,7 +36,7 @@ export default function Onboarding() {
   }
 
   async function next() {
-    const validators = { basics: validateBasics, photos: validatePhotos, about: validateAbout, quiz: () => null }
+    const validators = { basics: validateBasics, preferences: validatePreferences, photos: validatePhotos, about: validateAbout, quiz: () => null }
     const problem = validators[step.id](draft)
     if (problem) {
       setError(problem)
@@ -104,6 +105,7 @@ export default function Onboarding() {
             <p className="mb-6 text-ink-soft">{step.subtitle}</p>
 
             {step.id === 'basics' && <BasicsFields draft={draft} onChange={update} />}
+            {step.id === 'preferences' && <PreferencesFields draft={draft} onChange={update} />}
             {step.id === 'photos' && <PhotosFields draft={draft} onChange={update} />}
             {step.id === 'about' && <AboutFields draft={draft} onChange={update} />}
             {step.id === 'quiz' && (

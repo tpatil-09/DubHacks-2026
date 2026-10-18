@@ -1,0 +1,1066 @@
+"""
+✨ `DemoProfile_KeyOutput` returns the primary key fields of table type `DemoProfile`.
+
+It has the same format as `DemoProfile_Key`, but is only used as mutation return value.
+"""
+scalar DemoProfile_KeyOutput
+"""
+✨ `DemoReport_KeyOutput` returns the primary key fields of table type `DemoReport`.
+
+It has the same format as `DemoReport_Key`, but is only used as mutation return value.
+"""
+scalar DemoReport_KeyOutput
+"""
+✨ Generated data input type for table 'DemoProfile'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input DemoProfile_Data {
+  """
+  ✨ Generated from Field `DemoProfile`.`uid` of type `String!`
+  """
+  uid: String
+  """
+  ✨ `_expr` server value variant of `uid` (✨ Generated from Field `DemoProfile`.`uid` of type `String!`)
+  """
+  uid_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`age` of type `Int!`
+  """
+  age: Int
+  """
+  ✨ `_expr` server value variant of `age` (✨ Generated from Field `DemoProfile`.`age` of type `Int!`)
+  """
+  age_expr: Int_Expr @fdc_forbiddenInVariables
+  """
+  ✨ `_update` server value variant of `age` (✨ Generated from Field `DemoProfile`.`age` of type `Int!`)
+  """
+  age_update: [Int_Update!] @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`authUid` of type `String`
+  """
+  authUid: String
+  """
+  ✨ `_expr` server value variant of `authUid` (✨ Generated from Field `DemoProfile`.`authUid` of type `String`)
+  """
+  authUid_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`avatarColor` of type `String!`
+  """
+  avatarColor: String
+  """
+  ✨ `_expr` server value variant of `avatarColor` (✨ Generated from Field `DemoProfile`.`avatarColor` of type `String!`)
+  """
+  avatarColor_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`avatarEmoji` of type `String!`
+  """
+  avatarEmoji: String
+  """
+  ✨ `_expr` server value variant of `avatarEmoji` (✨ Generated from Field `DemoProfile`.`avatarEmoji` of type `String!`)
+  """
+  avatarEmoji_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`bio` of type `String!`
+  """
+  bio: String
+  """
+  ✨ `_expr` server value variant of `bio` (✨ Generated from Field `DemoProfile`.`bio` of type `String!`)
+  """
+  bio_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`city` of type `String!`
+  """
+  city: String
+  """
+  ✨ `_expr` server value variant of `city` (✨ Generated from Field `DemoProfile`.`city` of type `String!`)
+  """
+  city_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`discoverable` of type `Boolean!`
+  """
+  discoverable: Boolean
+  """
+  ✨ `_expr` server value variant of `discoverable` (✨ Generated from Field `DemoProfile`.`discoverable` of type `Boolean!`)
+  """
+  discoverable_expr: Boolean_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`displayName` of type `String!`
+  """
+  displayName: String
+  """
+  ✨ `_expr` server value variant of `displayName` (✨ Generated from Field `DemoProfile`.`displayName` of type `String!`)
+  """
+  displayName_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`email` of type `String!`
+  """
+  email: String
+  """
+  ✨ `_expr` server value variant of `email` (✨ Generated from Field `DemoProfile`.`email` of type `String!`)
+  """
+  email_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`gender` of type `String!`
+  """
+  gender: String
+  """
+  ✨ `_expr` server value variant of `gender` (✨ Generated from Field `DemoProfile`.`gender` of type `String!`)
+  """
+  gender_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`interestedIn` of type `[String!]!`
+  """
+  interestedIn: [String!]
+  """
+  ✨ `_update` server value variant of `interestedIn` (✨ Generated from Field `DemoProfile`.`interestedIn` of type `[String!]!`)
+  """
+  interestedIn_update: [String_ListUpdate!] @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`interests` of type `[String!]!`
+  """
+  interests: [String!]
+  """
+  ✨ `_update` server value variant of `interests` (✨ Generated from Field `DemoProfile`.`interests` of type `[String!]!`)
+  """
+  interests_update: [String_ListUpdate!] @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`isDemo` of type `Boolean!`
+  """
+  isDemo: Boolean
+  """
+  ✨ `_expr` server value variant of `isDemo` (✨ Generated from Field `DemoProfile`.`isDemo` of type `Boolean!`)
+  """
+  isDemo_expr: Boolean_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`likesYou` of type `Boolean!`
+  """
+  likesYou: Boolean
+  """
+  ✨ `_expr` server value variant of `likesYou` (✨ Generated from Field `DemoProfile`.`likesYou` of type `Boolean!`)
+  """
+  likesYou_expr: Boolean_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`photos` of type `[String!]!`
+  """
+  photos: [String!]
+  """
+  ✨ `_update` server value variant of `photos` (✨ Generated from Field `DemoProfile`.`photos` of type `[String!]!`)
+  """
+  photos_update: [String_ListUpdate!] @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`prompts` of type `Any!`
+  """
+  prompts: Any
+  """
+  ✨ `_expr` server value variant of `prompts` (✨ Generated from Field `DemoProfile`.`prompts` of type `Any!`)
+  """
+  prompts_expr: Any_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`quiz` of type `Any!`
+  """
+  quiz: Any
+  """
+  ✨ `_expr` server value variant of `quiz` (✨ Generated from Field `DemoProfile`.`quiz` of type `Any!`)
+  """
+  quiz_expr: Any_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoProfile`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `updatedAt` (✨ Generated from Field `DemoProfile`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_expr: Timestamp_Expr @fdc_forbiddenInVariables
+  """
+  ✨ `_time` server value variant of `updatedAt` (✨ Generated from Field `DemoProfile`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_time: Timestamp_Relative @fdc_forbiddenInVariables
+  """
+  ✨ `_update` server value variant of `updatedAt` (✨ Generated from Field `DemoProfile`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_update: [Timestamp_Update!] @fdc_forbiddenInVariables
+}
+"""
+✨ Generated filter input type for table 'DemoProfile'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input DemoProfile_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [DemoProfile_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: DemoProfile_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [DemoProfile_Filter!]
+  """
+  ✨ Generated from Field `DemoProfile`.`uid` of type `String!`
+  """
+  uid: String_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`age` of type `Int!`
+  """
+  age: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`authUid` of type `String`
+  """
+  authUid: String_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`avatarColor` of type `String!`
+  """
+  avatarColor: String_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`avatarEmoji` of type `String!`
+  """
+  avatarEmoji: String_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`bio` of type `String!`
+  """
+  bio: String_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`city` of type `String!`
+  """
+  city: String_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`discoverable` of type `Boolean!`
+  """
+  discoverable: Boolean_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`displayName` of type `String!`
+  """
+  displayName: String_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`email` of type `String!`
+  """
+  email: String_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`gender` of type `String!`
+  """
+  gender: String_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`interestedIn` of type `[String!]!`
+  """
+  interestedIn: String_ListFilter
+  """
+  ✨ Generated from Field `DemoProfile`.`interests` of type `[String!]!`
+  """
+  interests: String_ListFilter
+  """
+  ✨ Generated from Field `DemoProfile`.`isDemo` of type `Boolean!`
+  """
+  isDemo: Boolean_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`likesYou` of type `Boolean!`
+  """
+  likesYou: Boolean_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`photos` of type `[String!]!`
+  """
+  photos: String_ListFilter
+  """
+  ✨ Generated from Field `DemoProfile`.`prompts` of type `Any!`
+  """
+  prompts: Any_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`quiz` of type `Any!`
+  """
+  quiz: Any_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: Timestamp_Filter
+}
+"""
+✨ Generated first-row input type for table 'DemoProfile'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input DemoProfile_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [DemoProfile_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: DemoProfile_Filter
+}
+"""
+✨ Generated having input type for table 'DemoProfile'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input DemoProfile_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [DemoProfile_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: DemoProfile_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [DemoProfile_Having!]
+  """
+  ✨ Generated from Field `DemoProfile`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`age_count` of type `Int!`
+  """
+  age_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`authUid_count` of type `Int!`
+  """
+  authUid_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`avatarColor_count` of type `Int!`
+  """
+  avatarColor_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`avatarEmoji_count` of type `Int!`
+  """
+  avatarEmoji_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`bio_count` of type `Int!`
+  """
+  bio_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`city_count` of type `Int!`
+  """
+  city_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`discoverable_count` of type `Int!`
+  """
+  discoverable_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`displayName_count` of type `Int!`
+  """
+  displayName_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`email_count` of type `Int!`
+  """
+  email_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`gender_count` of type `Int!`
+  """
+  gender_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`isDemo_count` of type `Int!`
+  """
+  isDemo_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`likesYou_count` of type `Int!`
+  """
+  likesYou_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`prompts_count` of type `Int!`
+  """
+  prompts_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`quiz_count` of type `Int!`
+  """
+  quiz_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`uid_count` of type `Int!`
+  """
+  uid_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`updatedAt_count` of type `Int!`
+  """
+  updatedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`age_sum` of type `Int`
+  """
+  age_sum: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`age_avg` of type `Float`
+  """
+  age_avg: Float_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`age_min` of type `Int`
+  """
+  age_min: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`prompts_min` of type `Any`
+  """
+  prompts_min: Any_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`quiz_min` of type `Any`
+  """
+  quiz_min: Any_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`updatedAt_min` of type `Timestamp`
+  """
+  updatedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`age_max` of type `Int`
+  """
+  age_max: Int_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`prompts_max` of type `Any`
+  """
+  prompts_max: Any_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`quiz_max` of type `Any`
+  """
+  quiz_max: Any_Filter
+  """
+  ✨ Generated from Field `DemoProfile`.`updatedAt_max` of type `Timestamp`
+  """
+  updatedAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'DemoProfile'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input DemoProfile_Key {
+  """
+  ✨ Generated from Field `DemoProfile`.`uid` of type `String!`
+  """
+  uid: String
+  """
+  ✨ `_expr` server value variant of `uid` (✨ Generated from Field `DemoProfile`.`uid` of type `String!`)
+  """
+  uid_expr: String_Expr @fdc_forbiddenInVariables
+}
+"""
+✨ Generated list filter input type for table 'DemoProfile'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input DemoProfile_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: DemoProfile_Filter
+}
+"""
+✨ Generated order input type for table 'DemoProfile'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input DemoProfile_Order {
+  """
+  ✨ Generated from Field `DemoProfile`.`uid` of type `String!`
+  """
+  uid: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`age` of type `Int!`
+  """
+  age: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`authUid` of type `String`
+  """
+  authUid: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`avatarColor` of type `String!`
+  """
+  avatarColor: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`avatarEmoji` of type `String!`
+  """
+  avatarEmoji: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`bio` of type `String!`
+  """
+  bio: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`city` of type `String!`
+  """
+  city: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`discoverable` of type `Boolean!`
+  """
+  discoverable: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`displayName` of type `String!`
+  """
+  displayName: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`email` of type `String!`
+  """
+  email: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`gender` of type `String!`
+  """
+  gender: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`isDemo` of type `Boolean!`
+  """
+  isDemo: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`likesYou` of type `Boolean!`
+  """
+  likesYou: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`prompts` of type `Any!`
+  """
+  prompts: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`quiz` of type `Any!`
+  """
+  quiz: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`age_count` of type `Int!`
+  """
+  age_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`authUid_count` of type `Int!`
+  """
+  authUid_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`avatarColor_count` of type `Int!`
+  """
+  avatarColor_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`avatarEmoji_count` of type `Int!`
+  """
+  avatarEmoji_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`bio_count` of type `Int!`
+  """
+  bio_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`city_count` of type `Int!`
+  """
+  city_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`discoverable_count` of type `Int!`
+  """
+  discoverable_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`displayName_count` of type `Int!`
+  """
+  displayName_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`email_count` of type `Int!`
+  """
+  email_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`gender_count` of type `Int!`
+  """
+  gender_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`isDemo_count` of type `Int!`
+  """
+  isDemo_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`likesYou_count` of type `Int!`
+  """
+  likesYou_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`prompts_count` of type `Int!`
+  """
+  prompts_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`quiz_count` of type `Int!`
+  """
+  quiz_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`uid_count` of type `Int!`
+  """
+  uid_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`updatedAt_count` of type `Int!`
+  """
+  updatedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`age_sum` of type `Int`
+  """
+  age_sum: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`age_avg` of type `Float`
+  """
+  age_avg: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`age_min` of type `Int`
+  """
+  age_min: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`prompts_min` of type `Any`
+  """
+  prompts_min: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`quiz_min` of type `Any`
+  """
+  quiz_min: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`updatedAt_min` of type `Timestamp`
+  """
+  updatedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`age_max` of type `Int`
+  """
+  age_max: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`prompts_max` of type `Any`
+  """
+  prompts_max: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`quiz_max` of type `Any`
+  """
+  quiz_max: OrderDirection
+  """
+  ✨ Generated from Field `DemoProfile`.`updatedAt_max` of type `Timestamp`
+  """
+  updatedAt_max: OrderDirection
+}
+"""
+✨ Generated data input type for table 'DemoReport'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input DemoReport_Data {
+  """
+  ✨ Generated from Field `DemoReport`.`reportId` of type `String!`
+  """
+  reportId: String
+  """
+  ✨ `_expr` server value variant of `reportId` (✨ Generated from Field `DemoReport`.`reportId` of type `String!`)
+  """
+  reportId_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`contextProvided` of type `String`
+  """
+  contextProvided: String
+  """
+  ✨ `_expr` server value variant of `contextProvided` (✨ Generated from Field `DemoReport`.`contextProvided` of type `String`)
+  """
+  contextProvided_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`errors` of type `[String!]!`
+  """
+  errors: [String!]
+  """
+  ✨ `_update` server value variant of `errors` (✨ Generated from Field `DemoReport`.`errors` of type `[String!]!`)
+  """
+  errors_update: [String_ListUpdate!] @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`findings` of type `Any!`
+  """
+  findings: Any
+  """
+  ✨ `_expr` server value variant of `findings` (✨ Generated from Field `DemoReport`.`findings` of type `Any!`)
+  """
+  findings_expr: Any_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`generatedAt` of type `Timestamp!`
+  """
+  generatedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `generatedAt` (✨ Generated from Field `DemoReport`.`generatedAt` of type `Timestamp!`)
+  """
+  generatedAt_expr: Timestamp_Expr @fdc_forbiddenInVariables
+  """
+  ✨ `_time` server value variant of `generatedAt` (✨ Generated from Field `DemoReport`.`generatedAt` of type `Timestamp!`)
+  """
+  generatedAt_time: Timestamp_Relative @fdc_forbiddenInVariables
+  """
+  ✨ `_update` server value variant of `generatedAt` (✨ Generated from Field `DemoReport`.`generatedAt` of type `Timestamp!`)
+  """
+  generatedAt_update: [Timestamp_Update!] @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`humanReviewRequired` of type `Boolean!`
+  """
+  humanReviewRequired: Boolean
+  """
+  ✨ `_expr` server value variant of `humanReviewRequired` (✨ Generated from Field `DemoReport`.`humanReviewRequired` of type `Boolean!`)
+  """
+  humanReviewRequired_expr: Boolean_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`isSynthetic` of type `Boolean!`
+  """
+  isSynthetic: Boolean
+  """
+  ✨ `_expr` server value variant of `isSynthetic` (✨ Generated from Field `DemoReport`.`isSynthetic` of type `Boolean!`)
+  """
+  isSynthetic_expr: Boolean_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`limitations` of type `[String!]!`
+  """
+  limitations: [String!]
+  """
+  ✨ `_update` server value variant of `limitations` (✨ Generated from Field `DemoReport`.`limitations` of type `[String!]!`)
+  """
+  limitations_update: [String_ListUpdate!] @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`schemaVersion` of type `String!`
+  """
+  schemaVersion: String
+  """
+  ✨ `_expr` server value variant of `schemaVersion` (✨ Generated from Field `DemoReport`.`schemaVersion` of type `String!`)
+  """
+  schemaVersion_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`searchCompleted` of type `Boolean!`
+  """
+  searchCompleted: Boolean
+  """
+  ✨ `_expr` server value variant of `searchCompleted` (✨ Generated from Field `DemoReport`.`searchCompleted` of type `Boolean!`)
+  """
+  searchCompleted_expr: Boolean_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`sourcesNotAccessible` of type `[String!]!`
+  """
+  sourcesNotAccessible: [String!]
+  """
+  ✨ `_update` server value variant of `sourcesNotAccessible` (✨ Generated from Field `DemoReport`.`sourcesNotAccessible` of type `[String!]!`)
+  """
+  sourcesNotAccessible_update: [String_ListUpdate!] @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`sourcesSearched` of type `[String!]!`
+  """
+  sourcesSearched: [String!]
+  """
+  ✨ `_update` server value variant of `sourcesSearched` (✨ Generated from Field `DemoReport`.`sourcesSearched` of type `[String!]!`)
+  """
+  sourcesSearched_update: [String_ListUpdate!] @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`subjectNameProvided` of type `String!`
+  """
+  subjectNameProvided: String
+  """
+  ✨ `_expr` server value variant of `subjectNameProvided` (✨ Generated from Field `DemoReport`.`subjectNameProvided` of type `String!`)
+  """
+  subjectNameProvided_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`subjectUid` of type `String!`
+  """
+  subjectUid: String
+  """
+  ✨ `_expr` server value variant of `subjectUid` (✨ Generated from Field `DemoReport`.`subjectUid` of type `String!`)
+  """
+  subjectUid_expr: String_Expr @fdc_forbiddenInVariables
+  """
+  ✨ Generated from Field `DemoReport`.`summary` of type `String!`
+  """
+  summary: String
+  """
+  ✨ `_expr` server value variant of `summary` (✨ Generated from Field `DemoReport`.`summary` of type `String!`)
+  """
+  summary_expr: String_Expr @fdc_forbiddenInVariables
+}
+"""
+✨ Generated filter input type for table 'DemoReport'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input DemoReport_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [DemoReport_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: DemoReport_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [DemoReport_Filter!]
+  """
+  ✨ Generated from Field `DemoReport`.`reportId` of type `String!`
+  """
+  reportId: String_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`contextProvided` of type `String`
+  """
+  contextProvided: String_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`errors` of type `[String!]!`
+  """
+  errors: String_ListFilter
+  """
+  ✨ Generated from Field `DemoReport`.`findings` of type `Any!`
+  """
+  findings: Any_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`generatedAt` of type `Timestamp!`
+  """
+  generatedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`humanReviewRequired` of type `Boolean!`
+  """
+  humanReviewRequired: Boolean_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`isSynthetic` of type `Boolean!`
+  """
+  isSynthetic: Boolean_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`limitations` of type `[String!]!`
+  """
+  limitations: String_ListFilter
+  """
+  ✨ Generated from Field `DemoReport`.`schemaVersion` of type `String!`
+  """
+  schemaVersion: String_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`searchCompleted` of type `Boolean!`
+  """
+  searchCompleted: Boolean_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`sourcesNotAccessible` of type `[String!]!`
+  """
+  sourcesNotAccessible: String_ListFilter
+  """
+  ✨ Generated from Field `DemoReport`.`sourcesSearched` of type `[String!]!`
+  """
+  sourcesSearched: String_ListFilter
+  """
+  ✨ Generated from Field `DemoReport`.`subjectNameProvided` of type `String!`
+  """
+  subjectNameProvided: String_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`subjectUid` of type `String!`
+  """
+  subjectUid: String_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`summary` of type `String!`
+  """
+  summary: String_Filter
+}
+"""
+✨ Generated first-row input type for table 'DemoReport'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input DemoReport_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [DemoReport_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: DemoReport_Filter
+}
+"""
+✨ Generated having input type for table 'DemoReport'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input DemoReport_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [DemoReport_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: DemoReport_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [DemoReport_Having!]
+  """
+  ✨ Generated from Field `DemoReport`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`contextProvided_count` of type `Int!`
+  """
+  contextProvided_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`findings_count` of type `Int!`
+  """
+  findings_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`generatedAt_count` of type `Int!`
+  """
+  generatedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`humanReviewRequired_count` of type `Int!`
+  """
+  humanReviewRequired_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`isSynthetic_count` of type `Int!`
+  """
+  isSynthetic_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`reportId_count` of type `Int!`
+  """
+  reportId_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`schemaVersion_count` of type `Int!`
+  """
+  schemaVersion_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`searchCompleted_count` of type `Int!`
+  """
+  searchCompleted_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`subjectNameProvided_count` of type `Int!`
+  """
+  subjectNameProvided_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`subjectUid_count` of type `Int!`
+  """
+  subjectUid_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`summary_count` of type `Int!`
+  """
+  summary_count: Int_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`findings_min` of type `Any`
+  """
+  findings_min: Any_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`generatedAt_min` of type `Timestamp`
+  """
+  generatedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`findings_max` of type `Any`
+  """
+  findings_max: Any_Filter
+  """
+  ✨ Generated from Field `DemoReport`.`generatedAt_max` of type `Timestamp`
+  """
+  generatedAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'DemoReport'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input DemoReport_Key {
+  """
+  ✨ Generated from Field `DemoReport`.`reportId` of type `String!`
+  """
+  reportId: String
+  """
+  ✨ `_expr` server value variant of `reportId` (✨ Generated from Field `DemoReport`.`reportId` of type `String!`)
+  """
+  reportId_expr: String_Expr @fdc_forbiddenInVariables
+}
+"""
+✨ Generated list filter input type for table 'DemoReport'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input DemoReport_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: DemoReport_Filter
+}
+"""
+✨ Generated order input type for table 'DemoReport'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input DemoReport_Order {
+  """
+  ✨ Generated from Field `DemoReport`.`reportId` of type `String!`
+  """
+  reportId: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`contextProvided` of type `String`
+  """
+  contextProvided: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`findings` of type `Any!`
+  """
+  findings: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`generatedAt` of type `Timestamp!`
+  """
+  generatedAt: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`humanReviewRequired` of type `Boolean!`
+  """
+  humanReviewRequired: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`isSynthetic` of type `Boolean!`
+  """
+  isSynthetic: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`schemaVersion` of type `String!`
+  """
+  schemaVersion: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`searchCompleted` of type `Boolean!`
+  """
+  searchCompleted: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`subjectNameProvided` of type `String!`
+  """
+  subjectNameProvided: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`subjectUid` of type `String!`
+  """
+  subjectUid: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`summary` of type `String!`
+  """
+  summary: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`contextProvided_count` of type `Int!`
+  """
+  contextProvided_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`findings_count` of type `Int!`
+  """
+  findings_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`generatedAt_count` of type `Int!`
+  """
+  generatedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`humanReviewRequired_count` of type `Int!`
+  """
+  humanReviewRequired_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`isSynthetic_count` of type `Int!`
+  """
+  isSynthetic_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`reportId_count` of type `Int!`
+  """
+  reportId_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`schemaVersion_count` of type `Int!`
+  """
+  schemaVersion_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`searchCompleted_count` of type `Int!`
+  """
+  searchCompleted_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`subjectNameProvided_count` of type `Int!`
+  """
+  subjectNameProvided_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`subjectUid_count` of type `Int!`
+  """
+  subjectUid_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`summary_count` of type `Int!`
+  """
+  summary_count: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`findings_min` of type `Any`
+  """
+  findings_min: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`generatedAt_min` of type `Timestamp`
+  """
+  generatedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`findings_max` of type `Any`
+  """
+  findings_max: OrderDirection
+  """
+  ✨ Generated from Field `DemoReport`.`generatedAt_max` of type `Timestamp`
+  """
+  generatedAt_max: OrderDirection
+}

@@ -1,4 +1,5 @@
-export type OnboardingStep = 'basics' | 'photos' | 'about' | 'quiz' | 'complete'
+export type OnboardingStep = 'basics' | 'preferences' | 'photos' | 'about' | 'quiz' | 'complete'
+export type RelationshipIntent = 'long_term' | 'casual' | 'friends' | 'open'
 
 export interface SessionUser {
   uid: string
@@ -42,7 +43,13 @@ export interface Profile {
   /** YYYY-MM-DD date of birth. Age is derived from this, not stored directly. */
   birthdate: string
   gender: string
-  interestedIn: string[]
+  genderOther?: string
+  /** Private matching preference, returned only when the profile belongs to the signed-in member. */
+  interestedIn?: string[]
+  interestedInOther?: string
+  pronouns?: string
+  relationshipIntent?: RelationshipIntent
+  ageRange?: { min: number; max: number }
   city: string
   bio: string
   prompts: ProfilePrompt[]

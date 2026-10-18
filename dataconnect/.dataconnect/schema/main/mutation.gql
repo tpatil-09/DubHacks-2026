@@ -1,0 +1,206 @@
+extend type Mutation {
+  """
+  ✨ Insert a single `DemoProfile` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  demoProfile_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: DemoProfile_Data!
+  ): DemoProfile_KeyOutput! @fdc_generated(from: "DemoProfile", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `DemoReport` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  demoReport_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: DemoReport_Data!
+  ): DemoReport_KeyOutput! @fdc_generated(from: "DemoReport", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert `DemoProfile` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  demoProfile_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [DemoProfile_Data!]!
+  ): [DemoProfile_KeyOutput!]! @fdc_generated(from: "DemoProfile", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `DemoReport` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  demoReport_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [DemoReport_Data!]!
+  ): [DemoReport_KeyOutput!]! @fdc_generated(from: "DemoReport", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert or update a single `DemoProfile` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `DemoProfile`.
+  """
+  demoProfile_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: DemoProfile_Data!
+  ): DemoProfile_KeyOutput! @fdc_generated(from: "DemoProfile", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `DemoReport` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `DemoReport`.
+  """
+  demoReport_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: DemoReport_Data!
+  ): DemoReport_KeyOutput! @fdc_generated(from: "DemoReport", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update `DemoProfile` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `DemoProfile`.
+  """
+  demoProfile_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [DemoProfile_Data!]!
+  ): [DemoProfile_KeyOutput!]! @fdc_generated(from: "DemoProfile", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `DemoReport` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `DemoReport`.
+  """
+  demoReport_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [DemoReport_Data!]!
+  ): [DemoReport_KeyOutput!]! @fdc_generated(from: "DemoReport", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Update a single `DemoProfile` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `DemoProfile` or `null` if not found.
+  """
+  demoProfile_update(
+    """
+    The key used to identify the object.
+    """
+    key: DemoProfile_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DemoProfile_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: DemoProfile_Data!
+  ): DemoProfile_KeyOutput @fdc_generated(from: "DemoProfile", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `DemoReport` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `DemoReport` or `null` if not found.
+  """
+  demoReport_update(
+    """
+    The key used to identify the object.
+    """
+    key: DemoReport_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DemoReport_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: DemoReport_Data!
+  ): DemoReport_KeyOutput @fdc_generated(from: "DemoReport", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update `DemoProfile` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  demoProfile_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: DemoProfile_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: DemoProfile_Data!
+  ): Int! @fdc_generated(from: "DemoProfile", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `DemoReport` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  demoReport_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: DemoReport_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: DemoReport_Data!
+  ): Int! @fdc_generated(from: "DemoReport", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Delete a single `DemoProfile` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  demoProfile_delete(
+    """
+    The key used to identify the object.
+    """
+    key: DemoProfile_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DemoProfile_FirstRow
+  ): DemoProfile_KeyOutput @fdc_generated(from: "DemoProfile", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `DemoReport` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  demoReport_delete(
+    """
+    The key used to identify the object.
+    """
+    key: DemoReport_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DemoReport_FirstRow
+  ): DemoReport_KeyOutput @fdc_generated(from: "DemoReport", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete `DemoProfile` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  demoProfile_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: DemoProfile_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "DemoProfile", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `DemoReport` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  demoReport_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: DemoReport_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "DemoReport", purpose: DELETE_MULTIPLE)
+}

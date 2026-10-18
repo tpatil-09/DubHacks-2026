@@ -24,6 +24,9 @@ export interface Backend {
   signInDemo(): Promise<void>
   signOut(): Promise<void>
 
+  /** Idempotently copy the signed-in member's old Firestore data into the active database. */
+  migrateLegacyData(): Promise<void>
+
   getAccount(uid: string): Promise<Account | null>
   saveAccount(uid: string, patch: Partial<Account>): Promise<void>
   getProfile(uid: string): Promise<Profile | null>
@@ -65,7 +68,7 @@ export interface Backend {
 }
 
 export function matchIdFor(a: string, b: string): string {
-  return [a, b].sort().join('_')
+  return [a, b].sort().map((uid) => `${uid.length}:${uid}`).join('')
 }
 
 export function otherUser(match: Match, uid: string): string {

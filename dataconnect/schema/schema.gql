@@ -1,0 +1,43 @@
+type DemoProfile @table(key: "uid") {
+  uid: String!
+  authUid: String @unique
+  email: String! @unique
+  displayName: String!
+  age: Int!
+  gender: String!
+  interestedIn: [String!]!
+  city: String!
+  bio: String!
+  prompts: Any!
+  photos: [String!]!
+  avatarEmoji: String!
+  avatarColor: String!
+  interests: [String!]!
+  quiz: Any!
+  discoverable: Boolean!
+  isDemo: Boolean!
+  updatedAt: Timestamp!
+}
+
+type DemoLike @table {
+  person: DemoProfile! @unique
+  likes: Boolean!
+}
+
+type DemoReport @table(key: "reportId") {
+  reportId: String!
+  subjectUid: String!
+  schemaVersion: String!
+  generatedAt: Timestamp!
+  isSynthetic: Boolean!
+  subjectNameProvided: String!
+  contextProvided: String
+  sourcesSearched: [String!]!
+  sourcesNotAccessible: [String!]!
+  searchCompleted: Boolean!
+  summary: String!
+  findings: Any!
+  limitations: [String!]!
+  errors: [String!]!
+  humanReviewRequired: Boolean!
+}
