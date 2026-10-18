@@ -1,13 +1,12 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
-import { motion } from 'motion/react'
-import { Capsule } from '../../components/ui/Capsule'
-import { PersonaBadge } from '../../components/ui/Badges'
+import { ArrowRight, ChevronRight } from 'lucide-react'
 import { backend } from '../../data'
 import { wyrPrompts } from '../../games/wouldYouRather/prompts'
+import { personaById } from '../../games/quiz/personas'
 import { buzzQuizzes, isComplete, matchPuzzles, scoreBuzzQuiz, type FunGame } from '../../games/fun/games'
 import type { GameAnswers } from '../../types'
-import { arcadeVars, type PastelColor } from '../../lib/colors'
+import { pastel, type PastelColor } from '../../lib/colors'
 import { useSession } from '../../store/session'
 
 export default function ArcadeHub() {
@@ -22,101 +21,119 @@ export default function ArcadeHub() {
     backend().getGameAnswers(uid).then(setPlayed).catch(() => setPlayed({}))
   }, [uid])
 
-  return (
-    <div className="pb-8">
-      <div className="mb-10">
-        <div>
-          <span className="eyebrow">Totally optional</span>
-          <h1 className="mt-4 text-[2.6rem] sm:text-6xl">Find a fun match.</h1>
-          <p className="mt-4 text-lg text-ink-soft">Play a quick game to find people on your wavelength, or just keep swiping.</p>
-        </div>
-      </div>
+  const persona = personaById(profile?.quiz?.personaId)
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <GameCard
+  return (
+    <div className="pb-12">
+      <header className="mb-10 max-w-2xl">
+        <span className="eyebrow">Totally optional</span>
+        <h1 className="mt-4 text-[2.6rem] sm:text-6xl">Find a fun match.</h1>
+        <p className="mt-4 text-lg text-ink-soft">Play a quick game to find people on your wavelength, or just keep swiping.</p>
+      </header>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <FeaturedGame
           to="/arcade/quiz"
           color="lilac"
-          emoji="🧩"
-          title="Compatibility Quiz"
-          subtitle="What’s your co-op player type? 10 questions, 8 personas."
-          cta={profile?.quiz ? 'Retake quiz' : 'Play'}
-          footer={profile?.quiz ? <PersonaBadge personaId={profile.quiz.personaId} /> : <span className="text-sm text-ink-soft">Unlocks vibe % on every profile</span>}
+          kicker="Compatibility quiz"
+          title={persona ? `You’re ${persona.name}` : 'What’s your co\u2011op player type?'}
+          body="Ten questions about how you spend your time. Your result adds a vibe % to every profile you see."
+          meta={persona ? 'Retake' : '10 questions'}
         />
-        <GameCard
+        <FeaturedGame
           to="/arcade/would-you-rather"
-          color="bubblegum"
-          emoji="🎰"
-          title="Would You Rather"
-          subtitle="Crank the capsule machine, pick a side, and see which matches agree."
-          cta="Play"
-          footer={<span className="text-sm text-ink-soft">{wyrCount === null ? '…' : `${wyrCount} of ${wyrPrompts.length} capsules opened`}</span>}
+          color="peach"
+          kicker="Would you rather"
+          title="Pick a side, see who agrees"
+          body="Crank the capsule machine for a dilemma, then see which of your matches picked the same."
+          meta={wyrCount === null ? '…' : `${wyrCount} of ${wyrPrompts.length} answered`}
         />
       </div>
 
-      <GameSection title="Quizzes" blurb="BuzzFeed-style, 6 questions each. Find out who got the same result." games={buzzQuizzes} played={played} />
-      <GameSection title="Match puzzles" blurb="Lots of right answers. Pick the same things as someone and you’re puzzle twins." games={matchPuzzles} played={played} />
+      <div className="mt-14 grid gap-12 lg:grid-cols-2 lg:gap-10">
+        <GameList
+          title="Quizzes"
+          blurb="Six questions, one result. See who got the same."
+          games={buzzQuizzes}
+          played={played}
+        />
+        <GameList
+          title="Match puzzles"
+          blurb="No wrong answers. Pick the same things as someone and you’re twins."
+          games={matchPuzzles}
+          played={played}
+        />
+      </div>
     </div>
   )
 }
 
-function GameSection({ title, blurb, games, played }: { title: string; blurb: string; games: FunGame[]; played: Record<string, GameAnswers> }) {
+interface FeaturedGameProps {
+  to: string
+  color: PastelColor
+  kicker: string
+  title: string
+  body: string
+  meta: ReactNode
+}
+
+function FeaturedGame({ to, color, kicker, title, body, meta }: FeaturedGameProps) {
   return (
-    <section className="mt-12" aria-label={title}>
-      <h2 className="text-3xl font-bold">{title}</h2>
-      <p className="mt-1 text-ink-soft">{blurb}</p>
-      <div className="mt-5 grid gap-5 md:grid-cols-2">
-        {games.map((game) => {
-          const answers = played[game.id]
-          const done = isComplete(game, answers)
-          return (
-            <GameCard
-              key={game.id}
-              to={`/arcade/play/${game.id}`}
-              color={game.color}
-              emoji={game.emoji}
-              title={game.title}
-              subtitle={game.kind === 'quiz' ? game.tagline : game.prompt}
-              cta={done ? 'See twins' : 'Play'}
-              footer={
-                <span className="text-sm text-ink-soft">
-                  {done && answers ? (game.kind === 'quiz' ? `You got ${scoreBuzzQuiz(game, answers).emoji} ${scoreBuzzQuiz(game, answers).title}` : 'Picks locked in ✓') : '+5 tokens'}
-                </span>
-              }
-            />
-          )
-        })}
+    <Link
+      to={to}
+      className="group flex flex-col rounded-[var(--radius-card)] p-6 transition-colors sm:p-7"
+      style={{ background: pastel[color].soft }}
+    >
+      <span className="text-sm font-semibold" style={{ color: pastel[color].deep }}>{kicker}</span>
+      <h2 className="mt-2 text-[1.75rem] leading-tight">{title}</h2>
+      <p className="mt-2 max-w-md text-ink-soft">{body}</p>
+      <div className="mt-6 flex items-center justify-between text-sm">
+        <span className="text-ink-soft">{meta}</span>
+        <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
+          Play
+          <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+        </span>
       </div>
+    </Link>
+  )
+}
+
+function GameList({ title, blurb, games, played }: { title: string; blurb: string; games: FunGame[]; played: Record<string, GameAnswers> }) {
+  return (
+    <section aria-label={title}>
+      <div className="mb-4 flex items-baseline justify-between gap-4 border-b border-[var(--color-line)] pb-3">
+        <h2 className="text-2xl">{title}</h2>
+        <span className="text-sm text-ink-soft">{games.length} games</span>
+      </div>
+      <p className="mb-2 text-sm text-ink-soft">{blurb}</p>
+      <ul className="divide-y divide-[var(--color-line)]">
+        {games.map((game) => (
+          <li key={game.id}>
+            <GameRow game={game} answers={played[game.id]} />
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }
 
-interface GameCardProps {
-  to: string
-  color: PastelColor
-  emoji: string
-  title: string
-  subtitle: string
-  cta: string
-  footer: ReactNode
-}
+function GameRow({ game, answers }: { game: FunGame; answers: GameAnswers | undefined }) {
+  const done = isComplete(game, answers)
+  const name = game.kind === 'quiz' ? game.name : game.title
+  const detail = game.kind === 'quiz' ? `${game.questions.length} questions` : `Pick ${game.pick} of ${game.options.length}`
+  const status = done && answers ? (game.kind === 'quiz' ? `You got ${scoreBuzzQuiz(game, answers).title}` : 'Picks saved') : null
 
-function GameCard({ to, color, emoji, title, subtitle, cta, footer }: GameCardProps) {
   return (
-    <motion.div whileHover={{ y: -4, rotate: -0.5 }} transition={{ type: 'spring', stiffness: 300, damping: 18 }}>
-      <Link to={to} className="gloss-card group flex h-full flex-col gap-4 p-6">
-        <div className="flex items-start justify-between">
-          <span className="text-6xl drop-shadow-[0_6px_6px_rgba(35,26,27,.15)]" aria-hidden>{emoji}</span>
-          <Capsule color={color} size={44} className="transition-transform group-hover:rotate-12" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold">{title}</h2>
-          <p className="mt-1 text-ink-soft">{subtitle}</p>
-        </div>
-        <div className="mt-auto flex items-center justify-between gap-3">
-          {footer}
-          <span className="btn-arcade h-11 shrink-0 px-5" style={arcadeVars(color)}>{cta} ▶</span>
-        </div>
-      </Link>
-    </motion.div>
+    <Link to={`/arcade/play/${game.id}`} className="group -mx-3 flex items-center gap-4 rounded-xl px-3 py-3.5 transition-colors hover:bg-white">
+      <span className="grid size-11 shrink-0 place-items-center rounded-xl text-[22px]" style={{ background: pastel[game.color].soft }} aria-hidden>
+        {game.emoji}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-semibold">{name}</span>
+        <span className="block truncate text-sm text-ink-soft">{status ?? detail}</span>
+      </span>
+      {done && <span className="hidden text-xs font-semibold text-ink-soft sm:inline">See twins</span>}
+      <ChevronRight className="size-5 shrink-0 text-ink-soft transition-transform group-hover:translate-x-0.5" aria-hidden />
+    </Link>
   )
 }

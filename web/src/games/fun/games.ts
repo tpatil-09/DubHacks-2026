@@ -32,6 +32,8 @@ export interface BuzzResult {
 export interface BuzzQuiz {
   kind: 'quiz'
   id: string
+  /** Short name for lists. */
+  name: string
   title: string
   tagline: string
   emoji: string
@@ -62,6 +64,7 @@ export const buzzQuizzes: BuzzQuiz[] = [
   {
     kind: 'quiz',
     id: 'dream-date',
+    name: 'Love language',
     title: 'Build your dream date and we’ll reveal your love language',
     tagline: '6 questions · 5 love languages',
     emoji: '💌',
@@ -139,6 +142,7 @@ export const buzzQuizzes: BuzzQuiz[] = [
   {
     kind: 'quiz',
     id: 'dessert',
+    name: 'Which dessert are you?',
     title: 'Plan a perfect year and we’ll tell you which dessert you are',
     tagline: '6 questions · 5 desserts',
     emoji: '🍰',
@@ -217,6 +221,7 @@ export const buzzQuizzes: BuzzQuiz[] = [
   {
     kind: 'quiz',
     id: 'road-trip',
+    name: 'Your green flag',
     title: 'Pack road-trip snacks and we’ll guess your green flag',
     tagline: '6 questions · 5 green flags',
     emoji: '🚗',
@@ -297,7 +302,7 @@ export const matchPuzzles: MatchPuzzle[] = [
   {
     kind: 'puzzle',
     id: 'desert-island',
-    title: 'Desert Island Pack',
+    title: 'Desert island pack',
     prompt: 'You’re stranded for a month. Pack exactly 3 things.',
     emoji: '🏝️',
     color: 'sky',
@@ -320,7 +325,7 @@ export const matchPuzzles: MatchPuzzle[] = [
   {
     kind: 'puzzle',
     id: 'first-date-spots',
-    title: 'First-Date Bingo',
+    title: 'First-date bingo',
     prompt: 'Pick your top 3 first-date spots.',
     emoji: '📍',
     color: 'peach',
@@ -342,7 +347,7 @@ export const matchPuzzles: MatchPuzzle[] = [
   {
     kind: 'puzzle',
     id: 'dream-pizza',
-    title: 'Dream Pizza',
+    title: 'Dream pizza',
     prompt: 'Build a pizza with exactly 4 toppings.',
     emoji: '🍕',
     color: 'butter',
@@ -365,7 +370,7 @@ export const matchPuzzles: MatchPuzzle[] = [
   {
     kind: 'puzzle',
     id: 'road-trip-playlist',
-    title: 'Road-Trip Playlist',
+    title: 'Road-trip playlist',
     prompt: 'Pick 3 genres for the aux.',
     emoji: '🎶',
     color: 'lilac',
