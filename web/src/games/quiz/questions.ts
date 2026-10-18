@@ -47,6 +47,7 @@ export const quizQuestions: QuizQuestion[] = [
       { id: 'spreadsheet', emoji: '📊', label: 'A color-coded spreadsheet', scores: { plannerSpontaneous: -2 } },
       { id: 'vibes', emoji: '🎲', label: 'Book a flight, figure out the rest there', scores: { plannerSpontaneous: 2, cozyAdventurous: 1 } },
       { id: 'cabin', emoji: '🏡', label: 'Same cozy cabin every year', scores: { cozyAdventurous: -2, plannerSpontaneous: -1 } },
+      { id: 'mysterious', emoji: '⛰️', label: 'I travel like it is my job ', scores: { cozyAdventurous: 2, plannerSpontaneous: 3 } },
     ],
   },
   {
@@ -89,11 +90,12 @@ export const quizQuestions: QuizQuestion[] = [
   },
   {
     id: 'ducks',
-    prompt: 'What would you do with an army of 100 ducks?',
+    prompt: 'What would you do with an army of 100 baby ducklings?',
     options: [
-      { id: 'snuggle', emoji: '🤗', label: 'Snuggle them', scores: { cozyAdventurous: -2, chattyChill: 1 } },
+      { id: 'snuggle', emoji: '🤗', label: 'Snuggle them, so fluffy!', scores: { cozyAdventurous: -2, chattyChill: 1 } },
       { id: 'driveway', emoji: '😈', label: "Inconvenience my enemies by blocking their driveway", scores: { cozyAdventurous: 2, plannerSpontaneous: 1 } },
       { id: 'trenchcoat', emoji: '🥸', label: 'Buy a trench coat and sneak them into the movies', scores: { plannerSpontaneous: 2, cozyAdventurous: 1 } },
+      { id: 'evil', emoji: '🐣', label: 'Have them waddle behind me for intimidation', scores: { chattyChill: 2, cozyAdventurous: 1 } },
     ],
   },
 ]
