@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
-import { Ban, ChevronLeft, Flag, Heart, ScanSearch, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router'
+import { Ban, ChevronLeft, Flag, Heart, X } from 'lucide-react'
 import { ArcadeCard } from '../components/ui/ArcadeCard'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
 import { ProfilePhoto } from '../components/ui/ProfilePhoto'
@@ -9,6 +9,7 @@ import { PersonaBadge, VibeMeter } from '../components/ui/Badges'
 import { EmptyState, PageLoader } from '../components/ui/States'
 import { BlockReportModal } from '../components/profile/BlockReport'
 import { MatchModal } from '../components/discover/MatchModal'
+import { BackgroundCheck, TierChip } from '../components/safety/BackgroundCheck'
 import { useProfile } from '../hooks/data'
 import { backend } from '../data'
 import { vibePercent } from '../lib/vibe'
@@ -26,9 +27,16 @@ export default function ProfileDetail() {
   const [modal, setModal] = useState<'block' | 'report' | null>(null)
   const [match, setMatch] = useState<{ matchId: string } | null>(null)
   const [busy, setBusy] = useState(false)
+  const location = useLocation()
+
+  useEffect(() => {
+    if (!loading && location.hash === '#background-check') {
+      document.getElementById('background-check')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [loading, location.hash])
 
   if (loading) return <PageLoader />
-  if (!profile) return <EmptyState title="Profile not found" body="This player may have left the arcade." mood="thinking" />
+  if (!profile) return <EmptyState title="Profile not found" body="This profile is no longer available." mood="thinking" />
 
   const age = profile.age
   const vibe = me?.quiz && profile.quiz ? vibePercent(me.quiz.axes, profile.quiz.axes) : null
@@ -89,6 +97,7 @@ export default function ProfileDetail() {
             </div>
             {profile.city && <p className="text-ink-soft">📍 {profile.city}</p>}
             <div className="mt-2 flex flex-wrap items-center gap-3">
+              <a href="#background-check" aria-label="Jump to background check"><TierChip uid={profile.uid} size="md" /></a>
               <PersonaBadge personaId={profile.quiz?.personaId} />
               {vibe !== null && <VibeMeter percent={vibe} />}
             </div>
@@ -113,16 +122,6 @@ export default function ProfileDetail() {
                   Like
                 </ArcadeButton>
               </div>
-              <Link
-                to={`/safety/request/${profile.uid}`}
-                className="flex items-center gap-3 rounded-2xl border-2 border-white bg-white/70 p-3 transition hover:bg-white"
-              >
-                <ScanSearch className="size-6 shrink-0 text-lilac-deep" />
-                <span>
-                  <span className="block font-display font-semibold">Request a safety report</span>
-                  <span className="text-sm text-ink-soft">Private to you. A limited, source-linked summary of public records.</span>
-                </span>
-              </Link>
               <div className="flex gap-4 text-sm">
                 <button type="button" onClick={() => setModal('block')} className="flex items-center gap-1 text-ink-soft hover:text-ink">
                   <Ban className="size-4" /> Block
@@ -134,6 +133,10 @@ export default function ProfileDetail() {
             </>
           )}
         </div>
+      </div>
+
+      <div className="mt-8">
+        <BackgroundCheck uid={profile.uid} name={profile.displayName} self={isMe} />
       </div>
 
       <BlockReportModal otherUid={profile.uid} otherName={profile.displayName} mode={modal} onClose={() => setModal(null)} />

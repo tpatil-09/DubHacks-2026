@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { motion } from 'motion/react'
-import { Ban, ChevronLeft, Ellipsis, Flag, HeartCrack, ScanSearch, Send, User } from 'lucide-react'
+import { Ban, ChevronLeft, Ellipsis, Flag, HeartCrack, Send, ShieldCheck, User } from 'lucide-react'
 import { Avatar } from '../components/ui/ProfilePhoto'
 import { PersonaBadge } from '../components/ui/Badges'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
@@ -202,7 +202,7 @@ export default function Chat() {
       <Modal open={menuOpen} onClose={() => setMenuOpen(false)} title="Chat options">
         <div className="grid gap-2">
           <MenuItem icon={<User className="size-5" />} label="View profile" onClick={() => navigate(`/profile/${partnerUid}`)} />
-          <MenuItem icon={<ScanSearch className="size-5" />} label="Request safety report" onClick={() => navigate(`/safety/request/${partnerUid}`)} />
+          <MenuItem icon={<ShieldCheck className="size-5" />} label="Background check" onClick={() => navigate(`/profile/${partnerUid}#background-check`)} />
           <MenuItem icon={<HeartCrack className="size-5" />} label="Unmatch" onClick={unmatch} />
           <MenuItem icon={<Ban className="size-5" />} label="Block" onClick={() => { setMenuOpen(false); setModal('block') }} />
           <MenuItem icon={<Flag className="size-5" />} label="Report" onClick={() => { setMenuOpen(false); setModal('report') }} />

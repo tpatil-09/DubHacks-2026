@@ -35,9 +35,32 @@ export const findingSchema = z.object({
   supporting_excerpt: z.string().nullable().optional(),
   conflicts: z.array(z.string()),
   limitations: z.array(z.string()),
+  // Optional fields produced by background_check (see claude.md section 7).
+  evidence_status: z.enum(['verified', 'unverified', 'inconclusive']).optional(),
+  why_unresolved: z.string().nullable().optional(),
+  historical_report_only: z.boolean().optional(),
+})
+
+export const recordTiers = [
+  'verified_record_requires_attention',
+  'reported_conviction_unconfirmed',
+  'unresolved_allegations_or_charges',
+  'cleared_outcomes_only',
+  'no_linked_records',
+  'insufficient_information',
+] as const
+
+export const tldrSchema = z.object({
+  record_tier: z.enum(recordTiers),
+  tier_label: z.string(),
+  headline: z.string(),
+  key_points: z.array(z.object({ text: z.string(), finding_ids: z.array(z.string()) })),
+  caveats: z.array(z.string()),
 })
 
 export const safetyReportSchema = z.object({
+  /** The background check's summary: a rule-based tier plus a plain-language headline. */
+  tldr: tldrSchema.optional(),
   schema_version: z.string(),
   report_id: z.string(),
   generated_at: isoTimestamp,
@@ -61,8 +84,38 @@ export const safetyReportSchema = z.object({
 
 export type IdentityAssessment = (typeof identityAssessments)[number]
 export type CaseStatus = (typeof caseStatuses)[number]
+export type RecordTier = (typeof recordTiers)[number]
 export type Finding = z.infer<typeof findingSchema>
 export type SafetyReport = z.infer<typeof safetyReportSchema>
+export type Tldr = z.infer<typeof tldrSchema>
+
+/** Color coding for each record tier. Labels describe the evidence, never the person ("safe" is never used). */
+export const tierStyles: Record<RecordTier, { short: string; tone: 'red' | 'orange' | 'amber' | 'green' | 'gray' }> = {
+  verified_record_requires_attention: { short: 'Record needs attention', tone: 'red' },
+  reported_conviction_unconfirmed: { short: 'Past record reported', tone: 'orange' },
+  unresolved_allegations_or_charges: { short: 'Open allegations', tone: 'amber' },
+  cleared_outcomes_only: { short: 'Cleared', tone: 'green' },
+  no_linked_records: { short: 'No records linked', tone: 'green' },
+  insufficient_information: { short: 'Not enough info', tone: 'gray' },
+}
+
+/** Findings shown to viewers: verified or unresolved, and plausibly about this person. */
+export function visibleFindings(report: SafetyReport) {
+  const linked = report.findings.filter((f) => f.identity_assessment === 'strong_match' || f.identity_assessment === 'possible_match')
+  const verified = linked.filter((f) => (f.evidence_status ?? 'unverified') === 'verified')
+  const unresolved = linked.filter((f) => (f.evidence_status ?? 'unverified') !== 'verified')
+  const unlinkedCount = report.findings.length - linked.length
+  return { verified, unresolved, unlinkedCount }
+}
+
+/** Reports without a pipeline TLDR (older fixtures) fall back to a cautious tier. */
+export function reportTier(report: SafetyReport): RecordTier {
+  if (report.tldr) return report.tldr.record_tier
+  if (!report.scope.search_completed) return 'insufficient_information'
+  return visibleFindings(report).verified.length || visibleFindings(report).unresolved.length
+    ? 'unresolved_allegations_or_charges'
+    : 'no_linked_records'
+}
 
 export type ParsedReport = { ok: true; report: SafetyReport } | { ok: false; error: string }
 

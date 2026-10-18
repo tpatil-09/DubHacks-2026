@@ -7,6 +7,7 @@ import { ArcadeCard } from '../components/ui/ArcadeCard'
 import { ProfilePhoto } from '../components/ui/ProfilePhoto'
 import { PersonaBadge } from '../components/ui/Badges'
 import { InterestStickers } from '../components/ui/Sticker'
+import { BackgroundCheck, TierChip } from '../components/safety/BackgroundCheck'
 import { draftFromProfile, validateAbout, validateBasics, validatePhotos, type ProfileDraft } from '../lib/profileValidation'
 import { arcadeVars } from '../lib/colors'
 import { useSession } from '../store/session'
@@ -93,6 +94,7 @@ export default function MyProfile() {
               {age !== null && <span className="font-medium text-ink-soft">, {age}</span>}
             </h2>
             {profile.city && <p className="text-ink-soft">📍 {profile.city}</p>}
+            <TierChip uid={profile.uid} size="md" />
             {profile.quiz ? (
               <PersonaBadge personaId={profile.quiz.personaId} />
             ) : (
@@ -106,6 +108,9 @@ export default function MyProfile() {
                 <p className="font-display text-lg">{prompt.answer}</p>
               </div>
             ))}
+          </div>
+          <div className="sm:col-span-2">
+            <BackgroundCheck uid={profile.uid} name={profile.displayName} self />
           </div>
         </div>
       ) : (

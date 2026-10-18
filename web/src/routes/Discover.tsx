@@ -91,8 +91,8 @@ export default function Discover() {
       ) : queue.length === 0 ? (
         <EmptyState
           title="You’ve seen everyone!"
-          body="Play a game while new players join the arcade."
-          action={<Link to="/arcade" className="btn-arcade h-12 px-6" style={arcadeVars('lilac')}>Go to the arcade</Link>}
+          body="New people join every day. Try a fun-match game while you wait."
+          action={<Link to="/arcade" className="btn-arcade h-12 px-6" style={arcadeVars('lilac')}>Try a fun match</Link>}
         />
       ) : (
         <>

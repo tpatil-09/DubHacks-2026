@@ -4,6 +4,7 @@ import { animate, motion, useMotionValue, useReducedMotion, useTransform, type P
 import { ProfilePhoto } from '../ui/ProfilePhoto'
 import { InterestStickers, DemoTag } from '../ui/Sticker'
 import { PersonaBadge, VibeMeter } from '../ui/Badges'
+import { TierChip } from '../safety/BackgroundCheck'
 import { arcadeVars } from '../../lib/colors'
 import type { LikeType, Profile } from '../../types'
 
@@ -68,7 +69,10 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
           <div className="relative h-full overflow-hidden rounded-[18px]">
             <ProfilePhoto src={profile.photos[0]} alt={`${profile.displayName}'s photo`} className="h-full w-full" emojiSize="text-[9rem]" />
             <span className="holo-sheen" aria-hidden />
-            <div className="absolute left-3 top-3 flex gap-2">{profile.isDemo && <DemoTag />}</div>
+            <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+              <TierChip uid={profile.uid} />
+              {profile.isDemo && <DemoTag />}
+            </div>
             <motion.span style={{ opacity: likeOpacity }} className="absolute left-5 top-10 -rotate-12 rounded-2xl border-4 border-mint-deep bg-white/80 px-4 py-1 font-display text-3xl font-bold text-mint-deep">
               LIKE
             </motion.span>

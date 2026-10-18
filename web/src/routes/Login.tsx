@@ -45,14 +45,14 @@ export default function Login() {
       <AmbientBackground />
       <div className="w-full max-w-md">
         <Link to="/" className="mx-auto mb-16 flex w-fit items-center gap-2 font-display text-3xl font-bold tracking-tight">
-          <img src="/favicon.svg" alt="" className="size-10" /> vetted
+          <img src="/favicon.svg" alt="" className="size-10" /> SafeMatch
         </Link>
         <div className="gloss-card p-7">
           <div className="-mt-20 mb-2 flex justify-center">
             <Mascot mood="happy" size={110} />
           </div>
-          <h1 className="text-center text-3xl font-bold">{creatingAccount ? 'Create your player' : 'Insert coin to play'}</h1>
-          <p className="mt-1 text-center text-ink-soft">Sign in to start matching.</p>
+          <h1 className="text-center text-3xl font-bold">{creatingAccount ? 'Create your account' : 'Welcome back'}</h1>
+          <p className="mt-1 text-center text-ink-soft">Sign in to start matching. Every profile comes with a background check.</p>
 
           {firebaseAvailable ? (
             <>

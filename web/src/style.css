@@ -17,11 +17,13 @@
   --color-sky-deep: #74b4e8;
   --color-pearl: #f7f5fb;
   --color-sage: #cfe3d4;
+  --color-coral: #ff8a8a;
+  --color-coral-deep: #d9434e;
   --color-ink: #3b2f4a;
   --color-ink-soft: #6b5e7b;
 
-  --font-display: "Fredoka", ui-rounded, system-ui, sans-serif;
-  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", ui-rounded, system-ui, sans-serif;
+  --font-sans: "Figtree", system-ui, sans-serif;
 
   --radius-card: 24px;
 }

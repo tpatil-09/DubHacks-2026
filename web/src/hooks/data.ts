@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { backend } from '../data'
-import type { Match, Message, Profile, ReportRequest } from '../types'
+import type { Match, Message, Profile } from '../types'
+import { parseSafetyReport, type SafetyReport } from '../types/safetyReport'
 
 const profileCache = new Map<string, Promise<Profile | null>>()
 
@@ -69,11 +70,40 @@ export function useMessages(matchId: string | undefined) {
   return state
 }
 
-export function useReportRequest(requestId: string | undefined) {
-  const [state, setState] = useState<{ request: ReportRequest | null; loading: boolean }>({ request: null, loading: true })
+const screeningCache = new Map<string, Promise<unknown>>()
+
+export type ScreeningState =
+  | { status: 'loading' }
+  | { status: 'pending' }
+  | { status: 'error'; error: string }
+  | { status: 'ready'; report: SafetyReport }
+
+/** Loads and validates a member's background check (report.json from the background_check pipeline). */
+export function useScreening(uid: string | undefined): ScreeningState {
+  const [state, setState] = useState<ScreeningState>({ status: 'loading' })
   useEffect(() => {
-    if (!requestId) return
-    return backend().subscribeReportRequest(requestId, (request) => setState({ request, loading: false }))
-  }, [requestId])
+    if (!uid) return
+    let active = true
+    setState({ status: 'loading' })
+    let cached = screeningCache.get(uid)
+    if (!cached) {
+      cached = backend().getScreening(uid)
+      screeningCache.set(uid, cached)
+    }
+    cached
+      .then((raw) => {
+        if (!active) return
+        if (raw === null || raw === undefined) return setState({ status: 'pending' })
+        const parsed = parseSafetyReport(raw)
+        setState(parsed.ok ? { status: 'ready', report: parsed.report } : { status: 'error', error: parsed.error })
+      })
+      .catch((cause) => {
+        screeningCache.delete(uid)
+        if (active) setState({ status: 'error', error: cause instanceof Error ? cause.message : 'Could not load the background check.' })
+      })
+    return () => {
+      active = false
+    }
+  }, [uid])
   return state
 }

@@ -10,7 +10,7 @@ import { backend } from '../../data'
 
 const tabs = [
   { to: '/discover', label: 'Discover', icon: Heart, color: 'bg-bubblegum' },
-  { to: '/arcade', label: 'Arcade', icon: Gamepad2, color: 'bg-lilac' },
+  { to: '/arcade', label: 'Fun match', icon: Gamepad2, color: 'bg-lilac' },
   { to: '/matches', label: 'Matches', icon: MessageCircle, color: 'bg-sky' },
   { to: '/me', label: 'Profile', icon: Smile, color: 'bg-mint' },
 ]
@@ -47,7 +47,7 @@ function PlayerBar() {
     <header className="sticky top-0 z-30 mx-auto flex w-full max-w-5xl items-center justify-between gap-3 bg-cream/75 px-4 py-3 backdrop-blur-md sm:px-6 lg:bg-transparent lg:backdrop-blur-none">
       <NavLink to="/discover" className="flex items-center gap-2 font-display text-2xl font-bold tracking-tight lg:hidden">
         <img src="/favicon.svg" alt="" className="size-9" />
-        vetted
+        SafeMatch
       </NavLink>
       <div className="ml-auto flex items-center gap-2">
         {backend().kind === 'demo' && <DemoTag />}
@@ -69,7 +69,7 @@ function ArcadeDock() {
       <div className="gloss-card flex items-center justify-around gap-1 px-2 py-2 lg:h-full lg:flex-col lg:items-stretch lg:justify-start lg:gap-3 lg:p-4">
         <NavLink to="/discover" className="mb-4 hidden items-center gap-2 px-2 font-display text-3xl font-bold tracking-tight lg:flex">
           <img src="/favicon.svg" alt="" className="size-10" />
-          vetted
+          SafeMatch
         </NavLink>
         {tabs.map(({ to, label, icon: Icon, color }) => (
           <NavLink

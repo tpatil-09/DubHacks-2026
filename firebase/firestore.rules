@@ -9,9 +9,9 @@ service cloud.firestore {
     match /users/{uid} {
       allow read, delete: if isMe(uid);
       allow create: if isMe(uid)
-        && request.resource.data.keys().hasOnly(['uid', 'email', 'onboardingStep', 'settings', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'onboardingStep', 'settings', 'createdAt', 'screeningConsentAt'])
         && request.resource.data.uid == uid;
-      allow update: if isMe(uid) && onlyChanges(['onboardingStep', 'settings']);
+      allow update: if isMe(uid) && onlyChanges(['onboardingStep', 'settings', 'screeningConsentAt']);
     }
 
     // Discoverable profiles: any signed-in user can read; only the owner can write.
@@ -102,9 +102,11 @@ service cloud.firestore {
       allow write: if isMe(uid);
     }
 
-    // Written only by the screening team's Cloud Functions (Admin SDK bypasses rules).
-    match /reportRequests/{requestId} {
-      allow read: if signedIn() && resource.data.requesterUid == request.auth.uid;
+    // screenings/{uid}: the member's background check (report.json from background_check), written only by
+    // the screening Cloud Function after the member consents at onboarding (Admin SDK bypasses rules).
+    // Every signed-in member can read it; the UI shows only findings linked to the person.
+    match /screenings/{uid} {
+      allow read: if signedIn();
       allow write: if false;
     }
 

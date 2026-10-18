@@ -1,5 +1,5 @@
 {
-  "name": "vetted-web",
+  "name": "safematch-web",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -11,8 +11,8 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
-    "@fontsource/dm-sans": "^5.3.0",
-    "@fontsource/fredoka": "^5.3.0",
+    "@fontsource/bricolage-grotesque": "^5.3.0",
+    "@fontsource/figtree": "^5.3.0",
     "canvas-confetti": "^1.9.4",
     "firebase": "^13.0.0",
     "lucide-react": "^1.59.0",

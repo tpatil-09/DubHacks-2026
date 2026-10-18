@@ -6,9 +6,9 @@ import { Capsule } from '../components/ui/Capsule'
 import type { PastelColor } from '../lib/colors'
 
 const steps: { color: PastelColor; title: string; body: string }[] = [
-  { color: 'bubblegum', title: 'Make your player card', body: 'Photos, stickers, and a bio that sounds like you.' },
-  { color: 'lilac', title: 'Play to connect', body: 'Take the vibe quiz and crack open Would You Rather capsules.' },
-  { color: 'mint', title: 'Meet with care', body: 'Optional, source-linked safety reports before you meet.' },
+  { color: 'bubblegum', title: 'Make your profile', body: 'Photos, interests, and a bio that sounds like you.' },
+  { color: 'mint', title: 'Background checks built in', body: 'Every profile shows a color-coded summary of public records, with links to the sources.' },
+  { color: 'lilac', title: 'Swipe, or play for a fun match', body: 'Date the classic way, or try a quick quiz and Would You Rather to find your wavelength.' },
 ]
 
 export default function Landing() {
@@ -17,7 +17,7 @@ export default function Landing() {
       <AmbientBackground />
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <span className="flex items-center gap-2 font-display text-3xl font-bold tracking-tight">
-          <img src="/favicon.svg" alt="" className="size-10" /> vetted
+          <img src="/favicon.svg" alt="" className="size-10" /> SafeMatch
         </span>
         <Link to="/login" className="font-display font-semibold text-ink-soft hover:text-ink">
           Sign in
@@ -27,17 +27,17 @@ export default function Landing() {
       <main className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-16 pt-6 md:grid-cols-[1.15fr_.85fr] md:pt-12">
         <section>
           <p className="mb-3 inline-block rounded-full border-[3px] border-white bg-butter px-4 py-1 font-display text-sm font-semibold shadow-sm">
-            🕹️ The cozy pastel dating arcade
+            💘 Dating that’s actually fun
           </p>
           <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
-            Find your <span className="text-bubblegum-deep">player two.</span>
+            Have fun dating. <span className="text-bubblegum-deep">We do the homework.</span>
           </h1>
           <p className="mt-5 max-w-md text-lg text-ink-soft">
-            Swipe collectible profile cards, play silly mini-games with your matches, and meet up feeling informed.
+            Every SafeMatch profile comes with a background check of public records, so you can spend less time worrying and more time enjoying the date. Swipe like any dating app, or play a game for a fun match.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link to="/login" className="btn-arcade h-14 px-8 text-lg">
-              Start playing ▶
+              Start matching
             </Link>
           </div>
         </section>
@@ -75,7 +75,7 @@ export default function Landing() {
         ))}
       </section>
 
-      <footer className="pb-8 text-center text-sm text-ink-soft">© 2026 Vetted · A DubHacks prototype</footer>
+      <footer className="pb-8 text-center text-sm text-ink-soft">© 2026 SafeMatch · A DubHacks prototype · Background checks summarize public sources and can’t guarantee safety.</footer>
     </div>
   )
 }
