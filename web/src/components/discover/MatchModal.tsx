@@ -16,7 +16,10 @@ export function MatchModal({ match, me, onClose }: MatchModalProps) {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (match) celebrate()
+    if (match) {
+      celebrate()
+      new Audio('/sounds/its-a-match.mp3').play().catch(() => {})
+    }
   }, [match])
 
   return (
