@@ -6,6 +6,12 @@
   },
   "firestore": { "rules": "firebase/firestore.rules", "indexes": "firebase/firestore.indexes.json" },
   "storage": { "rules": "firebase/storage.rules" },
+  "functions": {
+    "source": "functions",
+    "runtime": "python312",
+    "codebase": "default",
+    "ignore": ["venv", ".venv", "__pycache__", "*.pyc", ".secret.local"]
+  },
   "emulators": {
     "auth": { "port": 9099 },
     "firestore": { "port": 8080 },

@@ -15,6 +15,12 @@ node_modules/
 dist/
 .vite/
 functions/lib/
+functions/venv/
+functions/.venv/
+functions/_pipeline/
+functions/config/
+__pycache__/
+*.pyc
 
 # Firebase local tooling
 .firebase/
