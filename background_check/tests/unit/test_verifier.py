@@ -148,3 +148,34 @@ def test_api_records_count_as_opened_and_grounded():
     c = c.model_copy(update={"provenance": c.provenance.model_copy(update={"from_records_api": True})})
     v = apply_guards(c, llm_verification(c, source_accessible=False), excerpt_confirmed=False)
     assert v.evidence_status == EvidenceStatus.verified and v.source_accessible and v.excerpt_confirmed
+
+
+def test_verifier_receives_official_text_passages_for_api_records():
+    from safematch.models import OfficialRecord
+
+    c = candidate()
+    c = c.model_copy(update={"provenance": c.provenance.model_copy(update={"from_records_api": True})})
+    rec = OfficialRecord(provider=RetrievedVia.courtlistener, record_type="appellate_opinion", url=c.source_url,
+                         title="State v. Doe", text_passages=["We affirm Doe's conviction and sentence."],
+                         full_text_status="retrieved")
+    inv = _inv(c).model_copy(update={"official_records": [rec]})
+    llm = MockLLMProvider({"verifier": lambda t: {"results": [llm_verification(c).model_dump(mode="json")]}})
+    Verifier(llm).run(inv)
+    sent = llm.calls[0].user_prompt
+    assert "official_text_passages" in sent and "We affirm Doe" in sent
+
+
+def test_unopened_courtlistener_page_with_api_text_is_not_an_error():
+    from safematch.models import OfficialRecord
+
+    c = candidate()
+    c = c.model_copy(update={"provenance": c.provenance.model_copy(update={"from_records_api": True})})
+    rec = OfficialRecord(provider=RetrievedVia.courtlistener, record_type="appellate_opinion", url=c.source_url,
+                         title="State v. Doe", text_passages=["We affirm."], full_text_status="retrieved")
+    inv = _inv(c).model_copy(update={"official_records": [rec]})
+    out = {"results": [llm_verification(c).model_dump(mode="json")],
+           "access_failures": [{"target": c.source_url, "kind": "blocked_by_policy", "detail": "used API text"},
+                               {"target": "https://news.example.com/x", "kind": "fetch_failed", "detail": "HTTP 403"}]}
+    vr = Verifier(MockLLMProvider({"verifier": lambda t: out})).run(inv)
+    targets = [e.target for e in vr.retrieval_errors]
+    assert c.source_url not in targets and "https://news.example.com/x" in targets

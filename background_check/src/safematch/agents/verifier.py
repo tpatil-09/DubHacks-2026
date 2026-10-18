@@ -258,6 +258,7 @@ class Verifier:
 
     def build_task(self, inv: InvestigatorResult, batch: List[CandidateFinding]) -> AgentTask:
         subject = inv.query.model_dump(mode="json", exclude={"scope"}, exclude_none=True)
+        passages = {r.url: r.text_passages for r in inv.official_records if r.text_passages}
         # Deliberately withhold the Investigator's provisional relevance/quality labels.
         claims = [
             {
@@ -271,6 +272,7 @@ class Verifier:
                 "stated_event_date": c.event_date,
                 "from_official_records_api": c.provenance.from_records_api,
                 "identity_details_in_record": c.identity_evidence if c.provenance.from_records_api else [],
+                "official_text_passages": passages.get(c.source_url, []) if c.provenance.from_records_api else [],
             }
             for c in batch
         ]
@@ -297,6 +299,7 @@ class Verifier:
     def run(self, inv: InvestigatorResult) -> VerifierResult:
         started = utc_now()
         errors = list(inv.retrieval_errors)
+        api_urls = {r.url for r in inv.official_records if r.text_passages}
         limitations = list(inv.limitations)
         queries = list(inv.search_queries_run)
         results: Dict[str, LLMVerification] = {}
@@ -319,6 +322,8 @@ class Verifier:
                     results[r.finding_id] = r
             queries += [truncate(q, 300) for q in out.search_queries_run]
             for a in out.access_failures:
+                if a.target in api_urls:  # official text came from the API; not opening the web page is not a failure
+                    continue
                 errors.append(RetrievalError(kind=a.kind, target=a.target[:300], detail=truncate(a.detail, 400), stage="verifier"))
 
         live = not self.llm.is_mock

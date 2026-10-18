@@ -294,6 +294,13 @@ class OfficialRecord(Strict):
     disposition: Optional[str] = None
     registry_as_of: Optional[str] = None
     identity_details: List[str] = Field(default_factory=list)
+    source_id: Optional[str] = Field(default=None, description="Provider's id for the document (CourtListener opinion id)")
+    text_passages: List[str] = Field(
+        default_factory=list, description="Relevant passages from the official full text (outcome, holding, identity)"
+    )
+    full_text_status: Optional[str] = Field(
+        default=None, description="retrieved | summary_only | not_fetched | failed (official full text via the API)"
+    )
     retrieved_at: str = Field(default_factory=utc_now)
 
 

@@ -116,3 +116,77 @@ def test_courtlistener_paces_requests_and_honours_retry_after():
 def test_courtlistener_stops_when_quota_window_is_long():
     res = cl_provider(lambda r: httpx.Response(429, headers={"Retry-After": "3600"}, json={})).search(Q)
     assert res.errors and all("quota" in e.detail for e in res.errors)
+
+
+OPINION_TEXT = (
+    "<p>COURT OF APPEALS OF WASHINGTON. STATE OF WASHINGTON, Respondent, v. ALEX R. FIXTURE DOE, Appellant.</p>"
+    + "<p>Background facts about the trial and the evidence presented to the jury. </p>" * 30
+    + "<p>Doe, a 34-year-old resident of Spokane County, was charged in 2017.</p>"
+    + "<p>A jury convicted Doe of rape in the second degree and the court sentenced him to 78 months.</p>"
+    + "<p>Analysis of the appellant's arguments about the jury instructions. </p>" * 30
+    + "<p>We affirm Doe's conviction and sentence.</p><p>AFFIRMED.</p>"
+)
+
+
+def _with_opinion_ids(*ids):
+    data = {"results": [dict(h) for h in OPINIONS["results"]]}
+    for hit, oid in zip(data["results"], ids):
+        hit["opinions"] = [dict(hit["opinions"][0], id=oid)]
+    return data
+
+
+def test_courtlistener_fetches_opinion_text_by_opinion_id_not_cluster_id():
+    seen = []
+
+    def handler(request: httpx.Request):
+        seen.append(request.url.path)
+        if request.url.path.startswith("/api/rest/v4/opinions/"):
+            # Short summary-only text for the second opinion; full text with several html fields for the first.
+            if request.url.path.endswith("/9001/"):
+                return httpx.Response(200, json={"id": 9001, "plain_text": "", "html": "<p>short</p>",
+                                                 "html_with_citations": OPINION_TEXT})
+            return httpx.Response(200, json={"id": 9003, "plain_text": "Defendant Alex Doe was sentenced. Judgment affirmed."})
+        return httpx.Response(200, json=_with_opinion_ids(9001, 9002, 9003) if request.url.params["type"] == "o" else {"results": []})
+
+    res = cl_provider(handler).search(Q)
+    assert "/api/rest/v4/opinions/9001/" in seen and "/api/rest/v4/opinions/9003/" in seen
+    assert "/api/rest/v4/opinions/111/" not in seen  # 111 is the cluster id from the page URL
+    wa = next(r for r in res.records if r.title == "State v. Doe")
+    assert wa.full_text_status == "retrieved" and wa.source_id == "9001"
+    joined = " ".join(wa.text_passages)
+    assert "<p>" not in joined and "AFFIRMED" in joined and "We affirm Doe's conviction" in joined
+    assert "34-year-old resident of Spokane County" in joined
+    assert sum(len(x) for x in wa.text_passages) <= 3000
+    assert "convict" in (wa.excerpt or "").lower() or "affirm" in (wa.excerpt or "").lower()
+    ca = next(r for r in res.records if r.title == "People v. Doe")
+    assert ca.full_text_status == "summary_only"
+    assert not res.errors
+
+
+def test_courtlistener_caps_text_fetches_and_reports_failures():
+    hits = {"results": [
+        {"caseName": f"State v. Doe {i}", "court": "Court of Appeals of Washington", "dateFiled": f"201{i}-01-01",
+         "docketNumber": str(i), "absolute_url": f"/opinion/{i}/x/", "opinions": [{"id": 500 + i, "snippet": "Alex Doe was convicted."}]}
+        for i in range(5)
+    ]}
+    fetches = []
+
+    def handler(request: httpx.Request):
+        if request.url.path.startswith("/api/rest/v4/opinions/"):
+            fetches.append(request.url.path)
+            return httpx.Response(500, json={})
+        return httpx.Response(200, json=hits if request.url.params["type"] == "o" else {"results": []})
+
+    res = cl_provider(handler).search(Q)
+    assert len(fetches) == 3 * 3  # 3 opinions, each tried 3 times (2 retries)
+    statuses = [r.full_text_status for r in res.records]
+    assert statuses.count("failed") == 3 and statuses.count("not_fetched") == 2
+    assert any(e.kind == ErrorKind.fetch_failed for e in res.errors)
+    assert any("per-person limit" in x for x in res.limitations)
+    assert all(TOKEN not in e.detail for e in res.errors)
+
+
+def test_key_passages_handles_empty_text():
+    from safematch.providers.records import key_passages, opinion_text
+    assert key_passages("", Q) == []
+    assert opinion_text({"plain_text": None, "html": "<b>Hi</b>"}) == "Hi"

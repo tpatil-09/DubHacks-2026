@@ -105,3 +105,5 @@ This case was added after a run missed a Washington Innocence Project page. That
 | Official conviction with a strong identity match | flag |
 | Official record, name-only match | no flag |
 | Records API outage | `partial` |
+
+**Official opinion text via the API.** CourtListener's web pages return HTTP 202 to automated fetches, so the agents couldn't read them, and API findings stayed `unverified`. The provider now fetches each opinion's text from `/api/rest/v4/opinions/{id}/`. The id is the opinion id from the search hit; the page URL holds the *cluster* id, and using that one returned unrelated cases. A live run for the same Maryland case retrieved full text for all 3 opinions (status `retrieved`, 0 errors). The extracted passages included the 2000 guilty verdicts, the post-conviction grant of a new trial, and the 2024 holding on the vacatur and nolle prosequi. These are passed to the Verifier as `official_text_passages`.

@@ -35,6 +35,10 @@ log = get_logger("records")
 
 COURTLISTENER_BASE = "https://www.courtlistener.com"
 MAX_RECORDS = 10
+# Full opinion texts fetched per person (1 request each). With 2 search requests that's 5 requests/person,
+# about 25 people/day on CourtListener's free tier (125 requests/day).
+MAX_TEXT_FETCHES = 3
+_OPINION_TEXT_FIELDS = ("plain_text", "html_with_citations", "html", "html_lawbox", "html_columbia", "html_anon_2020", "xml_harvard")
 
 US_STATES = {
     "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California", "CO": "Colorado",
@@ -124,6 +128,54 @@ def offense_category_from_text(text: str) -> OffenseCategory:
     return OffenseCategory.unknown
 
 
+_OUTCOME_SENTENCE = re.compile(
+    r"\b(we affirm|affirm(ed|s)?|we reverse|revers(ed|e)|vacat(e|ed|ing)|remand(ed)?|new trial|convict(ed|ion)|"
+    r"sentenc(ed|e)|guilty|acquit\w*|dismiss(ed|al)|judgment)\b",
+    re.I,
+)
+_JUDGMENT_LINE = re.compile(
+    r"\b(?:JUDGMENTS?|ORDER|CONVICTIONS?)?[A-Z ,;.']{0,80}\b(?:AFFIRMED|REVERSED|VACATED|REMANDED|DISMISSED)\b[A-Z ,;.'()0-9-]{0,160}"
+)
+_IDENTITY_SENTENCE = re.compile(r"\b(\d{2}[- ]year[- ]old|age(d)? \d{2}|born|resident of|county|years old)\b", re.I)
+
+
+def opinion_text(data: Dict[str, Any]) -> str:
+    """Longest available text field of a CourtListener opinion, as plain text."""
+    candidates = [str(data.get(f) or "") for f in _OPINION_TEXT_FIELDS]
+    raw = max(candidates, key=len) if candidates else ""
+    return " ".join(_TAGS.sub(" ", raw).split())
+
+
+def key_passages(text: str, query: PersonQuery, limit_chars: int = 3000) -> List[str]:
+    """The passages a reviewer needs: opening, closing judgment, outcome sentences, identity details."""
+    if not text:
+        return []
+    first, last = _name_parts(query)
+    sentences = re.split(r"(?<=[.!?])\s+(?=[A-Z(\"“])", text)
+    mentions = lambda s: re.search(rf"\b({re.escape(last)}|appellant|petitioner|defendant)\b", s, re.I)  # noqa: E731
+    picks: List[str] = []
+    picks.append(_clean(text[:600], 600))  # caption / syllabus / opening holding
+    outcome = [s for s in sentences if _OUTCOME_SENTENCE.search(s) and mentions(s) and 25 < len(s) < 600]
+    picks += outcome[:2] + outcome[-2:]  # how the case began and how it ended
+    identity = [s for s in sentences if re.search(rf"\b{re.escape(last)}\b", s, re.I) and _IDENTITY_SENTENCE.search(s) and len(s) < 500]
+    picks += identity[:2]
+    # Mandate line, which in long opinions sits before the concurrences, dissents and footnotes.
+    judgment = [m.group(0).strip(" .;,") for m in _JUDGMENT_LINE.finditer(text) if len(m.group(0).strip(" .;,")) > 12]
+    picks += judgment[:1]
+    tail = text[-600:]
+    if len(text) > 600:  # start the closing passage at a sentence boundary
+        cut = re.search(r"[.!?]\s+(?=[A-Z])", tail)
+        tail = tail[cut.end():] if cut else tail
+    picks.append(tail)  # closing judgment line ("JUDGMENT AFFIRMED", "REVERSED AND REMANDED")
+    out, total = [], 0
+    for s in picks:
+        s = _clean(s, 600)
+        if s and s not in out and total + len(s) <= limit_chars:
+            out.append(s)
+            total += len(s)
+    return out
+
+
 # --------------------------------------------------------------- CourtListener
 
 
@@ -139,7 +191,8 @@ class CourtListenerProvider:
     _last_request = 0.0  # shared across instances so separate runs in one process stay under the limit
 
     def __init__(self, token: Optional[str] = None, client: Optional[httpx.Client] = None, max_retries: int = 2,
-                 timeout: float = 20.0, sleep=time.sleep, clock=time.monotonic, min_interval: Optional[float] = None) -> None:
+                 timeout: float = 20.0, sleep=time.sleep, clock=time.monotonic, min_interval: Optional[float] = None,
+                 max_text_fetches: int = MAX_TEXT_FETCHES) -> None:
         headers = {"Accept": "application/json", "User-Agent": "SafeMatch-background-check/0.1"}
         if token:
             headers["Authorization"] = f"Token {token}"
@@ -151,6 +204,7 @@ class CourtListenerProvider:
         self._clock = clock
         self._min_interval = self.MIN_INTERVAL_SECONDS if min_interval is None else min_interval
         self.authenticated = bool(token)
+        self.max_text_fetches = max_text_fetches
 
     def _pace(self) -> None:
         wait = self._min_interval - (self._clock() - CourtListenerProvider._last_request)
@@ -158,12 +212,12 @@ class CourtListenerProvider:
             self._sleep(wait)
         CourtListenerProvider._last_request = self._clock()
 
-    def _get(self, params: Dict[str, str]) -> Dict[str, Any]:
+    def _get(self, params: Dict[str, str], path: str = "/api/rest/v4/search/") -> Dict[str, Any]:
         last = ""
         for attempt in range(self._max_retries + 1):
             self._pace()
             try:
-                resp = self._client.get("/api/rest/v4/search/", params=params)
+                resp = self._client.get(path, params=params)
             except httpx.HTTPError as exc:
                 last = type(exc).__name__
                 self._sleep(min(2 ** attempt * 2, 10))
@@ -227,6 +281,7 @@ class CourtListenerProvider:
             result.records.append(rec)
             if len(result.records) >= MAX_RECORDS:
                 break
+        self._attach_full_text(result, query)
         result.limitations.append(
             "CourtListener covers federal and state appellate opinions and federal dockets; it does not include state "
             "trial-court records or sex-offender registries."
@@ -238,7 +293,9 @@ class CourtListenerProvider:
 
     def _to_record(self, hit: Dict[str, Any], record_type: str, query: PersonQuery) -> Optional[OfficialRecord]:
         caption = str(hit.get("caseName") or hit.get("case_name_full") or "")
-        snippets = " ".join(_clean(o.get("snippet"), 2000) for o in (hit.get("opinions") or []) if isinstance(o, dict))
+        opinions = [o for o in (hit.get("opinions") or []) if isinstance(o, dict)]
+        snippets = " ".join(_clean(o.get("snippet"), 2000) for o in opinions)
+        opinion_id = opinions[0].get("id") if opinions else None
         parties = " ; ".join(str(p) for p in (hit.get("party") or []))
         text = f"{caption} {hit.get('caseNameFull') or ''} {parties} {snippets}"
         if not name_matches(text, query):
@@ -267,7 +324,40 @@ class CourtListenerProvider:
             excerpt=excerpt or None,
             offense_category=offense_category_from_text(snippets + " " + str(hit.get("cause") or "")),
             identity_details=[f"Name appears in the {'opinion' if record_type == 'appellate_opinion' else 'docket'} as matched by name only"],
+            source_id=str(opinion_id) if opinion_id else None,
+            full_text_status="not_fetched" if record_type == "appellate_opinion" else None,
         )
+
+    def _attach_full_text(self, result: RecordsResult, query: PersonQuery) -> None:
+        """Fetch official opinion text via the API (the website blocks automated page loads) and keep the key passages."""
+        fetched = 0
+        for i, rec in enumerate(result.records):
+            if rec.record_type != "appellate_opinion" or not rec.source_id:
+                continue
+            if fetched >= self.max_text_fetches:
+                break
+            fetched += 1
+            label = f"CourtListener opinion text: {rec.title}"
+            result.queries.append(label)
+            try:
+                data = self._get({"fields": ",".join(("id",) + _OPINION_TEXT_FIELDS)}, path=f"/api/rest/v4/opinions/{rec.source_id}/")
+            except (RuntimeError, PermissionError, ValueError) as exc:
+                result.errors.append(RetrievalError(kind=ErrorKind.fetch_failed, target=label, detail=scrub(str(exc))[:300], stage="investigator"))
+                result.records[i] = rec.model_copy(update={"full_text_status": "failed"})
+                continue
+            text = opinion_text(data)
+            passages = key_passages(text, query)
+            status = "retrieved" if len(text) > 1500 else "summary_only"
+            update: Dict[str, Any] = {"text_passages": passages, "full_text_status": status}
+            if passages:
+                outcome = next((s for s in passages[1:] if _OUTCOME_SENTENCE.search(s)), passages[0])
+                update["excerpt"] = _clean(outcome, 500)
+                update["offense_category"] = (rec.offense_category if rec.offense_category != OffenseCategory.unknown
+                                              else offense_category_from_text(" ".join(passages)))
+            result.records[i] = rec.model_copy(update=update)
+        skipped = sum(1 for r in result.records if r.full_text_status == "not_fetched")
+        if skipped:
+            result.limitations.append(f"Full text was not fetched for {skipped} additional opinion(s) (per-person limit of {self.max_text_fetches}).")
 
 
 # ------------------------------------------------------------------- mock
