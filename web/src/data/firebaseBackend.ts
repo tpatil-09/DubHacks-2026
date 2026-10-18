@@ -195,7 +195,8 @@ export const firebaseBackend: Backend = {
       .map((item) => profileFrom(item.data(), item.id))
       .filter((profile): profile is Profile => profile !== null)
     const viewer = me ? { ...me, ...preferences } as Profile : null
-    return filterDiscover(viewer, candidates, seen, blocked)
+    // Most recently added or updated profiles first.
+    return filterDiscover(viewer, candidates, seen, blocked).sort((a, b) => b.updatedAt - a.updatedAt)
   },
   async setLike(uid, targetUid, type) {
     own(uid, 'liking a profile')
