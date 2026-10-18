@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "seed": "node --import tsx seed.mjs"
+    "seed": "node --import tsx seed.mjs",
+    "demo-members": "node --import tsx demo-members.mjs"
   },
   "dependencies": {
     "firebase-admin": "^13.4.0",
