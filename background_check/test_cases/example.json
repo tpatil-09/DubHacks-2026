@@ -1,0 +1,10 @@
+{
+  "full_name": "Jane Example",
+  "middle_name": "Q",
+  "location": "Seattle, WA",
+  "jurisdictions": [
+    "King County, WA"
+  ],
+  "age_min": 28,
+  "age_max": 32
+}

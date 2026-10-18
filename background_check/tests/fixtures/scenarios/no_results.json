@@ -1,0 +1,20 @@
+{
+  "description": "SYNTHETIC. Searches complete successfully but find nothing relevant.",
+  "query": {
+    "full_name": "Taylor Nobody Example",
+    "location": "Quietville, Exampleland"
+  },
+  "investigator": {
+    "search_queries_run": ["\"Taylor Nobody Example\" court", "\"Taylor Nobody Example\" sex offender registry"],
+    "sources_checked": [],
+    "findings": [],
+    "access_failures": []
+  },
+  "verifier": {"by_source_url": {}},
+  "expected": {
+    "record_tier": "no_linked_records",
+    "overall_status": "no_relevant_records_found_in_scope",
+    "verified_record_flag": false,
+    "verified_records": 0, "unresolved_findings": 0, "contradicted_findings": 0
+  }
+}

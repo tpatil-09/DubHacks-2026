@@ -1,0 +1,57 @@
+{
+  "description": "SYNTHETIC. A public social post accuses the person; no official record. The mock model over-claims 'verified' on a name-only match — guards must downgrade it.",
+  "query": {
+    "full_name": "Casey Placeholder",
+    "location": "Rivertown, Exampleland"
+  },
+  "investigator": {
+    "search_queries_run": ["\"Casey Placeholder\" Rivertown assault"],
+    "sources_checked": [
+      {"url": "https://social.example/posts/998877", "title": "Public post", "source_type": "social_post", "accessible": true}
+    ],
+    "findings": [
+      {
+        "source_url": "https://social.example/posts/998877",
+        "source_type": "social_post",
+        "excerpt": "Everyone should know Casey Placeholder hurt [victim]. Stay away.",
+        "claim": "A public social media post alleges that a Casey Placeholder harmed someone.",
+        "record_stage": "allegation",
+        "offense_category": "other_serious_violent",
+        "identity_evidence": ["same name"],
+        "relevance": "medium",
+        "source_quality": "low"
+      }
+    ],
+    "access_failures": []
+  },
+  "verifier": {
+    "by_source_url": {
+      "https://social.example/posts/998877": {
+        "source_accessible": true,
+        "evidence_status": "verified",
+        "identity_match": "possible_match",
+        "identity_basis": ["full_name"],
+        "source_reliability": "low",
+        "reliability_rationale": "Anonymous social post with no supporting record.",
+        "record_stage": "conviction",
+        "offense_category": "other_serious_violent",
+        "case_outcome": null,
+        "outcome_checked": false,
+        "supporting_evidence": [],
+        "contradictory_evidence": [],
+        "missing_information": ["No police report, charge, or court record located."],
+        "rationale": "Post exists; no corroborating official record found."
+      }
+    }
+  },
+  "pages": {
+    "https://social.example/posts/998877": {"status": 200, "text": "Everyone should know Casey Placeholder hurt [victim]. Stay away."}
+  },
+  "expected": {
+    "record_tier": "no_linked_records",
+    "overall_status": "findings_require_review",
+    "verified_record_flag": false,
+    "verified_records": 0, "unresolved_findings": 1, "contradicted_findings": 0,
+    "finding_status": "unverified", "finding_identity": "weak_match", "finding_stage": "allegation"
+  }
+}

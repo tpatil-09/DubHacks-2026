@@ -1,0 +1,65 @@
+{
+  "description": "SYNTHETIC. News reported a domestic-violence charge; the official docket shows it was dismissed.",
+  "query": {
+    "full_name": "Morgan Testcase",
+    "middle_name": "L",
+    "location": "Hillview, Exampleland",
+    "age_min": 30,
+    "age_max": 35
+  },
+  "investigator": {
+    "search_queries_run": ["\"Morgan Testcase\" Hillview domestic violence charged", "\"Morgan Testcase\" dismissed"],
+    "sources_checked": [
+      {"url": "https://news.example/hillview/2022/charge", "title": "Hillview resident charged", "source_type": "news_report", "accessible": true},
+      {"url": "https://courts.exampleland.example/cases/DV-2022-0310", "title": "Docket DV-2022-0310", "source_type": "official_court_record", "accessible": true}
+    ],
+    "findings": [
+      {
+        "source_url": "https://news.example/hillview/2022/charge",
+        "source_title": "Hillview resident charged",
+        "source_type": "news_report",
+        "excerpt": "Morgan L. Testcase, 31, of Hillview was charged Tuesday with domestic assault.",
+        "claim": "News report states Morgan L. Testcase, 31, of Hillview was charged with domestic assault in 2022.",
+        "record_stage": "charge",
+        "offense_category": "domestic_violence",
+        "publication_date": "2022-04-12",
+        "jurisdiction": "Hillview, Exampleland",
+        "case_identifier": "DV-2022-0310",
+        "identity_evidence": ["name with middle initial L", "age 31 in 2022", "Hillview"],
+        "relevance": "high",
+        "source_quality": "medium"
+      }
+    ],
+    "access_failures": []
+  },
+  "verifier": {
+    "by_source_url": {
+      "https://news.example/hillview/2022/charge": {
+        "source_accessible": true,
+        "evidence_status": "verified",
+        "identity_match": "strong_match",
+        "identity_basis": ["full_name", "middle_name_or_initial", "location", "age_or_birth_year", "case_identifier"],
+        "source_reliability": "high",
+        "reliability_rationale": "Local news report corroborated by the official docket.",
+        "record_stage": "dismissed",
+        "offense_category": "domestic_violence",
+        "case_outcome": "Charge dismissed on 2022-09-01",
+        "outcome_checked": true,
+        "supporting_evidence": [{"url": "https://courts.exampleland.example/cases/DV-2022-0310", "source_type": "official_court_record", "excerpt": "Disposition: Dismissed"}],
+        "contradictory_evidence": [],
+        "missing_information": [],
+        "rationale": "The charge was filed and later dismissed per the official docket. A dismissal is not a finding of guilt."
+      }
+    }
+  },
+  "pages": {
+    "https://news.example/hillview/2022/charge": {"status": 200, "text": "Morgan L. Testcase, 31, of Hillview was charged Tuesday with domestic assault."}
+  },
+  "expected": {
+    "record_tier": "cleared_outcomes_only",
+    "overall_status": "findings_require_review",
+    "verified_record_flag": false,
+    "verified_records": 1, "unresolved_findings": 0, "contradicted_findings": 0,
+    "finding_stage": "dismissed", "case_outcomes": 1
+  }
+}

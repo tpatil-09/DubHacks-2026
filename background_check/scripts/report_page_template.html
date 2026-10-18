@@ -1,0 +1,159 @@
+<title>__PAGE_TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: single reading column — status verdict first, then findings by bucket, then sources and limits */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --ink: #17202b; --muted: #5b6676; --line: #d8dce3;
+  --accent: #2f5d8a; --accent-soft: #e3ecf5;
+  --pass: #1d7a4a; --pass-soft: #e2f3ea; --fail: #b4322c; --fail-soft: #fbe6e4; --warn: #9a6a00; --warn-soft: #fbf1d9;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161c; --surface: #1a2029; --sunken: #222a35; --ink: #e4e8ee; --muted: #9aa5b4; --line: #313b48;
+  --accent: #8db6e0; --accent-soft: #1f3247;
+  --pass: #5cc98e; --pass-soft: #173327; --fail: #f08a82; --fail-soft: #3d1d1b; --warn: #e3b552; --warn-soft: #3a2e12; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161c; --surface: #1a2029; --sunken: #222a35; --ink: #e4e8ee; --muted: #9aa5b4; --line: #313b48;
+  --accent: #8db6e0; --accent-soft: #1f3247;
+  --pass: #5cc98e; --pass-soft: #173327; --fail: #f08a82; --fail-soft: #3d1d1b; --warn: #e3b552; --warn-soft: #3a2e12; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--f-body); }
+.wrap { max-width: 920px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 20px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 2rem; line-height: 1.15; } h2 { font-size: 1.3rem; } h3 { font-size: 1.02rem; }
+p { margin: 0; max-width: 70ch; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+.eyebrow { font: 500 .72rem/1 var(--f-mono); letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.mono { font-family: var(--f-mono); font-size: .8rem; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.verdict { border-left: 4px solid var(--accent); }
+.verdict.attention { border-left-color: var(--fail); } .verdict.review, .verdict.partial, .verdict.inconclusive { border-left-color: var(--warn); } .verdict.none { border-left-color: var(--pass); }
+.verdict .status { font: 600 1.45rem/1.2 var(--f-display); }
+.pill { display: inline-flex; align-items: center; font: 500 .72rem/1 var(--f-mono); padding: 4px 7px; border-radius: 999px; background: var(--sunken); color: var(--muted); white-space: nowrap; }
+.pill.verified, .pill.strong_match, .pill.ok { background: var(--pass-soft); color: var(--pass); }
+.pill.contradicted, .pill.mismatch, .pill.bad { background: var(--fail-soft); color: var(--fail); }
+.pill.unverified, .pill.inconclusive, .pill.weak_match, .pill.possible_match, .pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.flag { background: var(--fail); color: var(--surface); }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: .88rem; margin: 0; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.stat { background: var(--sunken); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.stat b { font: 600 1.4rem/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
+.stat span { font-size: .8rem; color: var(--muted); }
+.finding { border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.finding .summary { font-size: .95rem; }
+details > summary { cursor: pointer; color: var(--accent); font-size: .85rem; }
+details[open] > summary { margin-bottom: 8px; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+ul.tight { margin: 0; padding-left: 18px; font-size: .88rem; display: flex; flex-direction: column; gap: 4px; }
+.empty { color: var(--muted); font-size: .9rem; }
+.note { background: var(--warn-soft); border-left: 3px solid var(--warn); padding: 10px 14px; border-radius: 4px; font-size: .88rem; max-width: none; }
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <span class="eyebrow">SafeMatch · final synthesis · report.json</span>
+    <h1 id="h"></h1>
+    <p class="muted" id="sub"></p>
+  </header>
+  <p class="note">Automated public-source research, not a certified background check. Findings may concern a different person with the same name. Read each item in its status, and keep this report private.</p>
+  <div id="root" style="display:flex;flex-direction:column;gap:20px"></div>
+</div>
+
+<script id="report-data" type="application/json">__REPORT_DATA__</script>
+<script>
+(function () {
+  const R = JSON.parse(document.getElementById("report-data").textContent);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const lab = (s) => String(s).replace(/_/g, " ");
+  const pill = (t, c) => `<span class="pill ${esc(c ?? t)}">${esc(lab(t))}</span>`;
+  const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return u; } };
+  const kv = (rows) => `<dl class="kv">${rows.filter(r => r[1]).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join("")}</dl>`;
+  const m = R.report_metadata, s = R.subject = m.subject;
+
+  document.getElementById("h").textContent = s.full_name;
+  document.getElementById("sub").textContent = [s.location, s.age_min ? (s.age_min === s.age_max ? `age ${s.age_min}` : `age ${s.age_min}–${s.age_max}`) : null,
+    `generated ${m.generated_at.replace("T", " ").replace("+00:00", " UTC")}`, `${m.pipeline_mode} run`].filter(Boolean).join(" · ");
+
+  const statusText = {
+    records_require_attention: ["Verified record requiring attention", "attention"],
+    findings_require_review: ["Findings need human review", "review"],
+    no_relevant_records_found_in_scope: ["No relevant records found in scope", "none"],
+    partial: ["Partial results: some searches failed", "partial"],
+    inconclusive: ["Inconclusive: key sources could not be checked", "inconclusive"],
+  }[R.overall_status] || [lab(R.overall_status), "review"];
+  const si = R.safety_indicators, ia = R.identity_assessment, ss = R.source_summary;
+  const all = R.verified_records.length + R.unresolved_findings.length + R.contradicted_findings.length;
+
+  const T = R.tldr;
+  const tierClass = { verified_record_requires_attention: "attention", reported_conviction_unconfirmed: "attention",
+    unresolved_allegations_or_charges: "review", cleared_outcomes_only: "none", no_linked_records: "none", insufficient_information: "inconclusive" }[T.record_tier] || "review";
+  const findingById = {}; [...R.verified_records, ...R.unresolved_findings, ...R.contradicted_findings].forEach(f => findingById[f.finding_id] = f);
+  let html = `<section class="card verdict ${tierClass}" aria-label="TLDR">
+    <span class="eyebrow">TLDR · record tier</span>
+    <div class="status">${esc(T.tier_label)}</div>
+    <p style="font-size:1.05rem">${esc(T.headline)}</p>
+    ${T.key_points.length ? `<ul class="tight">${T.key_points.map(p => `<li>${esc(p.text)} ${p.finding_ids.map(id => findingById[id] ? `<a href="${esc(findingById[id].source_url)}" target="_blank" rel="noopener" class="mono">[${esc(host(findingById[id].source_url))}]</a>` : "").join(" ")}</li>`).join("")}</ul>` : ""}
+    <div class="pills">${T.caveats.map(c => pill(c, "warn")).join(" ")}</div>
+    <p class="muted mono">tier computed by fixed rules · headline ${esc(T.written_by)}-written and checked against the tier</p>
+  </section>`;
+
+  html += `<section class="card verdict ${statusText[1]}">
+    <span class="eyebrow">Overall status</span><div class="status">${esc(statusText[0])}</div>
+    <div class="pills">${si.verified_record_flag ? pill(si.label || "flag", "flag") : pill("no flag raised", "ok")} ${pill("identity: " + ia.overall_identity_match, ia.overall_identity_match)}
+      ${ia.distinct_individuals_suspected ? pill("other people with this name found", "warn") : ""}</div>
+    ${ia.notes.length ? `<ul class="tight">${ia.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
+    <div class="stats">
+      <div class="stat"><b>${R.verified_records.length}</b><span>verified</span></div>
+      <div class="stat"><b>${R.unresolved_findings.length}</b><span>unresolved</span></div>
+      <div class="stat"><b>${R.contradicted_findings.length}</b><span>contradicted or other person</span></div>
+      <div class="stat"><b>${ss.total_sources_checked}</b><span>sources checked</span></div>
+      <div class="stat"><b>${ss.search_queries_run.length}</b><span>searches run</span></div>
+    </div></section>`;
+
+  if (si.indicators.length) {
+    html += `<section class="card"><h2>${esc(si.label)}</h2>${si.indicators.map(i => `<div class="finding">${pill(i.rule_id, "flag")}<p>${esc(i.basis)}</p><a href="${esc(i.source_url)}" target="_blank" rel="noopener">${esc(i.source_url)}</a></div>`).join("")}</section>`;
+  }
+
+  const finding = (f) => `<div class="finding">
+    <div class="pills">${pill(f.evidence_status)}${pill(f.identity_match)}${pill(f.record_stage, "")}${pill(f.source_type, "")}${f.historical_report_only ? pill("historical report only", "warn") : ""}</div>
+    ${f.why_unresolved && f.summary.startsWith(f.why_unresolved)
+      ? `<p class="summary"><strong>${esc(f.why_unresolved)}</strong> ${esc(f.summary.slice(f.why_unresolved.length).trim())}</p>`
+      : `<p class="summary">${esc(f.summary)}</p>`}
+    <p class="muted" style="font-size:.85rem">Source: <a href="${esc(f.source_url)}" target="_blank" rel="noopener">${esc(host(f.source_url))}</a>${f.publication_date ? ` · published ${esc(f.publication_date)}` : ""}${f.jurisdiction ? ` · ${esc(f.jurisdiction)}` : ""}</p>
+    <details><summary>Evidence and reasoning</summary>${kv([["Claim", esc(f.claim)], ["Verifier reasoning", esc(f.rationale)], ["Reliability", esc(f.source_reliability)],
+      ["Case", esc([f.case_identifier, f.disposition].filter(Boolean).join(" · "))], ["Event date", esc(f.event_date)],
+      ["Supporting", f.supporting_urls.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(host(u))}</a>`).join(", ")],
+      ["Contradicting", f.contradictory_evidence.map(e => `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(host(e.url))}</a>${e.note ? " (" + esc(e.note) + ")" : ""}`).join(", ")],
+      ["Missing", esc(f.missing_information.join(" "))], ["Finding ID", `<span class="mono">${esc(f.finding_id)}</span>`]])}</details></div>`;
+
+  [["Verified records", R.verified_records, "Reliable evidence supports the claim and identity is sufficiently established."],
+   ["Unresolved findings", R.unresolved_findings, "A source exists, but the claim or the identity link is not confirmed."],
+   ["Contradicted or about another person", R.contradicted_findings, "Evidence conflicts with the claim, or the record belongs to someone else."]]
+    .forEach(([t, list, d]) => {
+      html += `<section class="card"><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:baseline"><h2>${t}</h2><span class="muted">${list.length}</span></div><p class="muted" style="font-size:.88rem">${d}</p>${
+        list.length ? list.map(finding).join("") : `<p class="empty">None.</p>`}</section>`;
+    });
+
+  if (R.case_outcomes.length) {
+    html += `<section class="card"><h2>Case outcomes</h2><ul class="tight">${R.case_outcomes.map(o => `<li>${pill(o.record_stage, "")} ${esc(o.disposition || "outcome not stated")} ${o.case_identifier ? `<span class="mono">${esc(o.case_identifier)}</span>` : ""} — <a href="${esc(o.source_url)}" target="_blank" rel="noopener">${esc(host(o.source_url))}</a></li>`).join("")}</ul></section>`;
+  }
+
+  html += `<section class="card"><h2>Sources checked</h2>${ss.sources.length ? `<ul class="tight">${ss.sources.map(x => `<li>${pill(x.source_type, "")} ${x.accessible ? "" : pill("could not open", "bad")} <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title || host(x.url))}</a></li>`).join("")}</ul>` : `<p class="empty">No sources were opened.</p>`}
+    <details><summary>Searches run (${ss.search_queries_run.length})</summary><ul class="tight">${ss.search_queries_run.map(q => `<li class="mono">${esc(q)}</li>`).join("")}</ul></details>
+    ${ss.search_failures.length ? `<div><span class="eyebrow">Search failures</span><ul class="tight">${ss.search_failures.map(e => `<li>${pill(e.kind, "bad")} ${esc(e.target)}: ${esc(e.detail)}</li>`).join("")}</ul></div>` : ""}</section>`;
+
+  html += `<section class="card"><h2>Limitations</h2><ul class="tight">${R.limitations.map(l => `<li>${esc(l)}</li>`).join("")}</ul>
+    <p class="muted mono">report ${esc(m.report_id)} · schema ${esc(m.schema_version)} · rules ${esc(si.rules_version)} · ${esc(m.model_provider)} / ${esc(m.search_provider)}</p></section>`;
+  document.getElementById("root").innerHTML = html;
+})();
+</script>
