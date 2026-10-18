@@ -41,15 +41,6 @@ export const quizQuestions: QuizQuestion[] = [
     ],
   },
   {
-    id: 'texting',
-    prompt: 'Your texting style is…',
-    options: [
-      { id: 'essays', emoji: '📜', label: 'Paragraphs. With voice notes.', scores: { chattyChill: -2 } },
-      { id: 'memes', emoji: '🐸', label: 'Mostly memes and reactions', scores: { chattyChill: 1, plannerSpontaneous: 1 } },
-      { id: 'brief', emoji: '👍', label: 'Short and sweet', scores: { chattyChill: 2 } },
-    ],
-  },
-  {
     id: 'vacation',
     prompt: 'Vacation planning looks like…',
     options: [
@@ -66,25 +57,6 @@ export const quizQuestions: QuizQuestion[] = [
       { id: 'dog', emoji: '🐶', label: "Hanging out with the host's dog", scores: { chattyChill: 2, cozyAdventurous: -1 } },
       { id: 'deep', emoji: '🌙', label: 'In one deep 2am conversation', scores: { chattyChill: -1, nightEarly: -2 } },
       { id: 'early', emoji: '👋', label: 'Leaving early, happily', scores: { nightEarly: 2, chattyChill: 1 } },
-    ],
-  },
-  {
-    id: 'sunday',
-    prompt: 'Perfect Sunday morning:',
-    options: [
-      { id: 'market', emoji: '🧺', label: "Farmers' market at 8am", scores: { nightEarly: 2, cozyAdventurous: 1 } },
-      { id: 'brunch', emoji: '🥞', label: 'Late brunch, no alarms', scores: { nightEarly: -2, cozyAdventurous: -1 } },
-      { id: 'sidequest', emoji: '🗺️', label: 'Wander somewhere new', scores: { cozyAdventurous: 2, plannerSpontaneous: 2 } },
-    ],
-  },
-  {
-    id: 'game',
-    prompt: 'Pick a co-op game role:',
-    options: [
-      { id: 'strategist', emoji: '🧠', label: 'The strategist with a plan', scores: { plannerSpontaneous: -2 } },
-      { id: 'tank', emoji: '🛡️', label: 'The one who charges in first', scores: { cozyAdventurous: 2, plannerSpontaneous: 1 } },
-      { id: 'healer', emoji: '💖', label: 'The healer keeping everyone alive', scores: { cozyAdventurous: -1, chattyChill: -1 } },
-      { id: 'collector', emoji: '🍄', label: 'Wandering off to collect mushrooms', scores: { plannerSpontaneous: 2, chattyChill: 2 } },
     ],
   },
   {
@@ -113,6 +85,15 @@ export const quizQuestions: QuizQuestion[] = [
       { id: 'perfectnap', emoji: '💤', label: 'Perfect 20-minute naps', scores: { cozyAdventurous: -2, nightEarly: -1 } },
       { id: 'languages', emoji: '🗣️', label: 'Speak every language', scores: { chattyChill: -2 } },
       { id: 'schedule', emoji: '📅', label: 'Always know the best plan', scores: { plannerSpontaneous: -2, nightEarly: 1 } },
+    ],
+  },
+  {
+    id: 'ducks',
+    prompt: 'What would you do with an army of 100 ducks?',
+    options: [
+      { id: 'snuggle', emoji: '🤗', label: 'Snuggle them', scores: { cozyAdventurous: -2, chattyChill: 1 } },
+      { id: 'driveway', emoji: '😈', label: "Inconvenience my enemies by blocking their driveway", scores: { cozyAdventurous: 2, plannerSpontaneous: 1 } },
+      { id: 'trenchcoat', emoji: '🥸', label: 'Buy a trench coat and sneak them into the movies', scores: { plannerSpontaneous: 2, cozyAdventurous: 1 } },
     ],
   },
 ]
