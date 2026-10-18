@@ -235,18 +235,28 @@ export const firebaseBackend: Backend = {
       const reverse = await transaction.get(reverseLike)
       if (!reverse.exists() || reverse.data().action !== 'like') return { matched: false, created: false }
       const currentMatch = await transaction.get(matchRef(pairId))
-      // A closed match (e.g. from a reset or unmatch) must be reactivated, not left closed,
-      // or the match animation fires but nothing shows up on the Matches/chat screens.
-      if (currentMatch.exists() && currentMatch.data().status === 'active') return { matched: true, created: false }
+      const now = Date.now()
+      if (currentMatch.exists()) {
+        if (currentMatch.data().status === 'active') return { matched: true, created: false }
+        // A closed match (e.g. from a reset or unmatch) must be reactivated, not left closed,
+        // or the match animation fires but nothing shows up on the Matches/chat screens.
+        // The security rules only permit updating status/lastMessageAt/lastMessagePreview on an
+        // existing match, so reactivate with a targeted update rather than rewriting the doc.
+        transaction.update(matchRef(pairId), {
+          status: 'active',
+          lastMessageAt: now,
+          lastMessagePreview: 'You matched! Say hello ✨',
+        })
+        return { matched: true, created: true }
+      }
       const users = [uid, targetUid].sort() as [string, string]
-      const createdAt = Date.now()
       transaction.set(matchRef(pairId), {
         users,
         status: 'active',
-        createdAt,
-        lastMessageAt: createdAt,
+        createdAt: now,
+        lastMessageAt: now,
         lastMessagePreview: 'You matched! Say hello ✨',
-      }, { merge: true })
+      })
       return { matched: true, created: true }
     })
     if (result.matched && result.created) {
