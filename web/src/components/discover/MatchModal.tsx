@@ -38,7 +38,7 @@ export function MatchModal({ match, me, onClose }: MatchModalProps) {
             transition={{ type: 'spring', stiffness: 300, damping: 16 }}
           >
             <p className="eyebrow !text-bubblegum">It’s mutual</p>
-            <h2 className="mt-1 text-4xl font-bold">You matched with {match.them.displayName}.</h2>
+            <h2 className="mt-1 text-4xl font-bold">You matched with {match.them.firstName}.</h2>
             <div className="my-6 flex items-center justify-center">
               <motion.div initial={{ x: -80, rotate: -20 }} animate={{ x: 10, rotate: -8 }} transition={{ type: 'spring', stiffness: 260, damping: 14, delay: 0.1 }}>
                 <Avatar src={me?.photos[0]} alt="You" size={104} />
@@ -47,10 +47,10 @@ export function MatchModal({ match, me, onClose }: MatchModalProps) {
                 💖
               </motion.span>
               <motion.div initial={{ x: 80, rotate: 20 }} animate={{ x: -10, rotate: 8 }} transition={{ type: 'spring', stiffness: 260, damping: 14, delay: 0.1 }}>
-                <Avatar src={match.them.photos[0]} alt={match.them.displayName} size={104} />
+                <Avatar src={match.them.photos[0]} alt={match.them.firstName} size={104} />
               </motion.div>
             </div>
-            <p className="mb-6 text-ink-soft">You and {match.them.displayName} liked each other.</p>
+            <p className="mb-6 text-ink-soft">You and {match.them.firstName} liked each other.</p>
             <div className="grid gap-3">
               <ArcadeButton size="lg" onClick={() => navigate(`/chat/${match.matchId}`)}>
                 Say hello

@@ -48,12 +48,12 @@ export default function Matches() {
               >
                 <Link to={`/chat/${match.id}`} className="gloss-card block overflow-hidden p-2">
                   <div className="relative overflow-hidden rounded-[18px]">
-                    <ProfilePhoto src={partner?.photos[0]} alt={partner?.displayName ?? 'Match'} className="aspect-[3/4] w-full" emojiSize="text-6xl" />
+                    <ProfilePhoto src={partner?.photos[0]} alt={partner?.firstName ?? 'Match'} className="aspect-[3/4] w-full" emojiSize="text-6xl" />
                     {unread && <span className="absolute right-2 top-2 size-4 rounded-full border-[3px] border-white bg-bubblegum" aria-label="New messages" />}
                     {partner?.isDemo && <DemoTag className="absolute left-2 top-2" />}
                   </div>
                   <div className="px-1.5 pb-1 pt-2">
-                    <p className="font-display text-lg font-semibold">{partner?.displayName ?? '…'}</p>
+                    <p className="font-display text-lg font-semibold">{partner?.firstName ?? '…'}</p>
                     <p className="truncate text-sm text-ink-soft">{match.lastMessagePreview ?? 'Say hi 👋'}</p>
                   </div>
                 </Link>

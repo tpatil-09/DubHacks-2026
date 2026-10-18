@@ -3,11 +3,12 @@ import { ageFrom } from './age'
 
 export type ProfileDraft = Pick<
   Profile,
-  'displayName' | 'birthdate' | 'gender' | 'interestedIn' | 'city' | 'bio' | 'prompts' | 'photos' | 'interests'
+  'firstName' | 'lastName' | 'birthdate' | 'gender' | 'interestedIn' | 'city' | 'bio' | 'prompts' | 'photos' | 'interests'
 >
 
 export const emptyDraft: ProfileDraft = {
-  displayName: '',
+  firstName: '',
+  lastName: '',
   birthdate: '',
   gender: '',
   interestedIn: [],
@@ -21,8 +22,9 @@ export const emptyDraft: ProfileDraft = {
 export const LIMITS = { name: 30, city: 40, bio: 300, promptAnswer: 120, minInterests: 3, maxInterests: 10, maxPhotos: 6 }
 
 export function validateBasics(draft: ProfileDraft, today: Date = new Date()): string | null {
-  if (!draft.displayName.trim()) return 'Add the name you want people to see.'
-  if (draft.displayName.trim().length > LIMITS.name) return `Names can be up to ${LIMITS.name} characters.`
+  if (!draft.firstName.trim()) return 'Add your first name.'
+  if (!draft.lastName.trim()) return 'Add your last name.'
+  if (draft.firstName.trim().length > LIMITS.name || draft.lastName.trim().length > LIMITS.name) return `Names can be up to ${LIMITS.name} characters.`
   const age = ageFrom(draft.birthdate, today)
   if (age === null) return 'Add your date of birth.'
   if (age < 18) return 'You need to be 18 or older to use SafeMatch.'
@@ -52,7 +54,8 @@ export function validateAbout(draft: ProfileDraft): string | null {
 export function draftFromProfile(profile: Profile | null): ProfileDraft {
   if (!profile) return { ...emptyDraft }
   return {
-    displayName: profile.displayName,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
     birthdate: profile.birthdate,
     gender: profile.gender,
     interestedIn: profile.interestedIn,

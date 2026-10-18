@@ -73,8 +73,8 @@ function Sidebar() {
             {recent.map((match) => {
               const person = uid ? people[otherUser(match, uid)] : undefined
               return (
-                <Link key={match.id} to={`/chat/${match.id}`} aria-label={`Chat with ${person?.displayName ?? 'your match'}`} className="rounded-full transition hover:scale-105">
-                  <Avatar src={person?.photos[0]} alt={person?.displayName ?? 'Match'} size={52} />
+                <Link key={match.id} to={`/chat/${match.id}`} aria-label={`Chat with ${person?.firstName ?? 'your match'}`} className="rounded-full transition hover:scale-105">
+                  <Avatar src={person?.photos[0]} alt={person?.firstName ?? 'Match'} size={52} />
                 </Link>
               )
             })}
@@ -91,7 +91,7 @@ function Sidebar() {
         </p>
         <div className="mt-6 flex items-center gap-2">
           <Link to="/me" aria-label="My profile">
-            <Avatar src={profile?.photos[0]} alt={profile?.displayName ?? 'You'} size={36} />
+            <Avatar src={profile?.photos[0]} alt={profile?.firstName ?? 'You'} size={36} />
           </Link>
           <TokenCounter />
           {backend().kind === 'demo' && <DemoTag />}
@@ -110,7 +110,7 @@ function MobileBar() {
         {backend().kind === 'demo' && <DemoTag />}
         <TokenCounter />
         <NavLink to="/me" aria-label="My profile">
-          <Avatar src={profile?.photos[0]} alt={profile?.displayName ?? 'You'} size={34} />
+          <Avatar src={profile?.photos[0]} alt={profile?.firstName ?? 'You'} size={34} />
         </NavLink>
       </div>
     </header>

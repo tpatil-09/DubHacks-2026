@@ -52,10 +52,17 @@ export function BasicsFields({ draft, onChange }: FieldsProps) {
   const minDob = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate()).toISOString().slice(0, 10)
   return (
     <div className="grid gap-5">
-      <div>
-        <label htmlFor="displayName" className="label-arcade">Full name</label>
-        <input id="displayName" className="input-arcade" maxLength={LIMITS.name} value={draft.displayName} onChange={(event) => onChange({ displayName: event.target.value })} />
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label htmlFor="firstName" className="label-arcade">First name</label>
+          <input id="firstName" className="input-arcade" maxLength={LIMITS.name} value={draft.firstName} onChange={(event) => onChange({ firstName: event.target.value })} />
+        </div>
+        <div>
+          <label htmlFor="lastName" className="label-arcade">Last name</label>
+          <input id="lastName" className="input-arcade" maxLength={LIMITS.name} value={draft.lastName} onChange={(event) => onChange({ lastName: event.target.value })} />
+        </div>
       </div>
+      <p className="-mt-3 text-xs text-ink-soft">Only your first name is shown to other members. Your full name is used for your background check.</p>
       <div>
         <label htmlFor="birthdate" className="label-arcade">Date of birth</label>
         <input

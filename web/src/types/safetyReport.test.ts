@@ -16,7 +16,7 @@ import pipelineSample from '../fixtures/pipelineSample.json'
 
 const forProfile = (uid: string) => {
   const profile = demoProfiles.find((p) => p.uid === uid)!
-  return buildScreeningReport({ subjectUid: uid, nameProvided: profile.displayName, context: profile.city })
+  return buildScreeningReport({ subjectUid: uid, nameProvided: `${profile.firstName} ${profile.lastName}`.trim(), context: profile.city })
 }
 
 describe('parseSafetyReport', () => {

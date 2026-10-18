@@ -36,7 +36,9 @@ export interface ProfilePrompt {
 
 export interface Profile {
   uid: string
-  displayName: string
+  firstName: string
+  /** Collected for background-check matching; not shown on cards, chat, or matches — only the first name is public. */
+  lastName: string
   /** YYYY-MM-DD date of birth. Age is derived from this, not stored directly. */
   birthdate: string
   gender: string

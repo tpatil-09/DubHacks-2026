@@ -57,7 +57,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
       dragSnapToOrigin={false}
       onDragEnd={handleDragEnd}
       onTap={() => active && setFlipped((value) => !value)}
-      aria-label={`${profile.displayName}${age ? `, ${age}` : ''}. Tap to flip the card.`}
+      aria-label={`${profile.firstName}${age ? `, ${age}` : ''}. Tap to flip the card.`}
     >
       <motion.div
         className="relative h-full w-full"
@@ -67,7 +67,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
       >
         {/* Front: full-bleed photo with the details laid over it */}
         <div className="absolute inset-0 overflow-hidden rounded-2xl bg-white shadow-[0_28px_56px_-28px_rgba(35,26,27,.55)] [backface-visibility:hidden]">
-          <ProfilePhoto src={profile.photos[0]} alt={`${profile.displayName}'s photo`} className="h-full w-full" emojiSize="text-[6rem] -translate-y-[62%] sm:text-[10rem] sm:-translate-y-[18%]" />
+          <ProfilePhoto src={profile.photos[0]} alt={`${profile.firstName}'s photo`} className="h-full w-full" emojiSize="text-[6rem] -translate-y-[62%] sm:text-[10rem] sm:-translate-y-[18%]" />
           <div className="absolute left-5 top-5 flex flex-wrap gap-2">
             <TierChip uid={profile.uid} variant="badge" />
             {profile.isDemo && <DemoTag />}
@@ -85,7 +85,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
               </p>
             )}
             <h2 className="text-4xl text-white sm:text-5xl">
-              {profile.displayName}
+              {profile.firstName}
               {age !== null && <span className="ml-2 font-medium">{age}</span>}
             </h2>
             {profile.city && (
@@ -109,7 +109,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
         {/* Back */}
         <div className="gloss-card absolute inset-0 flex flex-col gap-5 overflow-y-auto p-7 [backface-visibility:hidden] [transform:rotateY(180deg)]">
           <span className="eyebrow">About</span>
-          <h2 className="text-3xl">{profile.displayName}</h2>
+          <h2 className="text-3xl">{profile.firstName}</h2>
           <p className="leading-relaxed text-ink-soft">{profile.bio}</p>
           {profile.prompts.map((prompt) => (
             <div key={prompt.question} className="border-t border-[var(--color-line)] pt-4">

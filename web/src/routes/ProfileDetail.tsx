@@ -48,7 +48,7 @@ export default function ProfileDetail() {
       const result = await backend().setLike(myUid, profile.uid, type)
       if (result.matchId) setMatch({ matchId: result.matchId })
       else {
-        toast(type === 'like' ? `You liked ${profile.displayName} 💖` : 'Passed', 'success')
+        toast(type === 'like' ? `You liked ${profile.firstName} 💖` : 'Passed', 'success')
         navigate('/discover')
       }
     } catch (cause) {
@@ -66,7 +66,7 @@ export default function ProfileDetail() {
       <div className="grid gap-12 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] lg:gap-16">
         <div className="min-w-0">
           <div className="relative overflow-hidden rounded-2xl shadow-[0_28px_56px_-28px_rgba(35,26,27,.55)]">
-            <ProfilePhoto src={profile.photos[photoIndex]} alt={`${profile.displayName}'s photo ${photoIndex + 1}`} className="aspect-[4/5] sm:aspect-[19/20] w-full" emojiSize="text-[6rem] -translate-y-[62%] sm:text-[10rem] sm:-translate-y-[18%]" />
+            <ProfilePhoto src={profile.photos[photoIndex]} alt={`${profile.firstName}'s photo ${photoIndex + 1}`} className="aspect-[4/5] sm:aspect-[19/20] w-full" emojiSize="text-[6rem] -translate-y-[62%] sm:text-[10rem] sm:-translate-y-[18%]" />
             <div className="absolute left-5 top-5 flex flex-wrap gap-2">
               <a href="#background-check" aria-label="Jump to background check"><TierChip uid={profile.uid} variant="badge" /></a>
               {profile.isDemo && <DemoTag />}
@@ -76,7 +76,7 @@ export default function ProfileDetail() {
                 <p className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90"><span className="size-2 rounded-full bg-mint" aria-hidden /> {vibe}% vibe match</p>
               )}
               <h1 className="text-4xl text-white sm:text-5xl">
-                {profile.displayName}
+                {profile.firstName}
                 {age !== null && <span className="ml-2 font-medium">{age}</span>}
               </h1>
               {profile.city && <p className="mt-2 flex items-center gap-2 text-lg text-white/90"><MapPin className="size-5 shrink-0" aria-hidden /> {profile.city}</p>}
@@ -99,10 +99,10 @@ export default function ProfileDetail() {
           )}
           {!isMe && (
             <div className="mt-10 flex justify-center gap-7">
-              <button type="button" className="btn-circle size-[4.5rem]" aria-label={`Pass on ${profile.displayName}`} onClick={() => decide('pass')} disabled={busy}>
+              <button type="button" className="btn-circle size-[4.5rem]" aria-label={`Pass on ${profile.firstName}`} onClick={() => decide('pass')} disabled={busy}>
                 <X className="size-8 text-ink-soft" strokeWidth={1.75} />
               </button>
-              <button type="button" className="btn-circle btn-circle-primary size-[5.5rem]" aria-label={`Like ${profile.displayName}`} onClick={() => decide('like')} disabled={busy}>
+              <button type="button" className="btn-circle btn-circle-primary size-[5.5rem]" aria-label={`Like ${profile.firstName}`} onClick={() => decide('like')} disabled={busy}>
                 <Heart className="size-9" fill="currentColor" />
               </button>
             </div>
@@ -111,7 +111,7 @@ export default function ProfileDetail() {
 
         <div className="min-w-0">
           <span className="eyebrow">The little things</span>
-          <h2 className="mt-8 text-4xl sm:text-[3.4rem]">Get to know {profile.displayName}.</h2>
+          <h2 className="mt-8 text-4xl sm:text-[3.4rem]">Get to know {profile.firstName}.</h2>
           <p className="mt-6 text-lg leading-8 text-ink-soft">{profile.bio}</p>
           <div className="mt-6"><InterestStickers ids={profile.interests} /></div>
           {profile.prompts.map((prompt) => (
@@ -145,10 +145,10 @@ export default function ProfileDetail() {
       </div>
 
       <div className="mt-16 border-t border-[var(--color-line)] pt-12">
-        <BackgroundCheck uid={profile.uid} name={profile.displayName} self={isMe} />
+        <BackgroundCheck uid={profile.uid} name={`${profile.firstName} ${profile.lastName}`.trim()} self={isMe} />
       </div>
 
-      <BlockReportModal otherUid={profile.uid} otherName={profile.displayName} mode={modal} onClose={() => setModal(null)} />
+      <BlockReportModal otherUid={profile.uid} otherName={profile.firstName} mode={modal} onClose={() => setModal(null)} />
       <MatchModal match={match ? { matchId: match.matchId, them: profile } : null} me={me} onClose={() => navigate('/discover')} />
     </div>
   )

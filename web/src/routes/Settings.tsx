@@ -84,8 +84,8 @@ export default function Settings() {
           <ul className="grid gap-2">
             {blocked.map((id) => (
               <li key={id} className="flex items-center gap-3 rounded-2xl bg-white/70 p-2">
-                <Avatar src={blockedProfiles[id]?.photos[0]} alt={blockedProfiles[id]?.displayName ?? 'Blocked user'} size={40} />
-                <span className="flex-1 font-semibold">{blockedProfiles[id]?.displayName ?? 'Player'}</span>
+                <Avatar src={blockedProfiles[id]?.photos[0]} alt={blockedProfiles[id]?.firstName ?? 'Blocked user'} size={40} />
+                <span className="flex-1 font-semibold">{blockedProfiles[id]?.firstName ?? 'Player'}</span>
                 <ArcadeButton size="sm" color="white" onClick={() => unblock(id)}>Unblock</ArcadeButton>
               </li>
             ))}

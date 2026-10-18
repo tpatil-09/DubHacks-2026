@@ -31,14 +31,14 @@ export function ProfileSide({ profile, vibe, hasQuiz }: { profile: Profile; vibe
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -6 }}
         transition={{ duration: 0.2 }}
-        aria-label={`About ${profile.displayName}`}
+        aria-label={`About ${profile.firstName}`}
         className="min-w-0"
       >
         <div className="flex items-center justify-between">
           <span className="eyebrow">The little things</span>
           <Sparkles className="size-7 text-bubblegum" aria-hidden />
         </div>
-        <h2 className="mt-8 text-4xl sm:text-[3.4rem]">Get to know {profile.displayName}.</h2>
+        <h2 className="mt-8 text-4xl sm:text-[3.4rem]">Get to know {profile.firstName}.</h2>
         <p className="mt-6 text-lg leading-8 text-ink-soft">{profile.bio}</p>
 
         {prompt && (

@@ -120,7 +120,7 @@ export default function WouldYouRather() {
                     <div className="flex flex-wrap items-center gap-3">
                       <div className="flex -space-x-3">
                         {agreeing.slice(0, 5).map((id) => (
-                          <Avatar key={id} src={partners[id]?.photos[0]} alt={partners[id]?.displayName ?? 'Match'} size={40} />
+                          <Avatar key={id} src={partners[id]?.photos[0]} alt={partners[id]?.firstName ?? 'Match'} size={40} />
                         ))}
                       </div>
                       <p className="font-display text-lg font-semibold">
@@ -153,8 +153,8 @@ export default function WouldYouRather() {
             return (
               <li key={match.id}>
                 <button type="button" onClick={() => sendTo(match.id)} className="flex w-full items-center gap-3 rounded-2xl bg-white/70 p-2 text-left hover:bg-white">
-                  <Avatar src={partner?.photos[0]} alt={partner?.displayName ?? 'Match'} size={44} />
-                  <span className="font-display text-lg font-semibold">{partner?.displayName ?? 'Match'}</span>
+                  <Avatar src={partner?.photos[0]} alt={partner?.firstName ?? 'Match'} size={44} />
+                  <span className="font-display text-lg font-semibold">{partner?.firstName ?? 'Match'}</span>
                 </button>
               </li>
             )

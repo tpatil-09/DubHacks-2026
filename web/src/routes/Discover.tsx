@@ -122,13 +122,13 @@ export default function Discover() {
               })}
             </div>
             <div className="mt-10 flex items-center gap-7">
-              <button type="button" className="btn-circle size-[4.5rem]" aria-label={`Pass on ${top.displayName}`} onClick={() => topCard.current?.swipe('pass')}>
+              <button type="button" className="btn-circle size-[4.5rem]" aria-label={`Pass on ${top.firstName}`} onClick={() => topCard.current?.swipe('pass')}>
                 <X className="size-8 text-ink-soft" strokeWidth={1.75} />
               </button>
-              <Link to={`/profile/${top.uid}`} className="btn-circle size-[4.5rem]" aria-label={`See ${top.displayName}’s full profile`}>
+              <Link to={`/profile/${top.uid}`} className="btn-circle size-[4.5rem]" aria-label={`See ${top.firstName}’s full profile`}>
                 <Star className="size-8 text-mint-deep" strokeWidth={1.75} />
               </Link>
-              <button type="button" className="btn-circle btn-circle-primary size-[5.5rem]" aria-label={`Like ${top.displayName}`} onClick={() => topCard.current?.swipe('like')}>
+              <button type="button" className="btn-circle btn-circle-primary size-[5.5rem]" aria-label={`Like ${top.firstName}`} onClick={() => topCard.current?.swipe('like')}>
                 <Heart className="size-9" fill="currentColor" />
               </button>
             </div>

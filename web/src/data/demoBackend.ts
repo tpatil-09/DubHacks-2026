@@ -204,7 +204,8 @@ export const demoBackend: Backend = {
   async saveProfile(uid, patch) {
     const defaults: Profile = {
       uid,
-      displayName: '',
+      firstName: '',
+      lastName: '',
       birthdate: '',
       gender: '',
       interestedIn: [],
@@ -323,7 +324,7 @@ export const demoBackend: Backend = {
     const age = years ? `age ${years}` : ''
     return buildScreeningReport({
       subjectUid,
-      nameProvided: profile.displayName,
+      nameProvided: `${profile.firstName} ${profile.lastName}`.trim(),
       context: [profile.city, age].filter(Boolean).join(', ') || undefined,
     })
   },

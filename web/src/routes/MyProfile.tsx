@@ -41,7 +41,8 @@ export default function MyProfile() {
     try {
       await saveProfile({
         ...draft,
-        displayName: draft.displayName.trim(),
+        firstName: draft.firstName.trim(),
+        lastName: draft.lastName.trim(),
         bio: draft.bio.trim(),
         city: draft.city.trim(),
         prompts: draft.prompts.filter((prompt) => prompt.answer.trim()),
@@ -91,7 +92,7 @@ export default function MyProfile() {
           </ArcadeCard>
           <div className="flex flex-col gap-3">
             <h2 className="text-3xl font-bold">
-              {profile.displayName}
+              {profile.firstName}
               {age !== null && <span className="font-medium text-ink-soft">, {age}</span>}
             </h2>
             {profile.city && <p className="flex items-center gap-1 text-ink-soft"><MapPin className="size-4 shrink-0" aria-hidden /> {profile.city}</p>}
@@ -111,7 +112,7 @@ export default function MyProfile() {
             ))}
           </div>
           <div className="sm:col-span-2">
-            <BackgroundCheck uid={profile.uid} name={profile.displayName} self />
+            <BackgroundCheck uid={profile.uid} name={`${profile.firstName} ${profile.lastName}`.trim()} self />
           </div>
         </div>
       ) : (

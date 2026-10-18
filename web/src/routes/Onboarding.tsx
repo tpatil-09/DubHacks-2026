@@ -45,7 +45,8 @@ export default function Onboarding() {
     try {
       await saveProfile({
         ...draft,
-        displayName: draft.displayName.trim(),
+        firstName: draft.firstName.trim(),
+        lastName: draft.lastName.trim(),
         city: draft.city.trim(),
         bio: draft.bio.trim(),
         prompts: draft.prompts.filter((prompt) => prompt.answer.trim()).map((prompt) => ({ ...prompt, answer: prompt.answer.trim() })),

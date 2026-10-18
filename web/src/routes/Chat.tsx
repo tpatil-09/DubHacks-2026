@@ -56,7 +56,7 @@ export default function Chat() {
     return <EmptyState title="Chat not found" body="This match may have ended." mood="thinking" action={<Link to="/matches" className="font-display font-semibold underline">Back to matches</Link>} />
   }
 
-  const partnerName = partner?.displayName ?? 'your match'
+  const partnerName = partner?.firstName ?? 'your match'
 
   async function send(event?: FormEvent, override?: string) {
     event?.preventDefault()
