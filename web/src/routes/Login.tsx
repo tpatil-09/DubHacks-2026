@@ -44,7 +44,7 @@ export default function Login() {
       <AmbientBackground />
       <div className="w-full max-w-md">
         <Link to="/" className="font-title mx-auto mb-8 flex w-fit items-center gap-2 text-3xl">
-          <img src="/favicon.svg" alt="" className="size-9" /> SafeMatch
+          <img src="/favicon.svg" alt="" className="size-9" /> Havenly
         </Link>
         <div className="gloss-card p-8">
           <h1 className="text-center text-3xl">{creatingAccount ? 'Create your account' : 'Welcome back'}</h1>

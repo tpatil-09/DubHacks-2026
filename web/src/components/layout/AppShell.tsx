@@ -34,7 +34,7 @@ function Wordmark({ className = '' }: { className?: string }) {
   return (
     <NavLink to="/discover" className={`font-title group flex items-center gap-2.5 text-2xl ${className}`}>
       <Capsule color="bubblegum" size={30} className="transition-transform group-hover:rotate-12" />
-      SafeMatch
+      Havenly
     </NavLink>
   )
 }

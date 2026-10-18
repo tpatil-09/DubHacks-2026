@@ -1,4 +1,4 @@
-"""The three SafeMatch agents. Each is independently constructible and testable."""
+"""The three Havenly agents. Each is independently constructible and testable."""
 from __future__ import annotations
 
 import json

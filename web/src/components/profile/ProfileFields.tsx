@@ -84,7 +84,7 @@ export function BasicsFields({ draft, onChange }: FieldsProps) {
           value={draft.birthdate}
           onChange={(event) => onChange({ birthdate: event.target.value })}
         />
-        <p className="mt-1 text-xs text-ink-soft">Your age appears on your profile. SafeMatch is for adults 18 and older.</p>
+        <p className="mt-1 text-xs text-ink-soft">Your age appears on your profile. Havenly is for adults 18 and older.</p>
       </div>
       <fieldset>
         <legend className="label-arcade">I am a…</legend>

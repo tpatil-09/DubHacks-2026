@@ -20,7 +20,7 @@ def generate_report_schema() -> Dict[str, Any]:
     schema = FinalReport.model_json_schema()
     schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
     schema["$id"] = f"https://safematch.local/schemas/report-{SCHEMA_VERSION}.json"
-    schema["title"] = "SafeMatch Background Check Report"
+    schema["title"] = "Havenly Background Check Report"
     return schema
 
 

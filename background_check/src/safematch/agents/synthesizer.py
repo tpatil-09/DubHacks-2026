@@ -52,7 +52,7 @@ from . import fence, load_prompt, truncate
 log = get_logger("synthesizer")
 
 DISCLAIMER = (
-    "SafeMatch background research is a limited, automated review of publicly accessible sources. It is not a "
+    "Havenly background research is a limited, automated review of publicly accessible sources. It is not a "
     "certified, FCRA-compliant, or comprehensive criminal background check, and an absence of findings is not "
     "evidence that a person has no record. Findings must be reviewed by a person before any action is taken."
 )
@@ -296,7 +296,7 @@ def template_tldr(tier: RecordTier, vr: VerifierResult, summaries: Dict[str, str
     mismatches = [f for f in vr.findings if f.verification.identity_match == IdentityMatch.mismatch]
     headline = {
         RecordTier.verified_record_requires_attention:
-            "An official record shows a verified conviction or current registry entry that meets SafeMatch's review rules.",
+            "An official record shows a verified conviction or current registry entry that meets Havenly's review rules.",
         RecordTier.reported_conviction_unconfirmed:
             "Sources report a past conviction or sex-offender registration for this person, but it was not confirmed on an official record.",
         RecordTier.unresolved_allegations_or_charges:

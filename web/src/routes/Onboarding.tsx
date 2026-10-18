@@ -64,7 +64,7 @@ export default function Onboarding() {
 
   async function finish(takeQuiz: boolean) {
     if (!consent) {
-      setError('Please agree to the background check to finish. Every SafeMatch member has one.')
+      setError('Please agree to the background check to finish. Every Havenly member has one.')
       return
     }
     setSaving(true)
@@ -113,7 +113,7 @@ export default function Onboarding() {
                 <div className="flex items-center gap-4">
                   <Mascot mood="excited" size={90} />
                   <p className="text-ink-soft">
-                    Every SafeMatch member has a background check, so everyone can relax and enjoy getting to know each other.
+                    Every Havenly member has a background check, so everyone can relax and enjoy getting to know each other.
                   </p>
                 </div>
                 <label className="flex items-start gap-3 rounded-2xl border-2 border-mint bg-mint/20 p-4 text-sm">
@@ -124,7 +124,7 @@ export default function Onboarding() {
                     className="mt-0.5 size-5 shrink-0 accent-mint-deep"
                   />
                   <span>
-                    I agree that SafeMatch can run a check of public records (court records, registries and news) about me, and
+                    I agree that Havenly can run a check of public records (court records, registries and news) about me, and
                     show a summary on my profile. Only records linked to me are shown, each with its source and how sure the match
                     is. It’s a limited summary of public sources, not a certified background check.
                   </span>

@@ -14,7 +14,7 @@ export default function Landing() {
     <div className="min-h-dvh bg-cream">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
         <span className="font-title flex items-center gap-2 text-2xl">
-          <img src="/favicon.svg" alt="" className="size-8" /> SafeMatch
+          <img src="/favicon.svg" alt="" className="size-8" /> Havenly
         </span>
         <Link to="/login" className="font-semibold text-ink-soft hover:text-ink">
           Sign in
@@ -31,7 +31,7 @@ export default function Landing() {
             <Mascot mood="happy" size={135} className="absolute right-24 bottom-0 hidden sm:block" />
           </h1>
           <p className="mt-6 max-w-[33rem] text-lg leading-8 text-ink-soft">
-            Every SafeMatch profile comes with a background check of public records, so you can spend less time worrying and
+            Every Havenly profile comes with a background check of public records, so you can spend less time worrying and
             more time enjoying the date. Swipe like any dating app, or play a game for a fun match.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-5">
@@ -87,7 +87,7 @@ export default function Landing() {
       </section>
 
       <footer className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2 border-t border-[var(--color-line)] px-6 py-6 text-sm text-ink-soft">
-        <span>© 2026 SafeMatch · A DubHacks prototype</span>
+        <span>© 2026 Havenly · A DubHacks prototype</span>
         <span>Background checks summarize public sources and can’t guarantee safety.</span>
       </footer>
     </div>

@@ -127,7 +127,7 @@ def build_parser() -> argparse.ArgumentParser:
     common.add_argument("--output-dir", help="directory for outputs (default: OUTPUT_DIR or ./output)")
     common.add_argument("-v", "--verbose", action="store_true")
 
-    parser = argparse.ArgumentParser(prog="safematch", description="SafeMatch three-agent public-source background research")
+    parser = argparse.ArgumentParser(prog="safematch", description="Havenly three-agent public-source background research")
     sub = parser.add_subparsers(dest="command", required=True)
 
     s = sub.add_parser("investigator", parents=[common], help="run Agent 1 only")

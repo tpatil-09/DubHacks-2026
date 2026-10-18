@@ -33,7 +33,7 @@ export function validateBasics(draft: ProfileDraft, today: Date = new Date()): s
   if (draft.firstName.trim().length > LIMITS.name || draft.lastName.trim().length > LIMITS.name) return `Names can be up to ${LIMITS.name} characters.`
   const age = ageFrom(draft.birthdate, today)
   if (age === null) return 'Add your date of birth.'
-  if (age < 18) return 'You need to be 18 or older to use SafeMatch.'
+  if (age < 18) return 'You need to be 18 or older to use Havenly.'
   if (age > 120) return 'Please double-check your date of birth.'
   if (!draft.gender) return 'Pick the gender that fits you best.'
   if (draft.gender === 'other' && !draft.genderOther?.trim()) return 'Add a short description for the “Other” gender option.'

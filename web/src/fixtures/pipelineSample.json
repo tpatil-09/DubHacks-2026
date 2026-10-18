@@ -2,7 +2,7 @@
   "tldr": {
     "record_tier": "verified_record_requires_attention",
     "tier_label": "Verified record requiring attention",
-    "headline": "An official record shows a verified conviction or current registry entry that meets SafeMatch's review rules.",
+    "headline": "An official record shows a verified conviction or current registry entry that meets Havenly's review rules.",
     "key_points": [
       {
         "text": "An official King County court record shows a 2022 conviction for second-degree assault (domestic violence). Identifiers strongly match and no appeal was found.",
@@ -38,7 +38,7 @@
     ],
     "search_completed": true
   },
-  "summary": "Verified record requiring attention. An official record shows a verified conviction or current registry entry that meets SafeMatch's review rules.",
+  "summary": "Verified record requiring attention. An official record shows a verified conviction or current registry entry that meets Havenly's review rules.",
   "findings": [
     {
       "finding_id": "f_4702d553525a067e",
@@ -85,12 +85,12 @@
     }
   ],
   "limitations": [
-    "SafeMatch provides a limited summary of accessible public sources. Information may be incomplete or inaccurate, and identity may be uncertain. This is not a formal criminal-history check and cannot guarantee personal safety.",
+    "Havenly provides a limited summary of accessible public sources. Information may be incomplete or inaccurate, and identity may be uncertain. This is not a formal criminal-history check and cannot guarantee personal safety.",
     "1 record(s) about other people with the same or a similar name were excluded.",
     "Public-source research only: covers what the configured search tools could find and open; it is not a certified or comprehensive criminal background check.",
     "Many court and registry systems are not indexed by web search or require formal requests.",
     "Source could not be accessed: https://sor.wa.example/search (Registry search requires CAPTCHA; not bypassed.).",
-    "SafeMatch background research is a limited, automated review of publicly accessible sources. It is not a certified, FCRA-compliant, or comprehensive criminal background check, and an absence of findings is not evidence that a person has no record. Findings must be reviewed by a person before any action is taken."
+    "Havenly background research is a limited, automated review of publicly accessible sources. It is not a certified, FCRA-compliant, or comprehensive criminal background check, and an absence of findings is not evidence that a person has no record. Findings must be reviewed by a person before any action is taken."
   ],
   "errors": [],
   "human_review_required": true

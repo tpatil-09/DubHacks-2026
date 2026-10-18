@@ -30,7 +30,7 @@ from .models import (
 )
 
 REQUIRED_NOTICE = (
-    "SafeMatch provides a limited summary of accessible public sources. Information may be incomplete or inaccurate, "
+    "Havenly provides a limited summary of accessible public sources. Information may be incomplete or inaccurate, "
     "and identity may be uncertain. This is not a formal criminal-history check and cannot guarantee personal safety."
 )
 
@@ -110,7 +110,7 @@ def _finding(f: ReportFinding) -> Dict[str, Any]:
         "supporting_excerpt": f.excerpt,
         "conflicts": conflicts,
         "limitations": list(dict.fromkeys(limitations)),
-        # Optional extensions used by the SafeMatch UI (claude.md section 7 notes them).
+        # Optional extensions used by the Havenly UI (claude.md section 7 notes them).
         "evidence_status": f.evidence_status.value,
         "why_unresolved": f.why_unresolved,
         "historical_report_only": f.historical_report_only,
@@ -175,7 +175,7 @@ _CASE = ["conviction", "guilty_plea", "charge_pending", "acquitted", "dismissed"
 _NULLABLE_STR = {"type": ["string", "null"]}
 FRONTEND_REPORT_SCHEMA: Dict[str, Any] = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "SafeMatch report.json (frontend contract, claude.md section 7)",
+    "title": "Havenly report.json (frontend contract, claude.md section 7)",
     "type": "object",
     "required": ["schema_version", "report_id", "generated_at", "subject", "scope", "summary", "findings",
                  "limitations", "errors", "human_review_required"],

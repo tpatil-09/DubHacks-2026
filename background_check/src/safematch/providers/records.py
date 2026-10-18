@@ -193,7 +193,7 @@ class CourtListenerProvider:
     def __init__(self, token: Optional[str] = None, client: Optional[httpx.Client] = None, max_retries: int = 2,
                  timeout: float = 20.0, sleep=time.sleep, clock=time.monotonic, min_interval: Optional[float] = None,
                  max_text_fetches: int = MAX_TEXT_FETCHES) -> None:
-        headers = {"Accept": "application/json", "User-Agent": "SafeMatch-background-check/0.1"}
+        headers = {"Accept": "application/json", "User-Agent": "Havenly-background-check/0.1"}
         if token:
             headers["Authorization"] = f"Token {token}"
         self._client = client or httpx.Client(base_url=COURTLISTENER_BASE, timeout=timeout, headers=headers)

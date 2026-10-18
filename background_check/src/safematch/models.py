@@ -1,4 +1,4 @@
-"""Shared, strictly validated data models for the SafeMatch pipeline.
+"""Shared, strictly validated data models for the Havenly pipeline.
 
 All three agents communicate exclusively through these models. Unknown values
 are represented as ``None`` (or an explicit ``unknown`` enum member) — never

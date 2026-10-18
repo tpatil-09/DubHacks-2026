@@ -28,7 +28,7 @@ from ..utils.logging_utils import get_logger
 
 log = get_logger("retrieval")
 
-USER_AGENT = "SafeMatchResearchBot/0.1 (+public-records verification; respects robots.txt)"
+USER_AGENT = "HavenlyResearchBot/0.1 (+public-records verification; respects robots.txt)"
 MAX_BYTES = 2_000_000
 MAX_REDIRECTS = 5
 ALLOWED_PORTS = {None, 80, 443}

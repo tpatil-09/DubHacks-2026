@@ -129,7 +129,7 @@ export function parseSafetyReport(raw: unknown): ParsedReport {
 }
 
 export const REQUIRED_NOTICE =
-  'SafeMatch provides a limited summary of accessible public sources. Information may be incomplete or inaccurate, and identity may be uncertain. This is not a formal criminal-history check and cannot guarantee personal safety.'
+  'Havenly provides a limited summary of accessible public sources. Information may be incomplete or inaccurate, and identity may be uncertain. This is not a formal criminal-history check and cannot guarantee personal safety.'
 
 type Tone = 'lilac' | 'butter' | 'sky' | 'gray' | 'peach' | 'mint'
 

@@ -901,7 +901,7 @@
     "limitations",
     "overall_status"
   ],
-  "title": "SafeMatch Background Check Report",
+  "title": "Havenly Background Check Report",
   "type": "object",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://safematch.local/schemas/report-1.0.json"

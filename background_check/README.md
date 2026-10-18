@@ -1,6 +1,6 @@
-# SafeMatch Background Check
+# Havenly Background Check
 
-This is a three-agent, public-source research pipeline for SafeMatch. It takes a person's voluntarily supplied search details and produces `output/report.json` in the team's frontend contract (`claude.md` §7), plus a detailed `output/report.full.json`.
+This is a three-agent, public-source research pipeline for Havenly. It takes a person's voluntarily supplied search details and produces `output/report.json` in the team's frontend contract (`claude.md` §7), plus a detailed `output/report.full.json`.
 
 ```
 PersonQuery ─▶ Investigator ─▶ investigator.json ─▶ Verifier ─▶ verifier.json ─▶ Synthesizer ─▶ report.json (+ report.full.json)
@@ -140,7 +140,7 @@ The pipeline writes two reports. Both are validated before either is written.
 | `scope.search_completed` | `false` when the report is `partial` (search or agent failure) |
 | `limitations[0]` | the required UI notice from `claude.md` §9 |
 | `human_review_required` | always `true` |
-| `findings[].evidence_status` / `why_unresolved` / `historical_report_only` | optional extensions used by the SafeMatch UI to split Verified vs Unresolved and lead unresolved cards with the reason |
+| `findings[].evidence_status` / `why_unresolved` / `historical_report_only` | optional extensions used by the Havenly UI to split Verified vs Unresolved and lead unresolved cards with the reason |
 
 `python -m safematch.cli validate-report --input <file>` detects which format it was given. Every synthetic scenario and the saved live cases have been parsed with the frontend's real zod schema (`zod@4.6.7`).
 
