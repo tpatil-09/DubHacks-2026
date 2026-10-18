@@ -16,7 +16,7 @@ const tierLabels: Record<RecordTier, string> = {
   verified_record_requires_attention: 'Verified record requiring attention',
   reported_conviction_unconfirmed: 'Conviction or registration reported, not confirmed on an official record',
   unresolved_allegations_or_charges: 'Flagged results to check, nothing confirmed',
-  cleared_outcomes_only: 'Accused or charged, but cleared (dismissed, acquitted, or exonerated)',
+  cleared_outcomes_only: 'Flagged results to check — charges were dismissed, acquitted, or exonerated',
   no_linked_records: 'No records linked to this person in the search scope',
   insufficient_information: 'Not enough information: key sources could not be checked',
 }

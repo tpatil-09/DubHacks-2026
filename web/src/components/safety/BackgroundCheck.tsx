@@ -1,7 +1,14 @@
 import { ExternalLink, Hourglass } from 'lucide-react'
 import { useScreening } from '../../hooks/data'
-import { reportTier, tierStyles, visibleFindings, type SafetyReport } from '../../types/safetyReport'
+import { reportTier, tierStyles, visibleFindings, type RecordTier, type SafetyReport } from '../../types/safetyReport'
 import { FindingCard, RequiredNotice, toneForTier } from './SafetyParts'
+
+// Tiers where nothing is confirmed (or a charge was only dropped, not disproven), so the headline
+// must prompt the viewer to check the flagged results themselves rather than trust stored text.
+const tierHeadlineOverride: Partial<Record<RecordTier, string>> = {
+  unresolved_allegations_or_charges: 'Flagged results to check, nothing confirmed',
+  cleared_outcomes_only: 'Flagged results to check — charges were dismissed, acquitted, or exonerated',
+}
 
 /** Small color-coded result chip for cards and headers. */
 export function TierChip({ uid, size = 'sm', variant = 'chip' }: { uid: string; size?: 'sm' | 'md'; variant?: 'chip' | 'badge' }) {
@@ -56,7 +63,7 @@ function TldrCard({ report }: { report: SafetyReport }) {
         </span>
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-ink-soft">TLDR</p>
-          <p className="font-display text-xl font-semibold leading-tight">{tier === 'unresolved_allegations_or_charges' ? 'Flagged results to check, nothing confirmed' : (tldr?.tier_label ?? tierStyles[tier].short)}</p>
+          <p className="font-display text-xl font-semibold leading-tight">{tierHeadlineOverride[tier] ?? tldr?.tier_label ?? tierStyles[tier].short}</p>
         </div>
       </div>
       <p className="mt-3 text-lg">{tldr?.headline ?? report.summary}</p>

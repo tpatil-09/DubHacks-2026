@@ -67,6 +67,7 @@ export const quizQuestions: QuizQuestion[] = [
       { id: 'ramen', emoji: '🍜', label: 'Instant ramen, obviously', scores: { nightEarly: -2 } },
       { id: 'tea', emoji: '🍵', label: "Tea — I'm asleep at midnight", scores: { nightEarly: 2, cozyAdventurous: -1 } },
       { id: 'taco', emoji: '🌮', label: 'Late-night taco truck run', scores: { nightEarly: -2, cozyAdventurous: 2 } },
+      { id: 'pancakes', emoji: '🥞', label: 'Midnight is my morning', scores: { nightEarly: -3, cozyAdventurous: 1 } },
     ],
   },
   {
@@ -76,6 +77,7 @@ export const quizQuestions: QuizQuestion[] = [
       { id: 'talk', emoji: '💬', label: 'Talk it out right away', scores: { chattyChill: -2 } },
       { id: 'walk', emoji: '🚶', label: 'Take a walk, then talk', scores: { chattyChill: 1, cozyAdventurous: 1 } },
       { id: 'letter', emoji: '✉️', label: 'Write down my thoughts first', scores: { plannerSpontaneous: -1, chattyChill: 1 } },
+      { id: 'think', emoji: '💭', label: 'I deal with my thoughts internally first', scores: { plannerSpontaneous: -1, chattyChill: -2 } },
     ],
   },
   {

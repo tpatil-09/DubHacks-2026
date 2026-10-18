@@ -422,22 +422,21 @@ export const firebaseBackend: Backend = {
   },
 
   async getScreening(subjectUid) {
-    if (fb.auth.currentUser?.uid !== subjectUid) {
-      // Real members' reports are private to them (see firestore.rules). Fictional demo
-      // members get the same clearly labeled synthetic report as in demo mode.
-      const profile = profileFrom((await getDoc(profileRef(subjectUid))).data() ?? null, subjectUid)
-      if (!profile?.isDemo) return null
-      const years = ageFrom(profile.birthdate)
-      return buildScreeningReport({
-        subjectUid,
-        nameProvided: `${profile.firstName} ${profile.lastName}`.trim(),
-        context: [profile.city, years ? `age ${years}` : ''].filter(Boolean).join(', ') || undefined,
-      })
-    }
     const snapshot = await getDoc(doc(fb.db, 'screenings', subjectUid))
-    if (!snapshot.exists()) return null
-    const data = snapshot.data() as { report?: unknown }
-    return data.report ?? data
+    if (snapshot.exists()) {
+      const data = snapshot.data() as { report?: unknown }
+      return data.report ?? data
+    }
+    // No stored report yet. Fictional demo members get a clearly labeled synthetic
+    // report as a fallback; real members just show as "not run yet" (null).
+    const profile = profileFrom((await getDoc(profileRef(subjectUid))).data() ?? null, subjectUid)
+    if (!profile?.isDemo) return null
+    const years = ageFrom(profile.birthdate)
+    return buildScreeningReport({
+      subjectUid,
+      nameProvided: `${profile.firstName} ${profile.lastName}`.trim(),
+      context: [profile.city, years ? `age ${years}` : ''].filter(Boolean).join(', ') || undefined,
+    })
   },
 
   async block(uid, otherUid) {

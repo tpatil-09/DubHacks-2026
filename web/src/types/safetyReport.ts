@@ -95,7 +95,8 @@ export const tierStyles: Record<RecordTier, { short: string; tone: 'red' | 'oran
   reported_conviction_unconfirmed: { short: 'Past record reported', tone: 'orange' },
   // Nothing here is confirmed, so the label must not suggest the person has done anything.
   unresolved_allegations_or_charges: { short: 'Check flagged results', tone: 'amber' },
-  cleared_outcomes_only: { short: 'Cleared', tone: 'green' },
+  // Dismissed/acquitted/exonerated is not proof of innocence, so this must not read as "safe."
+  cleared_outcomes_only: { short: 'Check flagged results', tone: 'amber' },
   no_linked_records: { short: 'No records linked', tone: 'green' },
   insufficient_information: { short: 'Not enough info', tone: 'gray' },
 }

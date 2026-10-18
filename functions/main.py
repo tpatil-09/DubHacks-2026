@@ -183,14 +183,10 @@ def _providers():
     )
 
 
-def _run(request_id: str, data: dict) -> None:
-    db = firestore.client()
-    ref = db.collection("reportRequests").document(request_id)
-    if not _claim(db.transaction(), ref):
-        return
+def _run_pipeline_and_write(ref, query: PersonQuery) -> None:
+    """Shared by both report flows: run the pipeline and write status/result onto `ref`."""
     try:
         providers, settings = _providers()
-        query = _query_for(data, _subject_age(db, data))
         found = run_investigator(query, providers, settings)
         if providers.mode == PipelineMode.live and any(
             finding.provenance.retrieved_via == RetrievedVia.fixture for finding in found.candidate_findings
@@ -211,6 +207,15 @@ def _run(request_id: str, data: dict) -> None:
         ref.update({"status": "failed", "error": message[:500], "finishedAt": firestore.SERVER_TIMESTAMP})
 
 
+def _run(request_id: str, data: dict) -> None:
+    db = firestore.client()
+    ref = db.collection("reportRequests").document(request_id)
+    if not _claim(db.transaction(), ref):
+        return
+    query = _query_for(data, _subject_age(db, data))
+    _run_pipeline_and_write(ref, query)
+
+
 @firestore_fn.on_document_created(
     document="reportRequests/{requestId}",
     region=REGION,
@@ -226,3 +231,49 @@ def runSafetyReport(event: Event) -> None:
     if data.get("status") != "queued":
         return
     _run(request_id, data)
+
+
+@firestore.transactional
+def _claim_screening(transaction, ref) -> bool:
+    snapshot = ref.get(transaction=transaction)
+    if snapshot.exists and snapshot.get("status") in ("searching", "verifying", "analyzing", "complete", "incomplete"):
+        return False
+    transaction.set(ref, {"status": "searching", "startedAt": firestore.SERVER_TIMESTAMP}, merge=True)
+    return True
+
+
+@firestore_fn.on_document_written(
+    document="users/{uid}",
+    region=REGION,
+    timeout_sec=540,
+    memory=options.MemoryOption.GB_1,
+    max_instances=2,
+)
+def runOnboardingScreening(event: Event) -> None:
+    """Runs the screening pipeline once, automatically, the first time a member
+    records consent at the end of onboarding (users/{uid}.screeningConsentAt)."""
+    if event.data is None or event.data.after is None:
+        return
+    before = (event.data.before.to_dict() if event.data.before else None) or {}
+    after = event.data.after.to_dict() or {}
+    if before.get("screeningConsentAt") or not after.get("screeningConsentAt"):
+        return  # only fire the first time consent is newly recorded
+    uid = event.params["uid"]
+    db = firestore.client()
+    ref = db.collection("screenings").document(uid)
+    if not _claim_screening(db.transaction(), ref):
+        return
+    profile = db.collection("profiles").document(uid).get().to_dict() or {}
+    name = _text(f"{profile.get('firstName', '')} {profile.get('lastName', '')}".strip(), 120)
+    if len(name.split(" ")) < 2:
+        ref.update({"status": "failed", "error": "Profile has no full name yet.", "finishedAt": firestore.SERVER_TIMESTAMP})
+        return
+    payload: dict[str, Any] = {"full_name": name}
+    location = _text(profile.get("city"), 120)
+    if location:
+        payload["location"] = location
+    age = _age(profile.get("birthdate"))
+    if age is not None:
+        payload["age_min"] = age
+        payload["age_max"] = age
+    _run_pipeline_and_write(ref, PersonQuery.model_validate(payload))

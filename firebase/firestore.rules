@@ -49,7 +49,7 @@ service cloud.firestore {
     }
 
     match /screenings/{uid} {
-      allow read: if owner(uid);
+      allow read: if signedIn();
       allow write: if false;
     }
 
