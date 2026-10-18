@@ -1,5 +1,6 @@
 import type {
   Account,
+  GameAnswers,
   LikeType,
   Match,
   Message,
@@ -13,12 +14,14 @@ import { buildScreeningReport } from '../fixtures/demoReports'
 import { matchIdFor, type Backend } from './backend'
 import { filterDiscover } from './discoverFilter'
 import { ageFrom } from '../lib/age'
+import { gameById, seededAnswers } from '../games/fun/games'
 
 // In-browser backend backed by localStorage. Used when Firebase isn't configured
 // or the player picks "Try demo mode". Demo profiles reply and play automatically.
 
 const STORAGE_KEY = 'safematch:demo:v1'
 const DEMO_UID = 'demo-you'
+const demoIds = new Set(demoProfiles.map((profile) => profile.uid))
 
 interface DemoState {
   signedIn: boolean
@@ -29,6 +32,7 @@ interface DemoState {
   messages: Record<string, Message[]>
   quizResults: Record<string, QuizResult>
   wyr: Record<string, Record<string, WyrChoice>>
+  games?: Record<string, Record<string, GameAnswers>>
   blocks: Record<string, string[]>
   userReports: { from: string; about: string; reason: string; details: string; at: number }[]
 }
@@ -314,6 +318,28 @@ export const demoBackend: Backend = {
   },
   async getWyrAnswersFor(uids) {
     return Object.fromEntries(uids.map((uid) => [uid, state.wyr[uid] ?? {}]))
+  },
+
+  async getGameAnswers(uid) {
+    return state.games?.[uid] ?? {}
+  },
+  async saveGameAnswers(uid, gameId, answers) {
+    commit((draft) => {
+      draft.games = { ...draft.games, [uid]: { ...draft.games?.[uid], [gameId]: answers } }
+    })
+  },
+  async listGamePlayers(uid, gameId) {
+    await wait(250)
+    const game = gameById(gameId)
+    const blocked = new Set(state.blocks[uid] ?? [])
+    return Object.values(state.profiles)
+      .filter((profile) => profile.uid !== uid && profile.discoverable && !blocked.has(profile.uid))
+      .map((profile) => ({
+        profile,
+        // Demo members "played" every game with seeded answers.
+        answers: state.games?.[profile.uid]?.[gameId] ?? (game && demoIds.has(profile.uid) ? seededAnswers(profile.uid, game) : undefined),
+      }))
+      .filter((entry): entry is { profile: Profile; answers: GameAnswers } => !!entry.answers)
   },
 
   async getScreening(subjectUid) {

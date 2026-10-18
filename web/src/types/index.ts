@@ -67,6 +67,9 @@ export interface Match {
 
 export type WyrChoice = 'a' | 'b'
 
+/** Fun-game answers: question id (or `picks` for a puzzle) to the chosen option ids. */
+export type GameAnswers = Record<string, string[]>
+
 export interface Message {
   id: string
   matchId: string

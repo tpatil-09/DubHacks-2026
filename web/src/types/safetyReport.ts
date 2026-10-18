@@ -93,7 +93,8 @@ export type Tldr = z.infer<typeof tldrSchema>
 export const tierStyles: Record<RecordTier, { short: string; tone: 'red' | 'orange' | 'amber' | 'green' | 'gray' }> = {
   verified_record_requires_attention: { short: 'Record needs attention', tone: 'red' },
   reported_conviction_unconfirmed: { short: 'Past record reported', tone: 'orange' },
-  unresolved_allegations_or_charges: { short: 'Open allegations', tone: 'amber' },
+  // Nothing here is confirmed, so the label must not suggest the person has done anything.
+  unresolved_allegations_or_charges: { short: 'Check flagged results', tone: 'amber' },
   cleared_outcomes_only: { short: 'Cleared', tone: 'green' },
   no_linked_records: { short: 'No records linked', tone: 'green' },
   insufficient_information: { short: 'Not enough info', tone: 'gray' },

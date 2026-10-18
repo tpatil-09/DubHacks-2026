@@ -56,7 +56,7 @@ function TldrCard({ report }: { report: SafetyReport }) {
         </span>
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-ink-soft">TLDR</p>
-          <p className="font-display text-xl font-semibold leading-tight">{tldr?.tier_label ?? tierStyles[tier].short}</p>
+          <p className="font-display text-xl font-semibold leading-tight">{tier === 'unresolved_allegations_or_charges' ? 'Flagged results to check, nothing confirmed' : (tldr?.tier_label ?? tierStyles[tier].short)}</p>
         </div>
       </div>
       <p className="mt-3 text-lg">{tldr?.headline ?? report.summary}</p>

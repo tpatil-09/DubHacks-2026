@@ -86,6 +86,8 @@ describe('built-in background checks', () => {
 describe('report wording', () => {
   it('never labels a tier or non-conviction as safe, clean, or a conviction', () => {
     for (const tier of recordTiers) expect(tierStyles[tier].short).not.toMatch(/\b(safe|clean)\b/i)
+    // Unconfirmed results must not read as if the person has issues.
+    expect(tierStyles.unresolved_allegations_or_charges.short).not.toMatch(/allegation|charge/i)
     for (const status of ['charge_pending', 'dismissed', 'acquitted', 'unknown'] as const) {
       expect(caseStatusLabels[status].label).not.toMatch(/^conviction/i)
     }

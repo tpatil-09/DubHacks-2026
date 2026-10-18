@@ -25,7 +25,7 @@ import {
 } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { auth, db, functions, storage } from '../lib/firebase'
-import type { Account, Match, Message, Profile, QuizResult, WyrChoice } from '../types'
+import type { Account, GameAnswers, Match, Message, Profile, QuizResult, WyrChoice } from '../types'
 import { matchIdFor, type Backend } from './backend'
 import { filterDiscover } from './discoverFilter'
 
@@ -221,6 +221,28 @@ export const firebaseBackend: Backend = {
     return Object.fromEntries(entries)
   },
 
+  async getGameAnswers(uid) {
+    const snapshot = await getDoc(doc(fb.db, 'gameAnswers', uid))
+    return (snapshot.data() as Record<string, GameAnswers> | undefined) ?? {}
+  },
+  async saveGameAnswers(uid, gameId, answers) {
+    // Replace this game's answers wholesale (merge only across games).
+    await setDoc(doc(fb.db, 'gameAnswers', uid), { [gameId]: answers }, { mergeFields: [gameId] })
+  },
+  async listGamePlayers(uid, gameId) {
+    const [profilesSnap, blocked] = await Promise.all([
+      getDocs(query(collection(fb.db, 'profiles'), where('discoverable', '==', true), limit(100))),
+      blockedSet(uid),
+    ])
+    const profiles = profilesSnap.docs
+      .map((entry) => ({ ...(entry.data() as Profile), uid: entry.id }))
+      .filter((profile) => profile.uid !== uid && !blocked.has(profile.uid))
+    const entries = await Promise.all(
+      profiles.map(async (profile) => ({ profile, answers: (await firebaseBackend.getGameAnswers(profile.uid))[gameId] })),
+    )
+    return entries.filter((entry): entry is { profile: Profile; answers: GameAnswers } => !!entry.answers)
+  },
+
   async getScreening(subjectUid) {
     // Written by the screening Cloud Function (background_check pipeline) when a member signs up.
     const snapshot = await getDoc(doc(fb.db, 'screenings', subjectUid))
@@ -253,6 +275,7 @@ export const firebaseBackend: Backend = {
       deleteDoc(doc(fb.db, 'profiles', uid)),
       deleteDoc(doc(fb.db, 'quizResults', uid)),
       deleteDoc(doc(fb.db, 'wyrAnswers', uid)),
+      deleteDoc(doc(fb.db, 'gameAnswers', uid)),
     ])
     await deleteDoc(doc(fb.db, 'users', uid))
     await firebaseSignOut(fb.auth)

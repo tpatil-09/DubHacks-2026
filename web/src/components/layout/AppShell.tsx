@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet } from 'react-router'
 import { Compass, Gamepad2, MessageCircle, Smile } from 'lucide-react'
+import { Capsule } from '../ui/Capsule'
 import { Avatar } from '../ui/ProfilePhoto'
 import { TokenCounter } from '../ui/Badges'
 import { DemoTag } from '../ui/Sticker'
@@ -31,8 +32,8 @@ export function AppShell() {
 
 function Wordmark({ className = '' }: { className?: string }) {
   return (
-    <NavLink to="/discover" className={`font-title flex items-center gap-2 text-2xl ${className}`}>
-      <img src="/favicon.svg" alt="" className="size-8" />
+    <NavLink to="/discover" className={`font-title group flex items-center gap-2.5 text-2xl ${className}`}>
+      <Capsule color="bubblegum" size={30} className="transition-transform group-hover:rotate-12" />
       SafeMatch
     </NavLink>
   )
@@ -83,7 +84,7 @@ function Sidebar() {
       )}
 
       <div className="mt-auto px-1">
-        <img src="/favicon.svg" alt="" className="size-12" />
+        <Capsule color="bubblegum" size={48} className="-rotate-12" />
         <p className="mt-4 text-xl font-extrabold leading-snug tracking-tight text-ink-soft">
           More butterflies.
           <br />

@@ -5,6 +5,8 @@ import { Capsule } from '../../components/ui/Capsule'
 import { PersonaBadge } from '../../components/ui/Badges'
 import { backend } from '../../data'
 import { wyrPrompts } from '../../games/wouldYouRather/prompts'
+import { buzzQuizzes, isComplete, matchPuzzles, scoreBuzzQuiz, type FunGame } from '../../games/fun/games'
+import type { GameAnswers } from '../../types'
 import { arcadeVars, type PastelColor } from '../../lib/colors'
 import { useSession } from '../../store/session'
 
@@ -12,10 +14,12 @@ export default function ArcadeHub() {
   const uid = useSession((state) => state.user?.uid)
   const profile = useSession((state) => state.profile)
   const [wyrCount, setWyrCount] = useState<number | null>(null)
+  const [played, setPlayed] = useState<Record<string, GameAnswers>>({})
 
   useEffect(() => {
     if (!uid) return
     backend().getWyrAnswers(uid).then((answers) => setWyrCount(Object.keys(answers).length)).catch(() => setWyrCount(0))
+    backend().getGameAnswers(uid).then(setPlayed).catch(() => setPlayed({}))
   }, [uid])
 
   return (
@@ -48,7 +52,41 @@ export default function ArcadeHub() {
           footer={<span className="text-sm text-ink-soft">{wyrCount === null ? '…' : `${wyrCount} of ${wyrPrompts.length} capsules opened`}</span>}
         />
       </div>
+
+      <GameSection title="Quizzes" blurb="BuzzFeed-style, 6 questions each. Find out who got the same result." games={buzzQuizzes} played={played} />
+      <GameSection title="Match puzzles" blurb="Lots of right answers. Pick the same things as someone and you’re puzzle twins." games={matchPuzzles} played={played} />
     </div>
+  )
+}
+
+function GameSection({ title, blurb, games, played }: { title: string; blurb: string; games: FunGame[]; played: Record<string, GameAnswers> }) {
+  return (
+    <section className="mt-12" aria-label={title}>
+      <h2 className="text-3xl font-bold">{title}</h2>
+      <p className="mt-1 text-ink-soft">{blurb}</p>
+      <div className="mt-5 grid gap-5 md:grid-cols-2">
+        {games.map((game) => {
+          const answers = played[game.id]
+          const done = isComplete(game, answers)
+          return (
+            <GameCard
+              key={game.id}
+              to={`/arcade/play/${game.id}`}
+              color={game.color}
+              emoji={game.emoji}
+              title={game.title}
+              subtitle={game.kind === 'quiz' ? game.tagline : game.prompt}
+              cta={done ? 'See twins' : 'Play'}
+              footer={
+                <span className="text-sm text-ink-soft">
+                  {done && answers ? (game.kind === 'quiz' ? `You got ${scoreBuzzQuiz(game, answers).emoji} ${scoreBuzzQuiz(game, answers).title}` : 'Picks locked in ✓') : '+5 tokens'}
+                </span>
+              }
+            />
+          )
+        })}
+      </div>
+    </section>
   )
 }
 

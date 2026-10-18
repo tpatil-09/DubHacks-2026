@@ -1,5 +1,6 @@
 import type {
   Account,
+  GameAnswers,
   LikeType,
   Match,
   Message,
@@ -43,6 +44,12 @@ export interface Backend {
   getWyrAnswers(uid: string): Promise<Record<string, WyrChoice>>
   saveWyrAnswer(uid: string, promptId: string, choice: WyrChoice): Promise<void>
   getWyrAnswersFor(uids: string[]): Promise<Record<string, Record<string, WyrChoice>>>
+
+  /** Fun quizzes and match puzzles, keyed by game id. */
+  getGameAnswers(uid: string): Promise<Record<string, GameAnswers>>
+  saveGameAnswers(uid: string, gameId: string, answers: GameAnswers): Promise<void>
+  /** Other discoverable members (not blocked) who played this game, with their answers. */
+  listGamePlayers(uid: string, gameId: string): Promise<{ profile: Profile; answers: GameAnswers }[]>
 
   /**
    * The member's background check, produced by the background_check pipeline when they join.

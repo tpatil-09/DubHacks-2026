@@ -102,6 +102,11 @@ service cloud.firestore {
       allow write: if isMe(uid);
     }
 
+    match /gameAnswers/{uid} {
+      allow read: if signedIn();
+      allow write: if isMe(uid);
+    }
+
     // screenings/{uid}: the member's background check (report.json from background_check), written only by
     // the screening Cloud Function after the member consents at onboarding (Admin SDK bypasses rules).
     // Every signed-in member can read it; the UI shows only findings linked to the person.
