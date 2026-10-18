@@ -61,7 +61,7 @@ export default function MyProfile() {
   return (
     <div className="max-w-4xl pb-10">
       <div className="mb-8 flex items-end justify-between gap-4">
-        <div><span className="eyebrow">This is you</span><h1 className="mt-4 text-[2.6rem] sm:text-6xl">My profile.</h1></div>
+        <h1 className="text-[2.6rem] sm:text-6xl">My profile.</h1>
         <Link to="/settings" className="flex items-center gap-1.5 font-display font-semibold text-ink-soft hover:text-ink">
           <SettingsIcon className="size-5" /> Settings
         </Link>

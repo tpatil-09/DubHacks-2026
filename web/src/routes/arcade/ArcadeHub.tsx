@@ -26,8 +26,7 @@ export default function ArcadeHub() {
   return (
     <div className="pb-12">
       <header className="mb-10 max-w-2xl">
-        <span className="eyebrow">Totally optional</span>
-        <h1 className="mt-4 text-[2.6rem] sm:text-6xl">Find a fun match.</h1>
+        <h1 className="text-[2.6rem] sm:text-6xl">Find a fun match.</h1>
         <p className="mt-4 text-lg text-ink-soft">Play a quick game to find people on your wavelength, or just keep swiping.</p>
       </header>
 
