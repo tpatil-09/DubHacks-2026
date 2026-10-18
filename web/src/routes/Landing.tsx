@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { motion } from 'motion/react'
 import { ArrowRight, Heart, MapPin, ShieldCheck, X } from 'lucide-react'
+import { Mascot } from '../components/ui/Mascot'
 
 const steps = [
   { title: 'Make your profile', body: 'Photos, interests, and a bio that sounds like you.' },
@@ -23,10 +24,11 @@ export default function Landing() {
       <main className="mx-auto grid max-w-6xl items-center gap-14 px-6 pb-20 pt-8 md:grid-cols-[1.15fr_.85fr] md:pt-14">
         <section>
           <span className="eyebrow">Dating, minus the worry</span>
-          <h1 className="mt-5 text-[3.1rem] sm:text-7xl">
+          <h1 className="relative mt-5 text-[3.1rem] sm:text-7xl">
             Have fun dating.
             <br />
             We do the <span className="text-bubblegum">homework.</span>
+            <Mascot mood="happy" size={135} className="absolute right-24 bottom-0 hidden sm:block" />
           </h1>
           <p className="mt-6 max-w-[33rem] text-lg leading-8 text-ink-soft">
             Every SafeMatch profile comes with a background check of public records, so you can spend less time worrying and
