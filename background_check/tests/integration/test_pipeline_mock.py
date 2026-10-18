@@ -7,6 +7,7 @@ import pytest
 
 from safematch.models import PersonQuery
 from safematch.orchestrator import PipelineError, Providers, build_mock_providers_from_file, run_pipeline, run_verifier
+from safematch.frontend_contract import validate_frontend_report
 from safematch.utils.validation import validate_report
 from tests.conftest import ROOT, SCENARIO_DIR, scenario
 
@@ -17,8 +18,11 @@ def test_full_pipeline_writes_all_stages(settings, tmp_path):
     res = run_pipeline(PersonQuery.model_validate(sc["query"]), p, settings, tmp_path)
     for key in ("investigator_path", "verifier_path", "report_path"):
         assert (tmp_path / res[key].split("/")[-1]).exists()
-    report = json.loads((tmp_path / "report.json").read_text())
+    report = json.loads((tmp_path / "report.full.json").read_text())
     assert validate_report(report) == []
+    frontend = json.loads((tmp_path / "report.json").read_text())
+    assert validate_frontend_report(frontend) == [] and list(frontend)[0] == "tldr"
+    assert frontend["is_synthetic"] is True
     assert report["report_metadata"]["is_test_fixture"] is True
     assert report["report_metadata"]["pipeline_mode"] == "mock"
     assert res["summary"]["verified_record_flag"] is True
@@ -56,7 +60,9 @@ def test_cli_stage_by_stage_and_validate(tmp_path):
     r3 = _cli("synthesizer", "--mock", "--input", f"{out}/verifier.json", "--output-dir", out)
     assert r3.returncode == 0, r3.stderr
     r4 = _cli("validate-report", "--input", f"{out}/report.json")
-    assert r4.returncode == 0 and "VALID" in r4.stdout
+    assert r4.returncode == 0 and "VALID" in r4.stdout and "frontend" in r4.stdout
+    r5 = _cli("validate-report", "--input", f"{out}/report.full.json")
+    assert r5.returncode == 0 and "report_schema.json" in r5.stdout
 
 
 def test_cli_run_and_bad_inputs(tmp_path):

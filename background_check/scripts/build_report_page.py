@@ -1,6 +1,6 @@
 """Render a report.json as a self-contained, human-readable HTML page.
 
-    python scripts/build_report_page.py --input output/report.json --out output/report.html
+    python scripts/build_report_page.py --input output/report.full.json --out output/report.html
 """
 from __future__ import annotations
 

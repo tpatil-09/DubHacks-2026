@@ -380,6 +380,9 @@ class ReportFinding(Strict):
     finding_id: str
     source_url: str
     source_type: SourceType
+    source_title: Optional[str] = None
+    excerpt: Optional[str] = None
+    retrieved_at: str
     claim: str
     why_unresolved: Optional[str] = Field(
         default=None, description="Unverified/inconclusive findings only: why, in plain language. Also the first sentence of summary."

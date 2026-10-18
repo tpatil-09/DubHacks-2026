@@ -259,6 +259,34 @@
         "source_type": {
           "$ref": "#/$defs/SourceType"
         },
+        "source_title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Title"
+        },
+        "excerpt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Excerpt"
+        },
+        "retrieved_at": {
+          "title": "Retrieved At",
+          "type": "string"
+        },
         "claim": {
           "title": "Claim",
           "type": "string"
@@ -389,6 +417,7 @@
         "finding_id",
         "source_url",
         "source_type",
+        "retrieved_at",
         "claim",
         "summary",
         "evidence_status",

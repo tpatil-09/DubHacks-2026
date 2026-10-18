@@ -21,6 +21,7 @@ from typing import List, Optional
 from pydantic import ValidationError
 
 from .config import PROJECT_ROOT, ConfigError, Settings, load_settings
+from .frontend_contract import validate_frontend_report
 from .models import InvestigatorResult, PersonQuery, VerifierResult
 from .orchestrator import (
     INVESTIGATOR_FILE,
@@ -30,6 +31,7 @@ from .orchestrator import (
     Providers,
     build_live_providers,
     build_mock_providers_from_file,
+    full_report_path,
     run_investigator,
     run_pipeline,
     run_synthesizer,
@@ -84,7 +86,7 @@ def cmd_synthesizer(args, settings) -> int:
     p = _providers(args, settings)
     report = run_synthesizer(vr, p)
     path = write_report(report, Path(args.out) if args.out else _out_dir(args, settings) / REPORT_FILE)
-    print(json.dumps({"output": str(path), "overall_status": report.overall_status.value,
+    print(json.dumps({"output": str(path), "full_report": str(full_report_path(path)), "overall_status": report.overall_status.value,
                       "verified_record_flag": report.safety_indicators.verified_record_flag}, indent=2))
     return 0
 
@@ -92,19 +94,23 @@ def cmd_synthesizer(args, settings) -> int:
 def cmd_run(args, settings) -> int:
     p = _providers(args, settings)
     res = run_pipeline(_load_query(args.query_file), p, settings, _out_dir(args, settings), args.report_name)
-    print(json.dumps({"report": res["report_path"], "investigator": res["investigator_path"],
+    print(json.dumps({"report": res["report_path"], "full_report": res["full_report_path"], "investigator": res["investigator_path"],
                       "verifier": res["verifier_path"], **res["summary"]}, indent=2))
     return 0
 
 
 def cmd_validate(args, settings) -> int:
-    errors = validate_report(read_json(Path(args.input)))
+    """Validate either format: the frontend report.json or the detailed report.full.json."""
+    data = read_json(Path(args.input))
+    detailed = isinstance(data, dict) and "report_metadata" in data
+    errors = validate_report(data) if detailed else validate_frontend_report(data)
+    contract = SCHEMA_PATH.name if detailed else "the frontend report.json contract (claude.md section 7)"
     if errors:
         print(f"INVALID: {args.input}")
         for e in errors:
             print(f"  - {e}")
         return 1
-    print(f"VALID: {args.input} conforms to {SCHEMA_PATH.name}")
+    print(f"VALID: {args.input} conforms to {contract}")
     return 0
 
 

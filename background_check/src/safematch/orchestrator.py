@@ -9,6 +9,7 @@ from .agents.investigator import Investigator
 from .agents.synthesizer import Synthesizer
 from .agents.verifier import Verifier
 from .config import Settings
+from .frontend_contract import to_frontend_report, validate_frontend_report
 from .models import FinalReport, InvestigatorResult, PersonQuery, PipelineMode, RetrievedVia, VerifierResult
 from .providers.llm import ClaudeCLIProvider, LLMProvider
 from .providers.search import SearchProvider, TavilySearchProvider
@@ -88,12 +89,24 @@ def _check_mode(input_mode: PipelineMode, p: Providers, stage: str) -> None:
         )
 
 
+def full_report_path(path: Path) -> Path:
+    """report.json -> report.full.json (the detailed FinalReport kept next to the frontend report)."""
+    path = Path(path)
+    return path.with_name(f"{path.stem}.full{path.suffix or '.json'}")
+
+
 def write_report(report: FinalReport, path: Path) -> Path:
-    data = report.model_dump(mode="json")
-    errors = validate_report(data)
+    """Write the frontend report.json (claude.md section 7 contract) and the detailed report.full.json.
+
+    Both are validated before either file is written.
+    """
+    full = report.model_dump(mode="json")
+    frontend = to_frontend_report(report)
+    errors = validate_report(full) + validate_frontend_report(frontend)
     if errors:
         raise PipelineError("final report failed schema validation: " + "; ".join(errors[:5]))
-    return write_json_atomic(path, data)
+    write_json_atomic(full_report_path(path), full)
+    return write_json_atomic(path, frontend)
 
 
 def run_pipeline(
@@ -134,6 +147,7 @@ def run_pipeline(
     log.info("pipeline done: %s", summary)
     return {
         "report_path": str(report_path),
+        "full_report_path": str(full_report_path(report_path)),
         "investigator_path": str(inv_path),
         "verifier_path": str(ver_path),
         "summary": summary,

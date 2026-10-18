@@ -1,9 +1,9 @@
 # SafeMatch Background Check
 
-This is a three-agent, public-source research pipeline for SafeMatch. It takes a person's voluntarily supplied search details and produces a fixed-schema `output/report.json`. A separate frontend consumes that file.
+This is a three-agent, public-source research pipeline for SafeMatch. It takes a person's voluntarily supplied search details and produces `output/report.json` in the team's frontend contract (`claude.md` §7), plus a detailed `output/report.full.json`.
 
 ```
-PersonQuery ─▶ Investigator ─▶ investigator.json ─▶ Verifier ─▶ verifier.json ─▶ Synthesizer ─▶ report.json
+PersonQuery ─▶ Investigator ─▶ investigator.json ─▶ Verifier ─▶ verifier.json ─▶ Synthesizer ─▶ report.json (+ report.full.json)
               (Claude Code:                         (Claude Code:                 (deterministic build +
                WebSearch/WebFetch)                   WebSearch/WebFetch +          LLM-phrased summaries,
                                                      Python guards + rules)        schema-validated)
@@ -75,11 +75,12 @@ python -m safematch.cli investigator --query-file test_cases/example.json
 python -m safematch.cli verifier     --input output/investigator.json
 python -m safematch.cli synthesizer  --input output/verifier.json
 
-# Full pipeline (writes output/investigator.json, verifier.json, report.json)
+# Full pipeline (writes output/investigator.json, verifier.json, report.json, report.full.json)
 python -m safematch.cli run --query-file test_cases/example.json [--output-dir DIR] [--report-name NAME.json]
 python -m safematch.cli run --mock --query-file test_cases/example.json      # demo report for frontend work
 
-python -m safematch.cli validate-report --input output/report.json
+python -m safematch.cli validate-report --input output/report.json        # frontend contract
+python -m safematch.cli validate-report --input output/report.full.json   # detailed report
 python -m safematch.cli export-schema    # regenerate config/report_schema.json after model changes
 ```
 
@@ -97,9 +98,34 @@ pytest                        # everything except live
 
 Synthetic scenarios (`tests/fixtures/scenarios/`) cover a verified conviction, a same-name unrelated person, an unverified accusation, a dismissed charge, conflicting sources, no results, an inaccessible registry, a search-provider error, an Investigator agent failure, an exonerated (vacated) conviction, and a mixed demo report used by `--mock`. Several scenarios deliberately make the mock model **over-claim** (for example, "verified" on a name-only match) to prove that the guards hold.
 
-## Report format (`report.json`)
+## Output files
 
-The authoritative schema is `config/report_schema.json` (JSON Schema 2020-12, generated from `models.FinalReport`). Every report has exactly these top-level keys:
+The pipeline writes two reports. Both are validated before either is written.
+
+| File | Format | Used by |
+|---|---|---|
+| `report.json` | The team contract from `claude.md` §7, checked by the frontend's zod schema in `web/src/types/safetyReport.ts`, plus `tldr` as the first key (zod ignores extra keys) | The frontend |
+| `report.full.json` | The detailed `FinalReport` described below (schema in `config/report_schema.json`) | Audit and debugging, `scripts/build_report_page.py`, the evaluation harness |
+
+`src/safematch/frontend_contract.py` converts one to the other deterministically:
+
+| `report.json` field | Comes from |
+|---|---|
+| `summary` | `tldr.tier_label` + `tldr.headline` |
+| `findings[]` | verified + unresolved findings. Records about other people (identity `mismatch`) and contradicted claims are left out and counted in `limitations`. |
+| `findings[].description` | `summary` (for unresolved findings this starts with `why_unresolved`) |
+| `findings[].case_status` | record stage: `conviction` / `guilty_plea` only for a conviction stage. A vacated (exonerated) conviction becomes `dismissed` if the charges were dismissed, otherwise `unknown`, and is never `conviction`. A charge whose outcome was dismissal or acquittal becomes `dismissed` / `acquitted`; otherwise `charge_pending`. An allegation becomes `allegation_only`; a registry entry becomes `not_applicable`. |
+| `findings[].identity_assessment` | `strong_match` / `possible_match` / `weak_match`; `inconclusive` becomes `unresolved` |
+| `findings[].identity_rationale` | `why_unresolved`, or the Verifier's rationale |
+| `scope.search_completed` | `false` when the report is `partial` (search or agent failure) |
+| `limitations[0]` | the required UI notice from `claude.md` §9 |
+| `human_review_required` | always `true` |
+
+`python -m safematch.cli validate-report --input <file>` detects which format it was given. Every synthetic scenario and the saved live cases have been parsed with the frontend's real zod schema (`zod@4.6.7`).
+
+## Detailed report format (`report.full.json`)
+
+The authoritative schema is `config/report_schema.json` (JSON Schema 2020-12, generated from `models.FinalReport`). Every detailed report has exactly these top-level keys:
 
 | Key | Contents |
 |---|---|
@@ -199,7 +225,7 @@ python scripts/live_eval.py                              # all cases, all stages
 python scripts/live_eval.py --cases exoneration           # one case (writes eval_results.<case>.json)
 python scripts/live_eval.py --from-stage synthesizer      # re-run only Stage 3 on saved verifier.json
 python scripts/build_eval_page.py                        # -> output/eval/eval_report.html (every stage, every check)
-python scripts/build_report_page.py --input output/report.json --out output/report.html  # readable view of one report
+python scripts/build_report_page.py --input output/report.full.json --out output/report.html  # readable view of one report
 ```
 
 ## Project layout
@@ -208,6 +234,7 @@ python scripts/build_report_page.py --input output/report.json --out output/repo
 config/report_schema.json        fixed report contract (generated; checked by a unit test)
 src/safematch/
   models.py config.py orchestrator.py cli.py mock_scenarios.py
+  frontend_contract.py           FinalReport -> report.json (claude.md section 7 / safetyReport.ts)
   prompts/{investigator,verifier,synthesizer}.md
   providers/llm.py               ClaudeCLIProvider, MockLLMProvider, complete_structured
   providers/search.py            optional TavilySearchProvider, MockSearchProvider
@@ -219,7 +246,7 @@ tests/{unit,integration,evaluation,fixtures/scenarios}
 test_cases/example.json          placeholder query
 scripts/live_eval.py             live stage-by-stage evaluation harness
 scripts/build_eval_page.py       evaluation results -> HTML page
-scripts/build_report_page.py     report.json -> readable HTML page
+scripts/build_report_page.py     report.full.json -> readable HTML page
 EVALUATION.md                    results of live evaluation runs
 ```
 

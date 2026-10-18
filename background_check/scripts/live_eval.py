@@ -277,10 +277,10 @@ def synth_stage(name: str, d: Path, vr: VerifierResult, planted_ids: Dict[str, s
     # ---------------- Stage 3: Synthesizer (standalone CLI)
     print(f"[{name}] synthesizer…", flush=True)
     stages["synthesizer"] = cli("synthesizer", "--input", str(d / "verifier.json"), "--output-dir", str(d))
-    rep_ok = stages["synthesizer"]["returncode"] == 0 and (d / "report.json").exists()
+    rep_ok = stages["synthesizer"]["returncode"] == 0 and (d / "report.full.json").exists()
     check(checks, "synthesizer", "S1", "Stage ran via CLI; report.json written", rep_ok)
     if rep_ok:
-        rep = json.loads((d / "report.json").read_text())
+        rep = json.loads((d / "report.full.json").read_text())
         errs = validate_report(rep)
         check(checks, "synthesizer", "S2", "report.json passes JSON Schema + model validation (validate-report)", not errs, "; ".join(errs[:3]))
         fs = rep["verified_records"] + rep["unresolved_findings"] + rep["contradicted_findings"]
