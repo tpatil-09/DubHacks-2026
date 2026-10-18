@@ -133,3 +133,18 @@ def test_excerpt_checker_is_applied():
     res = Verifier(llm, excerpt_checker=fetcher).run(_inv(c))
     v = res.findings[0].verification
     assert v.excerpt_confirmed is False and v.evidence_status == EvidenceStatus.unverified
+
+
+def test_reinstated_conviction_is_not_relabelled_vacated():
+    # Regression from a live run: "vacated in 2022, reinstated on appeal in 2023" means the conviction stands.
+    c = candidate()
+    v = apply_guards(c, llm_verification(c, case_outcome="Conviction vacated in 2022; reinstated by the appellate court in 2023"), True)
+    assert v.record_stage == RecordStage.conviction
+    assert any("reinstatement" in m for m in v.missing_information)
+
+
+def test_api_records_count_as_opened_and_grounded():
+    c = candidate()
+    c = c.model_copy(update={"provenance": c.provenance.model_copy(update={"from_records_api": True})})
+    v = apply_guards(c, llm_verification(c, source_accessible=False), excerpt_confirmed=False)
+    assert v.evidence_status == EvidenceStatus.verified and v.source_accessible and v.excerpt_confirmed

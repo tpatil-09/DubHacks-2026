@@ -16,6 +16,7 @@ Scenario format::
       "synthesizer": {"summaries_by_source_url": {url: "text"}}       (optional),
       "search": {"fail_with": "..."} | {"results": {...}}             (optional),
       "pages": {url: {"status": 200, "text": "..."}}                  (optional),
+      "records": [{OfficialRecord minus provider}], "records_error": "..."   (optional),
       "expected": {...}                                               (tests only)
     }
 """
@@ -25,6 +26,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from .providers.llm import AgentTask, LLMError, MockLLMProvider
+from .providers.records import MockRecordsProvider
 from .providers.search import MockSearchProvider
 from .providers.source_retrieval import FixtureFetcher
 from .utils.validation import read_json
@@ -94,4 +96,7 @@ def build_mock_providers(scenario: Dict[str, Any]):
     search_spec: Optional[Dict[str, Any]] = scenario.get("search")
     search = MockSearchProvider(search_spec.get("results"), search_spec.get("fail_with")) if search_spec else None
     fetcher = FixtureFetcher(scenario.get("pages", {}))
-    return llm, search, fetcher
+    records = []
+    if "records" in scenario or "records_error" in scenario:
+        records.append(MockRecordsProvider(scenario.get("records"), scenario.get("records_error"), scenario.get("records_provider", "courtlistener")))
+    return llm, search, fetcher, records

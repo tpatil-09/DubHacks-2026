@@ -1,9 +1,9 @@
 """Pipeline orchestration: Investigator → Verifier → Synthesizer → validated report.json."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from .agents.investigator import Investigator
 from .agents.synthesizer import Synthesizer
@@ -12,6 +12,7 @@ from .config import Settings
 from .frontend_contract import to_frontend_report, validate_frontend_report
 from .models import FinalReport, InvestigatorResult, PersonQuery, PipelineMode, RetrievedVia, VerifierResult
 from .providers.llm import ClaudeCLIProvider, LLMProvider
+from .providers.records import CheckrTrustProvider, CourtListenerProvider, RecordsProvider
 from .providers.search import SearchProvider, TavilySearchProvider
 from .providers.source_retrieval import SafeFetcher
 from .utils.logging_utils import get_logger, register_secrets
@@ -33,6 +34,7 @@ class Providers:
     llm: LLMProvider
     search: Optional[SearchProvider] = None
     fetcher: Any = None  # ExcerptChecker
+    records: List[RecordsProvider] = field(default_factory=list)
 
     @property
     def mode(self) -> PipelineMode:
@@ -50,14 +52,20 @@ def build_live_providers(settings: Settings) -> Providers:
     )
     search = TavilySearchProvider(settings.tavily_api_key or "") if settings.search_provider == "tavily" else None
     fetcher = SafeFetcher() if settings.verify_excerpts_with_fetch else None
-    return Providers(llm=llm, search=search, fetcher=fetcher)
+    records: List[RecordsProvider] = []
+    if "courtlistener" in settings.records_providers:
+        records.append(CourtListenerProvider(token=settings.courtlistener_api_token))
+    if "checkr_trust" in settings.records_providers:
+        records.append(CheckrTrustProvider(settings.checkr_trust_client_id or "", settings.checkr_trust_client_secret or "",
+                                           base_url=settings.checkr_trust_base_url))
+    return Providers(llm=llm, search=search, fetcher=fetcher, records=records)
 
 
 def build_mock_providers_from_file(scenario_path: Path) -> Providers:
     from .mock_scenarios import build_mock_providers, load_scenario
 
-    llm, search, fetcher = build_mock_providers(load_scenario(scenario_path))
-    return Providers(llm=llm, search=search, fetcher=fetcher)
+    llm, search, fetcher, records = build_mock_providers(load_scenario(scenario_path))
+    return Providers(llm=llm, search=search, fetcher=fetcher, records=records)
 
 
 def _search_name(p: Providers) -> str:
@@ -67,7 +75,7 @@ def _search_name(p: Providers) -> str:
 
 
 def run_investigator(query: PersonQuery, p: Providers, settings: Settings) -> InvestigatorResult:
-    return Investigator(p.llm, p.search, settings.llm_max_retries, settings.agent_timeout_seconds).run(query)
+    return Investigator(p.llm, p.search, settings.llm_max_retries, settings.agent_timeout_seconds, records=p.records).run(query)
 
 
 def run_verifier(inv: InvestigatorResult, p: Providers, settings: Settings) -> VerifierResult:

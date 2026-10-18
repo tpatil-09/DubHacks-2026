@@ -80,3 +80,32 @@ This case was added after a run missed a Washington Innocence Project page. That
   - The linking page was found, and the exoneration records are a strong or possible match at stage `vacated`.
   - A same-name 28-year-old from Rhode Island is a `mismatch`.
   - No flag was raised, and the TLDR tier is `cleared_outcomes_only`.
+
+---
+
+# Official records APIs (CourtListener + Checkr Trust)
+
+**Live CourtListener check** (`pytest -m live -k courtlistener`, no token): a search for a widely reported Maryland appellate case returned 3 distinct official opinions (Syed v. State, 2018; State v. Syed, 2019; Syed v. Lee, 2024), each with a courtlistener.com link. The live test only checks that the integration returns parseable official records.
+
+**Live end-to-end run** (same public case):
+- **Records pipeline:** the 3 CourtListener records entered as `official_court_record` findings (`from_records_api`). The agents built on them and found 13 more sources, 16 findings in total.
+- **Report:** validates against the frontend contract and lists its coverage: CourtListener searched, registries not checked (with a pointer to nsopw.gov).
+- **Status was `partial`:** the federal-docket query hit CourtListener's anonymous rate limit (5 requests/minute). Setting `COURTLISTENER_API_TOKEN` avoids this.
+- **Bug found and fixed:**
+  - The outcome history read "vacated 2022, **reinstated** on appeal 2023, sentence reduced 2025", so the conviction stands.
+  - Guard G4 relabelled these findings "vacated" because the outcome text mentioned a vacatur, which overstated the person's position. The Verifier had correctly said "conviction".
+  - G4 now leaves the stage alone when the outcome also reports a reinstatement, and adds a note to confirm the current status. Regression test added.
+- **No flag:** identity stayed at `possible_match` (name and city), so no flag fired, as intended.
+
+**Checkr Trust:**
+- The adapter is built against the published OpenAPI spec (`/_spec/v1.json`): OAuth2 client credentials at `POST /accounts/token`, then `POST /checks` with `check_type` set to `sex_offender_registry` or `instant_criminal`.
+- It's tested with mocked responses only. Live testing needs test-account credentials from Checkr Trust.
+
+**Synthetic scenarios added:**
+
+| Scenario | Expected result |
+|---|---|
+| Official conviction with a strong identity match | flag |
+| Official record, name-only match | no flag |
+| Checkr registry hit | registry flag |
+| Records API outage | `partial` |

@@ -47,6 +47,7 @@ BATCH_SIZE = 5
 _OUTCOME_ACQUITTED = re.compile(r"acquit|not guilty|found innocent", re.I)
 _OUTCOME_DISMISSED = re.compile(r"dismiss|nolle|charges? (were )?dropped|no[- ]billed", re.I)
 _OUTCOME_VACATED = re.compile(r"exonerat|wrongful(ly)? convict|overturn|vacat|expung|revers|set aside", re.I)
+_OUTCOME_REINSTATED = re.compile(r"reinstat|re-instat|restored|upheld|affirmed|still stands|remains? (in place|convicted)", re.I)
 _OUTCOME_CONVICTED = re.compile(r"convict|pleaded guilty|pled guilty|guilty plea|found guilty|sentenced", re.I)
 _PRE_CONVICTION = {RecordStage.allegation, RecordStage.arrest, RecordStage.charge, RecordStage.unknown}
 
@@ -112,6 +113,12 @@ def _evidence(items: List[LLMEvidence]) -> List[EvidenceRef]:
 def apply_guards(c: CandidateFinding, r: LLMVerification, excerpt_confirmed: Optional[bool]) -> VerificationResult:
     """Convert the model's judgement into a VerificationResult, downgrading where rules require."""
     adj: List[str] = []
+    if c.provenance.from_records_api:
+        # Retrieved by Python straight from the official-records API, so the record itself exists as stated even
+        # if the agent couldn't open a public web page for it. Identity and stage are still judged and guarded.
+        if not r.source_accessible:
+            r = r.model_copy(update={"source_accessible": True})
+        excerpt_confirmed = True
     status, identity, stage = r.evidence_status, r.identity_match, r.record_stage
     supporting, contradicting = _evidence(r.supporting_evidence), _evidence(r.contradictory_evidence)
     registry_as_of = r.registry_current_as_of
@@ -141,7 +148,10 @@ def apply_guards(c: CandidateFinding, r: LLMVerification, excerpt_confirmed: Opt
     if stage == RecordStage.conviction and outcome:
         mentions_conviction = bool(_OUTCOME_CONVICTED.search(_OUTCOME_ACQUITTED.sub(" ", outcome)))
         exculpatory = _OUTCOME_ACQUITTED.search(outcome) or _OUTCOME_DISMISSED.search(outcome)
-        if _OUTCOME_VACATED.search(outcome):
+        if _OUTCOME_VACATED.search(outcome) and _OUTCOME_REINSTATED.search(outcome):
+            # e.g. "vacated in 2022, reinstated on appeal in 2023": the conviction stands, keep the model's stage.
+            missing.append("Outcome history includes both a vacatur and a reinstatement; confirm the current status with the court.")
+        elif _OUTCOME_VACATED.search(outcome):
             adj.append("G4: stage conviction -> vacated (outcome reports exoneration/vacatur/reversal/expungement)")
             stage = RecordStage.vacated
         elif exculpatory and mentions_conviction:
@@ -247,7 +257,7 @@ class Verifier:
         self.batch_size = batch_size
 
     def build_task(self, inv: InvestigatorResult, batch: List[CandidateFinding]) -> AgentTask:
-        subject = inv.query.model_dump(mode="json", exclude={"scope"}, exclude_none=True)
+        subject = inv.query.model_dump(mode="json", exclude={"scope", "date_of_birth"}, exclude_none=True)
         # Deliberately withhold the Investigator's provisional relevance/quality labels.
         claims = [
             {
@@ -259,6 +269,8 @@ class Verifier:
                 "stated_case_identifier": c.case_identifier,
                 "stated_jurisdiction": c.jurisdiction,
                 "stated_event_date": c.event_date,
+                "from_official_records_api": c.provenance.from_records_api,
+                "identity_details_in_record": c.identity_evidence if c.provenance.from_records_api else [],
             }
             for c in batch
         ]
@@ -317,7 +329,7 @@ class Verifier:
                 v = fallback_result(c, failed.get(c.finding_id, "the verifier returned no result for this finding"))
             else:
                 confirmed = None
-                if self.excerpt_checker is not None:
+                if self.excerpt_checker is not None and not c.provenance.from_records_api:
                     try:
                         confirmed = self.excerpt_checker.check_excerpt(c.source_url, c.excerpt)
                     except Exception as exc:  # retrieval must never crash verification
@@ -340,6 +352,7 @@ class Verifier:
             search_scope=inv.search_scope,
             search_queries_run=queries,
             sources_checked=inv.sources_checked,
+            records_providers_run=inv.records_providers_run,
             findings=findings,
             retrieval_errors=errors,
             limitations=limitations,

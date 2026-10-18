@@ -170,7 +170,13 @@ class RetrievedVia(str, Enum):
     claude_code_websearch = "claude_code_websearch"
     claude_code_webfetch = "claude_code_webfetch"
     tavily = "tavily"
+    courtlistener = "courtlistener"
+    checkr_trust = "checkr_trust"
     fixture = "fixture"
+
+
+# Records that come straight from an official-records API (not from a model reading a web page).
+API_RECORD_SOURCES = frozenset({RetrievedVia.courtlistener, RetrievedVia.checkr_trust})
 
 
 # ------------------------------------------------------------------------ query
@@ -191,7 +197,7 @@ class SearchScope(Strict):
 
 
 class PersonQuery(Strict):
-    """Voluntarily supplied search information. No DOB or home address required."""
+    """Voluntarily supplied search information. No home address; DOB is optional and never shown in reports."""
 
     full_name: str = Field(min_length=3, max_length=120)
     middle_name: Optional[str] = Field(default=None, max_length=60)
@@ -200,7 +206,29 @@ class PersonQuery(Strict):
     age_min: Optional[int] = Field(default=None, ge=18, le=120)
     age_max: Optional[int] = Field(default=None, ge=18, le=120)
     other_identifiers: List[str] = Field(default_factory=list, max_length=10)
+    date_of_birth: Optional[str] = Field(
+        default=None,
+        description="Optional YYYY-MM-DD. Only sent to records APIs that match on it (Checkr Trust); never sent to the "
+        "language model and never included in reports.",
+    )
     scope: SearchScope = Field(default_factory=SearchScope)
+
+    @field_validator("date_of_birth")
+    @classmethod
+    def _valid_dob(cls, v: Optional[str]) -> Optional[str]:
+        if v is None or not v.strip():
+            return None
+        from datetime import date
+
+        try:
+            parsed = date.fromisoformat(v.strip())
+        except ValueError:
+            raise ValueError("date_of_birth must be YYYY-MM-DD") from None
+        today = date.today()
+        age = today.year - parsed.year - ((today.month, today.day) < (parsed.month, parsed.day))
+        if age < 18 or age > 120:
+            raise ValueError("date_of_birth must be for an adult (18-120)")
+        return parsed.isoformat()
 
     @field_validator("full_name")
     @classmethod
@@ -243,6 +271,9 @@ class Provenance(Strict):
     agent: str
     retrieved_via: RetrievedVia
     search_query: Optional[str] = None
+    from_records_api: bool = Field(
+        default=False, description="True when the record came directly from an official-records API (not from web content)"
+    )
     retrieved_at: str = Field(default_factory=utc_now)
 
 
@@ -268,6 +299,27 @@ class CandidateFinding(Strict):
     provenance: Provenance
 
 
+class OfficialRecord(Strict):
+    """A record returned directly by an official-records API (CourtListener, Checkr Trust)."""
+
+    provider: RetrievedVia
+    record_type: str = Field(description="appellate_opinion | federal_docket | sex_offender_registry | criminal_record")
+    url: str
+    title: str
+    court_or_agency: Optional[str] = None
+    jurisdiction: Optional[str] = None
+    case_number: Optional[str] = None
+    date: Optional[str] = None
+    excerpt: Optional[str] = Field(default=None, max_length=1200)
+    offense: Optional[str] = None
+    offense_category: OffenseCategory = OffenseCategory.unknown
+    record_stage: RecordStage = RecordStage.unknown
+    disposition: Optional[str] = None
+    registry_as_of: Optional[str] = None
+    identity_details: List[str] = Field(default_factory=list)
+    retrieved_at: str = Field(default_factory=utc_now)
+
+
 class InvestigatorResult(Strict):
     stage: str = "investigator"
     mode: PipelineMode
@@ -276,6 +328,8 @@ class InvestigatorResult(Strict):
     search_queries_run: List[str] = Field(default_factory=list)
     sources_checked: List[SourceDocument] = Field(default_factory=list)
     candidate_findings: List[CandidateFinding] = Field(default_factory=list)
+    official_records: List[OfficialRecord] = Field(default_factory=list)
+    records_providers_run: List[str] = Field(default_factory=list)
     retrieval_errors: List[RetrievalError] = Field(default_factory=list)
     limitations: List[str] = Field(default_factory=list)
     started_at: str = Field(default_factory=utc_now)
@@ -340,6 +394,7 @@ class VerifierResult(Strict):
     search_queries_run: List[str] = Field(default_factory=list)
     sources_checked: List[SourceDocument] = Field(default_factory=list)
     findings: List[VerifiedFinding] = Field(default_factory=list)
+    records_providers_run: List[str] = Field(default_factory=list)
     retrieval_errors: List[RetrievalError] = Field(default_factory=list)
     limitations: List[str] = Field(default_factory=list)
     started_at: str = Field(default_factory=utc_now)

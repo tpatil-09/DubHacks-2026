@@ -1,0 +1,13 @@
+{
+  "description": "SYNTHETIC. The official-records API is down and web research finds nothing. The report must be partial, never clear.",
+  "query": {"full_name": "Morgan Outage Example", "location": "Salem, OR"},
+  "records_error": "CourtListener search failed: HTTP 503",
+  "investigator": {"search_queries_run": ["\"Morgan Outage Example\" court"], "sources_checked": [], "findings": [], "access_failures": []},
+  "verifier": {"by_source_url": {}},
+  "expected": {
+    "record_tier": "insufficient_information",
+    "overall_status": "partial", "verified_record_flag": false,
+    "verified_records": 0, "unresolved_findings": 0, "contradicted_findings": 0,
+    "limitation_contains": "nsopw.gov"
+  }
+}
