@@ -44,6 +44,14 @@ const members = [
     interests: ['jazz', 'cooking', 'reading', 'walking'],
     prompts: [['My perfect Sunday…', 'Farmers market, a long walk, and a record on while dinner cooks.'], ['A tiny hill I will die on…', 'Vinyl just sounds better.']],
   },
+  {
+    uid: 'member-denzel-b',
+    firstName: 'Denzel', lastName: 'Dre Colton Bird', age: 30, gender: 'man', city: 'Edmonton, Alberta, Canada',
+    photo: 'denzel', avatar: '🏒:mint',
+    bio: 'Rink-side coffee, weekend road trips, and a playlist for every mood.',
+    interests: ['hockey', 'road trips', 'music', 'coffee'],
+    prompts: [['My perfect Saturday…', 'Morning skate, a long drive with no destination, good music.'], ['A green flag I look for…', 'You can hold a conversation on a long car ride.']],
+  },
 ]
 
 initializeApp({ credential: applicationDefault(), projectId })
@@ -72,8 +80,8 @@ if (remove) {
 
 const now = Date.now()
 for (const member of members) {
-  const photoFile = new URL(`../../web/public/demo-photos/${member.photo}.jpg`, import.meta.url)
-  const photos = existsSync(photoFile) ? [`/demo-photos/${member.photo}.jpg`] : [`avatar:${member.avatar}`]
+  const extension = ['jpg', 'jpeg'].find((ext) => existsSync(new URL(`../../web/public/demo-photos/${member.photo}.${ext}`, import.meta.url)))
+  const photos = extension ? [`/demo-photos/${member.photo}.${extension}`] : [`avatar:${member.avatar}`]
   await db.collection('profiles').doc(member.uid).set({
     uid: member.uid,
     firstName: member.firstName,

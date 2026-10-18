@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { AnimatePresence, motion } from 'motion/react'
 import { Avatar } from '../ui/ProfilePhoto'
 import { ArcadeButton } from '../ui/ArcadeButton'
+import { celebrate } from '../../lib/confetti'
 import type { Profile } from '../../types'
 
 interface MatchModalProps {
@@ -14,9 +15,11 @@ interface MatchModalProps {
 export function MatchModal({ match, me, onClose }: MatchModalProps) {
   const navigate = useNavigate()
 
-  // Match sound from main; the confetti burst was removed in the redesign.
   useEffect(() => {
-    if (match) new Audio('/sounds/its-a-match.mp3').play().catch(() => {})
+    if (match) {
+      celebrate()
+      new Audio('/sounds/its-a-match.mp3').play().catch(() => {})
+    }
   }, [match])
 
   return (

@@ -235,7 +235,9 @@ export const firebaseBackend: Backend = {
       const reverse = await transaction.get(reverseLike)
       if (!reverse.exists() || reverse.data().action !== 'like') return { matched: false, created: false }
       const currentMatch = await transaction.get(matchRef(pairId))
-      if (currentMatch.exists()) return { matched: true, created: false }
+      // A closed match (e.g. from a reset or unmatch) must be reactivated, not left closed,
+      // or the match animation fires but nothing shows up on the Matches/chat screens.
+      if (currentMatch.exists() && currentMatch.data().status === 'active') return { matched: true, created: false }
       const users = [uid, targetUid].sort() as [string, string]
       const createdAt = Date.now()
       transaction.set(matchRef(pairId), {
@@ -244,7 +246,7 @@ export const firebaseBackend: Backend = {
         createdAt,
         lastMessageAt: createdAt,
         lastMessagePreview: 'You matched! Say hello ✨',
-      })
+      }, { merge: true })
       return { matched: true, created: true }
     })
     if (result.matched && result.created) {
@@ -496,5 +498,19 @@ export const firebaseBackend: Backend = {
     for (const match of matches.docs) batch.update(match.ref, { status: 'closed' })
     await batch.commit()
     await firebaseSignOut(fb.auth)
+  },
+  async resetMatches(uid) {
+    own(uid, 'resetting your matches')
+    const db = fb.db
+    // Only clear likes you made, not others' likes toward you — otherwise a reset would
+    // erase seeded "they already liked you" demo state (e.g. Eric, Leo).
+    const [outgoingLikes, matches] = await Promise.all([
+      getDocs(query(collection(db, 'likes'), where('fromUid', '==', uid))),
+      getDocs(query(collection(db, 'matches'), where('users', 'array-contains', uid))),
+    ])
+    const batch = writeBatch(db)
+    for (const snapshot of outgoingLikes.docs) batch.delete(snapshot.ref)
+    for (const match of matches.docs) batch.update(match.ref, { status: 'closed' })
+    await batch.commit()
   },
 }

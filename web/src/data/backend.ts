@@ -75,6 +75,7 @@ export interface Backend {
   listBlocked(uid: string): Promise<string[]>
   reportUser(uid: string, otherUid: string, reason: UserReportReason, details: string): Promise<void>
   deleteMyData(uid: string): Promise<void>
+  resetMatches(uid: string): Promise<void>
 }
 
 export function matchIdFor(a: string, b: string): string {

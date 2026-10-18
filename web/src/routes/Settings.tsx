@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { LogOut, Trash2 } from 'lucide-react'
+import { LogOut, RotateCcw, Trash2 } from 'lucide-react'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
 import { Avatar } from '../components/ui/ProfilePhoto'
 import { Modal } from '../components/ui/Modal'
@@ -16,7 +16,9 @@ export default function Settings() {
   const [blocked, setBlocked] = useState<string[]>([])
   const blockedProfiles = useProfiles(blocked)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [resetting, setResetting] = useState(false)
   const isDemo = backend().kind === 'demo'
 
   useEffect(() => {
@@ -40,6 +42,21 @@ export default function Settings() {
     await backend().unblock(uid, otherUid)
     setBlocked((current) => current.filter((id) => id !== otherUid))
     toast('Unblocked.', 'success')
+  }
+
+  async function resetMatches() {
+    if (!uid) return
+    setResetting(true)
+    try {
+      await backend().resetMatches(uid)
+      toast('Likes and matches reset. Discover is fresh again.', 'success')
+      setConfirmReset(false)
+      navigate('/discover', { replace: true })
+    } catch (cause) {
+      toast(cause instanceof Error ? cause.message : 'Could not reset your matches.', 'error')
+    } finally {
+      setResetting(false)
+    }
   }
 
   async function deleteData() {
@@ -100,10 +117,23 @@ export default function Settings() {
           <ArcadeButton color="sky" onClick={leaveDemoMode}>Leave demo mode</ArcadeButton>
         )}
         <ArcadeButton color="white" icon={<LogOut className="size-5" />} onClick={() => backend().signOut()}>Sign out</ArcadeButton>
+        <ArcadeButton color="sky" icon={<RotateCcw className="size-5" />} onClick={() => setConfirmReset(true)}>
+          Reset likes & matches
+        </ArcadeButton>
         <ArcadeButton color="peach" icon={<Trash2 className="size-5" />} onClick={() => setConfirmDelete(true)}>
           {isDemo ? 'Reset demo data' : 'Delete my data'}
         </ArcadeButton>
       </section>
+
+      <Modal open={confirmReset} onClose={() => setConfirmReset(false)} title="Reset likes & matches?">
+        <p className="text-ink-soft">
+          This clears your likes, matches, and chats so you can redo Discover from scratch. Your profile, photos, and quiz results stay as they are.
+        </p>
+        <div className="mt-6 flex gap-3">
+          <ArcadeButton color="white" className="flex-1" onClick={() => setConfirmReset(false)}>Cancel</ArcadeButton>
+          <ArcadeButton color="sky" className="flex-1" loading={resetting} onClick={resetMatches}>Reset</ArcadeButton>
+        </div>
+      </Modal>
 
       <Modal open={confirmDelete} onClose={() => setConfirmDelete(false)} title={isDemo ? 'Reset demo data?' : 'Delete your data?'}>
         <p className="text-ink-soft">

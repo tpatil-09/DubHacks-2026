@@ -467,4 +467,12 @@ export const demoBackend: Backend = {
     }
     for (const listener of listeners) listener()
   },
+  async resetMatches() {
+    const fresh = freshState()
+    commit((draft) => {
+      draft.likes = fresh.likes
+      draft.matches = fresh.matches
+      draft.messages = fresh.messages
+    })
+  },
 }
