@@ -173,7 +173,7 @@ export function PhotosFields({ draft, onChange }: FieldsProps) {
       <input ref={inputRef} type="file" accept="image/*" multiple hidden onChange={handleFiles} />
       {error && <p role="alert" className="rounded-2xl bg-peach/40 p-3 text-sm">{error}</p>}
 
-      {!full && (
+      {draft.photos.length === 0 && (
         <div className="rounded-2xl border-2 border-white bg-white/60 p-4">
           <p className="label-arcade">Or pick a cute avatar</p>
           <div className="mb-3 flex gap-2">
