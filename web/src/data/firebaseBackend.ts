@@ -242,12 +242,14 @@ export const firebaseBackend: Backend = {
         // or the match animation fires but nothing shows up on the Matches/chat screens.
         // The security rules only permit updating status/lastMessageAt/lastMessagePreview on an
         // existing match, so reactivate with a targeted update rather than rewriting the doc.
+        // created: false here so we don't post another "You matched!" message — the match
+        // already has its history (and original system message) from when it was first made.
         transaction.update(matchRef(pairId), {
           status: 'active',
           lastMessageAt: now,
           lastMessagePreview: 'You matched! Say hello ✨',
         })
-        return { matched: true, created: true }
+        return { matched: true, created: false }
       }
       const users = [uid, targetUid].sort() as [string, string]
       transaction.set(matchRef(pairId), {
