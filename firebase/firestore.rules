@@ -96,7 +96,12 @@ service cloud.firestore {
     }
 
     match /likes/{likeId} {
-      allow read: if signedIn() && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      // A like that doesn't exist yet has no data, so allow that read by its id
+      // ("<from>_<to>"); setLike checks for the reverse like before creating a match.
+      allow get: if signedIn() && (resource == null
+        ? (likeId.matches(request.auth.uid + '_.+') || likeId.matches('.+_' + request.auth.uid))
+        : (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid));
+      allow list: if signedIn() && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
       allow create, update: if signedIn()
         && request.resource.data.fromUid == request.auth.uid
         && request.resource.data.toUid is string
