@@ -7,16 +7,15 @@ import { ArcadeButton } from '../components/ui/ArcadeButton'
 import { Capsule } from '../components/ui/Capsule'
 import { Mascot } from '../components/ui/Mascot'
 import { draftFromProfile, validateAbout, validateBasics, validatePhotos, type ProfileDraft } from '../lib/profileValidation'
-import { celebrate } from '../lib/confetti'
 import { useSession } from '../store/session'
 import type { OnboardingStep } from '../types'
 import type { PastelColor } from '../lib/colors'
 
 const steps: { id: Exclude<OnboardingStep, 'complete'>; title: string; subtitle: string; color: PastelColor }[] = [
-  { id: 'basics', title: 'The basics', subtitle: 'Let’s set up your player card.', color: 'bubblegum' },
+  { id: 'basics', title: 'The basics', subtitle: 'Let’s set up your profile.', color: 'bubblegum' },
   { id: 'photos', title: 'Your photos', subtitle: 'Add 1–6 photos. The first one is your cover.', color: 'peach' },
   { id: 'about', title: 'About you', subtitle: 'Stickers and prompts make great conversation starters.', color: 'lilac' },
-  { id: 'quiz', title: 'Vibe check', subtitle: 'A 10-question quiz unlocks vibe % on every profile.', color: 'mint' },
+  { id: 'quiz', title: 'Last step', subtitle: 'Agree to your background check, then start matching.', color: 'mint' },
 ]
 
 export default function Onboarding() {
@@ -27,6 +26,7 @@ export default function Onboarding() {
   const [draft, setDraft] = useState<ProfileDraft>(() => draftFromProfile(profile))
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [consent, setConsent] = useState(false)
   const step = steps[index]
 
   const update = (patch: Partial<ProfileDraft>) => {
@@ -61,11 +61,14 @@ export default function Onboarding() {
   }
 
   async function finish(takeQuiz: boolean) {
+    if (!consent) {
+      setError('Please agree to the background check to finish. Every SafeMatch member has one.')
+      return
+    }
     setSaving(true)
     try {
       await saveProfile({ discoverable: account?.settings.discoverable ?? true })
-      await saveAccount({ onboardingStep: 'complete' })
-      celebrate()
+      await saveAccount({ onboardingStep: 'complete', screeningConsentAt: Date.now() })
       navigate(takeQuiz ? '/arcade/quiz' : '/discover', { replace: true })
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not save. Try again.')
@@ -96,17 +99,35 @@ export default function Onboarding() {
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             <p className="font-display text-sm font-semibold text-ink-soft">Step {index + 1} of {steps.length}</p>
-            <h1 className="text-3xl font-bold">{step.title}</h1>
+            <h1 className="mt-2 text-4xl">{step.title}</h1>
             <p className="mb-6 text-ink-soft">{step.subtitle}</p>
 
             {step.id === 'basics' && <BasicsFields draft={draft} onChange={update} />}
             {step.id === 'photos' && <PhotosFields draft={draft} onChange={update} />}
             {step.id === 'about' && <AboutFields draft={draft} onChange={update} />}
             {step.id === 'quiz' && (
-              <div className="flex flex-col items-center gap-4 py-4 text-center">
-                <Mascot mood="excited" size={130} />
-                <p className="max-w-sm text-ink-soft">
-                  Find out your co-op player type and see how your vibe compares with everyone else. It’s just for fun!
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-4">
+                  <Mascot mood="excited" size={90} />
+                  <p className="text-ink-soft">
+                    Every SafeMatch member has a background check, so everyone can relax and enjoy getting to know each other.
+                  </p>
+                </div>
+                <label className="flex items-start gap-3 rounded-2xl border-2 border-mint bg-mint/20 p-4 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(event) => setConsent(event.target.checked)}
+                    className="mt-0.5 size-5 shrink-0 accent-mint-deep"
+                  />
+                  <span>
+                    I agree that SafeMatch can run a check of public records (court records, registries and news) about me, and
+                    show a summary on my profile. Only records linked to me are shown, each with its source and how sure the match
+                    is. It’s a limited summary of public sources, not a certified background check.
+                  </span>
+                </label>
+                <p className="text-sm text-ink-soft">
+                  Want a fun match? The optional 10-question vibe quiz shows your vibe % with everyone. You can also skip it and just swipe.
                 </p>
               </div>
             )}
@@ -121,11 +142,11 @@ export default function Onboarding() {
               )}
               {step.id === 'quiz' ? (
                 <>
-                  <ArcadeButton color="white" className="flex-1" onClick={() => finish(false)} disabled={saving}>
-                    Skip for now
+                  <ArcadeButton color="white" className="flex-1" onClick={() => finish(true)} disabled={saving || !consent}>
+                    Take the vibe quiz
                   </ArcadeButton>
-                  <ArcadeButton color="mint" className="flex-1" onClick={() => finish(true)} loading={saving}>
-                    Take the quiz
+                  <ArcadeButton color="mint" className="flex-1" onClick={() => finish(false)} loading={saving} disabled={!consent}>
+                    Start matching
                   </ArcadeButton>
                 </>
               ) : (

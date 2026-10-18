@@ -1,123 +1,174 @@
-import type { SafetyReport } from '../types/safetyReport'
+import type { Finding, RecordTier, SafetyReport } from '../types/safetyReport'
+import { REQUIRED_NOTICE } from '../types/safetyReport'
 
-// SYNTHETIC TEST DATA. These reports describe fictional demo profiles only.
-// All sources point at example.com and every report sets is_synthetic: true.
+// SYNTHETIC TEST DATA. Pre-built background checks for fictional demo profiles only, in the
+// same report.json shape the background_check pipeline produces. All sources point at
+// example.com and every report sets is_synthetic: true.
 
 interface ReportArgs {
-  reportId: string
   subjectUid?: string
   nameProvided: string
   context?: string
   now?: Date
 }
 
-const baseLimitations = [
-  'This is not a formal criminal-history check.',
-  'A lack of results does not establish that no records exist.',
-  'This report was generated from synthetic demo data. No live sources were searched.',
+const tierLabels: Record<RecordTier, string> = {
+  verified_record_requires_attention: 'Verified record requiring attention',
+  reported_conviction_unconfirmed: 'Conviction or registration reported, not confirmed on an official record',
+  unresolved_allegations_or_charges: 'Allegations or charges with no confirmed outcome',
+  cleared_outcomes_only: 'Accused or charged, but cleared (dismissed, acquitted, or exonerated)',
+  no_linked_records: 'No records linked to this person in the search scope',
+  insufficient_information: 'Not enough information: key sources could not be checked',
+}
+
+const demoSources = [
+  'https://example.com/synthetic/county-court-portal',
+  'https://example.com/synthetic/state-registry',
+  'https://example.com/synthetic/news-archive',
 ]
 
-function base(args: ReportArgs): Omit<SafetyReport, 'summary' | 'findings' | 'scope' | 'errors'> {
+function report(
+  args: ReportArgs,
+  tier: RecordTier,
+  headline: string,
+  findings: Finding[],
+  extra: Partial<Pick<SafetyReport, 'scope' | 'errors'>> & { caveats?: string[]; keyPoints?: { text: string; finding_ids: string[] }[] } = {},
+): SafetyReport {
+  const limitations = [REQUIRED_NOTICE, 'This report was generated from synthetic demo data. No live sources were searched.']
   return {
+    tldr: {
+      record_tier: tier,
+      tier_label: tierLabels[tier],
+      headline,
+      key_points: extra.keyPoints ?? [],
+      caveats: [...(extra.caveats ?? []), 'Public-source research only; not a certified background check.'],
+    },
     schema_version: '1.0',
-    report_id: args.reportId,
-    generated_at: (args.now ?? new Date()).toISOString(),
+    report_id: `demo-screening-${args.subjectUid ?? 'unknown'}`,
+    generated_at: (args.now ?? new Date('2026-10-01T12:00:00Z')).toISOString(),
     is_synthetic: true,
     subject: { name_provided: args.nameProvided, context_provided: args.context ?? null },
-    limitations: baseLimitations,
+    scope: extra.scope ?? { sources_searched: demoSources, sources_not_accessible: [], search_completed: true },
+    summary: `${tierLabels[tier]}. ${headline}`,
+    findings,
+    limitations,
+    errors: extra.errors ?? [],
     human_review_required: true,
   }
 }
 
-const demoSources = ['Synthetic county court portal (demo)', 'Synthetic state registry (demo)', 'Synthetic local news archive (demo)']
-
-function mixedFindingsReport(args: ReportArgs): SafetyReport {
-  const retrievedAt = (args.now ?? new Date()).toISOString()
+function finding(id: string, fields: Partial<Finding> & Pick<Finding, 'description' | 'case_status' | 'identity_assessment' | 'source_title'>): Finding {
   return {
-    ...base(args),
-    scope: { sources_searched: demoSources, sources_not_accessible: [], search_completed: true },
-    summary:
-      'Two synthetic records were found that share the provided name. One civil case was dismissed and is a possible match. One pending charge is a weak match with conflicting details that suggest a different person. Neither record establishes identity.',
-    findings: [
-      {
-        finding_id: 'finding-001',
-        description: 'Synthetic civil small-claims case filed and later dismissed by the court.',
-        record_type: 'civil_case',
-        case_status: 'dismissed',
-        identity_assessment: 'possible_match',
-        identity_rationale: 'Name and broad region match. No date of birth or other identifier was available to confirm identity.',
-        event_date: '2021-06-02',
-        jurisdiction: 'Example County (synthetic)',
-        source_url: 'https://example.com/synthetic/court/case-1001',
-        source_title: 'Example County court portal — case 1001 (synthetic)',
-        source_type: 'official_record',
-        retrieved_at: retrievedAt,
-        supporting_excerpt: 'Case status: Dismissed. (synthetic excerpt)',
-        conflicts: [],
-        limitations: ['A dismissed civil case is not a finding of wrongdoing.'],
-      },
-      {
-        finding_id: 'finding-002',
-        description: 'Synthetic news report about a pending charge against a person with the same name.',
-        record_type: 'criminal_case',
-        case_status: 'charge_pending',
-        identity_assessment: 'weak_match',
-        identity_rationale: 'Only the name matches. The reported age and city differ from the provided context.',
-        event_date: '2025-01-15',
-        jurisdiction: 'Another State (synthetic)',
-        source_url: 'https://example.com/synthetic/news/article-2002',
-        source_title: 'Example Gazette — local news (synthetic)',
-        source_type: 'news',
-        retrieved_at: retrievedAt,
-        supporting_excerpt: 'The case is pending; no verdict has been reached. (synthetic excerpt)',
-        conflicts: ['Reported age differs by about 15 years.', 'Reported city is in a different state.'],
-        limitations: ['News reporting is not a court finding.', 'A pending charge is not a conviction.'],
-      },
-    ],
-    errors: [],
+    finding_id: id,
+    record_type: 'criminal_case',
+    identity_rationale: fields.why_unresolved ?? 'Name, city and age range match the profile.',
+    event_date: null,
+    jurisdiction: null,
+    source_url: `https://example.com/synthetic/${id}`,
+    source_type: 'news_report',
+    retrieved_at: '2026-10-01T12:00:00Z',
+    supporting_excerpt: null,
+    conflicts: [],
+    limitations: [],
+    evidence_status: 'verified',
+    why_unresolved: null,
+    historical_report_only: false,
+    ...fields,
   }
 }
 
-function noFindingsReport(args: ReportArgs): SafetyReport {
-  return {
-    ...base(args),
-    scope: { sources_searched: demoSources, sources_not_accessible: [], search_completed: true },
-    summary: 'No matching records were found in the synthetic demo sources searched.',
-    findings: [],
-    errors: [],
-  }
+function noRecords(args: ReportArgs): SafetyReport {
+  return report(args, 'no_linked_records', 'No records linked to this person were found in the sources searched.', [])
 }
 
-function incompleteReport(args: ReportArgs): SafetyReport {
-  return {
-    ...base(args),
-    scope: {
-      sources_searched: [demoSources[0]],
-      sources_not_accessible: [demoSources[1], demoSources[2]],
-      search_completed: false,
-    },
-    summary: 'The search did not complete. Only one synthetic source responded, and it returned no matching records.',
-    findings: [],
-    errors: ['Synthetic state registry (demo): request timed out.', 'Synthetic local news archive (demo): source unavailable.'],
-  }
+function sameNameOnly(args: ReportArgs): SafetyReport {
+  const other = (id: string, where: string) =>
+    finding(id, {
+      description: `A synthetic news report about a different person with the same first and last name in ${where}.`,
+      case_status: 'charge_pending',
+      identity_assessment: 'weak_match',
+      source_title: `Example Gazette — ${where} (synthetic)`,
+      evidence_status: 'unverified',
+      why_unresolved: 'The match is by name only, so it may be a different person.',
+    })
+  return report(
+    args,
+    'no_linked_records',
+    'No records linked to this person were found. Two records under the same name could not be linked to them.',
+    [other('demo-river-1', 'Ohio'), other('demo-river-2', 'Texas')],
+    { caveats: ['2 finding(s) could not be reliably linked to this person.'] },
+  )
 }
 
-function customNameReport(args: ReportArgs): SafetyReport {
-  return {
-    ...base(args),
-    scope: { sources_searched: [], sources_not_accessible: ['Live sources are not configured in demo mode'], search_completed: false },
-    summary: 'Demo mode does not search live sources, so no information is available for this name.',
-    findings: [],
-    errors: ['Live search is not available in demo mode.'],
-  }
+function cleared(args: ReportArgs): SafetyReport {
+  const f = finding('demo-maya-1', {
+    description: 'A synthetic county court record shows a 2021 misdemeanor assault charge that was dismissed. A dismissal is not a finding of guilt.',
+    case_status: 'dismissed',
+    identity_assessment: 'possible_match',
+    source_title: 'Example County court portal — case 21-0042 (synthetic)',
+    source_type: 'official_record',
+    event_date: '2021-06-02',
+    jurisdiction: 'Example County, WA (synthetic)',
+    supporting_excerpt: 'Disposition: Dismissed. (synthetic excerpt)',
+    identity_rationale: 'Name and city match; the record gives no age to confirm.',
+  })
+  return report(args, 'cleared_outcomes_only',
+    'A 2021 charge was found, and it was dismissed. No standing conviction was found.', [f],
+    { keyPoints: [{ text: 'A 2021 misdemeanor charge was dismissed by the court.', finding_ids: [f.finding_id] }] })
+}
+
+function openAllegation(args: ReportArgs): SafetyReport {
+  const f = finding('demo-leo-1', {
+    description: 'A synthetic local news article reports that a man with this name was accused of harassment in 2024. No charge or court outcome was found.',
+    case_status: 'allegation_only',
+    identity_assessment: 'possible_match',
+    source_title: 'Example Eastside News (synthetic)',
+    event_date: '2024-03-11',
+    evidence_status: 'unverified',
+    why_unresolved: 'It was not confirmed on an official court or registry record, and only some identifiers match, so it may be a different person.',
+  })
+  return report(args, 'unresolved_allegations_or_charges',
+    'A news report describes a 2024 harassment allegation. No charge or outcome was confirmed, and it may be a different person.', [f],
+    { keyPoints: [{ text: 'A 2024 allegation was reported by local news; no charge was found.', finding_ids: [f.finding_id] }] })
+}
+
+function reportedConviction(args: ReportArgs): SafetyReport {
+  const f = finding('demo-kai-1', {
+    description: 'A synthetic 2015 news article reports a DUI-related assault conviction for a man with this name.',
+    case_status: 'conviction',
+    identity_assessment: 'possible_match',
+    source_title: 'Example Herald archive, 2015 (synthetic)',
+    event_date: '2015-08-20',
+    jurisdiction: 'Example County, WA (synthetic)',
+    evidence_status: 'unverified',
+    historical_report_only: true,
+    why_unresolved: 'Current official status was not confirmed, and only some identifiers match, so it may be a different person.',
+    limitations: ['Reported by news only; current official status was not confirmed.'],
+  })
+  return report(args, 'reported_conviction_unconfirmed',
+    'A 2015 news report describes a past conviction, but it was not confirmed on an official record.', [f],
+    { keyPoints: [{ text: 'A past conviction was reported in 2015; no court record confirmed it.', finding_ids: [f.finding_id] }] })
+}
+
+function incomplete(args: ReportArgs): SafetyReport {
+  return report(args, 'insufficient_information',
+    'Nothing linked to this person was found, but key sources could not be checked, so this is not a clear result.', [],
+    {
+      scope: { sources_searched: [demoSources[2]], sources_not_accessible: [demoSources[0], demoSources[1]], search_completed: false },
+      errors: ['search_failed: synthetic court portal (request timed out)', 'search_failed: synthetic state registry (unavailable)'],
+      caveats: ['2 source(s), such as registries or court portals, could not be checked.'],
+    })
 }
 
 const bySubject: Record<string, (args: ReportArgs) => SafetyReport> = {
-  'demo-maya': mixedFindingsReport,
-  'demo-theo': incompleteReport,
+  'demo-maya': cleared,
+  'demo-leo': openAllegation,
+  'demo-kai': reportedConviction,
+  'demo-theo': incomplete,
+  'demo-river': sameNameOnly,
 }
 
-export function buildDemoReport(args: ReportArgs): SafetyReport {
-  if (!args.subjectUid?.startsWith('demo-')) return customNameReport(args)
-  return (bySubject[args.subjectUid] ?? noFindingsReport)(args)
+/** The pre-built background check for a demo profile (every demo profile has one). */
+export function buildScreeningReport(args: ReportArgs): SafetyReport {
+  return (bySubject[args.subjectUid ?? ''] ?? noRecords)(args)
 }

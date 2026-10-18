@@ -13,14 +13,14 @@ interface StickerProps {
 }
 
 export function Sticker({ children, color = 'blush', tilt = 0, className = '', as = 'span', selected, onClick }: StickerProps) {
-  const style = { '--sticker-bg': pastel[color].bg, '--tilt': `${tilt}deg` } as CSSProperties
+  const style = { '--sticker-bg': pastel[color].soft, '--tilt': `${tilt}deg` } as CSSProperties
   if (as === 'button') {
     return (
       <button
         type="button"
         onClick={onClick}
         aria-pressed={selected}
-        className={`sticker ${selected ? 'ring-4 ring-bubblegum/60' : 'opacity-70 hover:opacity-100'} ${className}`}
+        className={`sticker ${selected ? 'ring-2 ring-bubblegum' : 'opacity-70 hover:opacity-100'} ${className}`}
         style={style}
       >
         {children}

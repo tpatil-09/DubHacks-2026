@@ -22,7 +22,7 @@ export const LIMITS = { name: 30, city: 40, bio: 300, promptAnswer: 120, minInte
 export function validateBasics(draft: ProfileDraft): string | null {
   if (!draft.displayName.trim()) return 'Add the name you want people to see.'
   if (draft.displayName.trim().length > LIMITS.name) return `Names can be up to ${LIMITS.name} characters.`
-  if (!Number.isInteger(draft.age) || draft.age < 18) return 'You need to be 18 or older to use Vetted.'
+  if (!Number.isInteger(draft.age) || draft.age < 18) return 'You need to be 18 or older to use SafeMatch.'
   if (draft.age > 120) return 'Please enter an age no greater than 120.'
   if (!draft.gender) return 'Pick the gender that fits you best.'
   if (draft.interestedIn.length === 0) return 'Pick who you’d like to meet.'

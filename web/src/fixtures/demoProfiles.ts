@@ -2,7 +2,7 @@ import type { Profile, QuizAxes, WyrChoice } from '../types'
 import { personaFor } from '../games/quiz/personas'
 import { wyrPrompts } from '../games/wouldYouRather/prompts'
 
-// Fictional, clearly labeled demo profiles. Never use real people here.
+// Fictional, clearly labeled demo profiles. Never use real people here: demo photos are AI-generated faces.
 
 interface DemoSeed {
   uid: string
@@ -101,7 +101,8 @@ export const demoProfiles: Profile[] = seeds.map((seed) => ({
   city: seed.city,
   bio: seed.bio,
   prompts: seed.prompts.map(([question, answer]) => ({ question, answer })),
-  photos: [`avatar:${seed.avatar[0]}:${seed.avatar[1]}`],
+  // AI-generated faces (thispersondoesnotexist.com, StyleGAN): no real person is depicted.
+  photos: [`/demo-photos/${seed.uid.replace('demo-', '')}.jpg`],
   interests: seed.interests,
   quiz: { personaId: personaFor(seed.axes).id, axes: seed.axes },
   discoverable: true,

@@ -24,9 +24,8 @@ import {
   type DocumentData,
 } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
-import { httpsCallable } from 'firebase/functions'
 import { auth, db, functions, storage } from '../lib/firebase'
-import type { Account, Match, Message, Profile, QuizResult, ReportRequest, WyrChoice } from '../types'
+import type { Account, Match, Message, Profile, QuizResult, WyrChoice } from '../types'
 import { matchIdFor, type Backend } from './backend'
 import { filterDiscover } from './discoverFilter'
 
@@ -62,10 +61,6 @@ function toMatch(id: string, data: DocumentData): Match {
     lastMessageAt: data.lastMessageAt ? millis(data.lastMessageAt) : undefined,
     lastMessagePreview: data.lastMessagePreview,
   }
-}
-
-function toRequest(id: string, data: DocumentData): ReportRequest {
-  return { ...(data as ReportRequest), id, createdAt: millis(data.createdAt) }
 }
 
 async function blockedSet(uid: string): Promise<Set<string>> {
@@ -226,34 +221,12 @@ export const firebaseBackend: Backend = {
     return Object.fromEntries(entries)
   },
 
-  async requestSafetyReport(_uid, input) {
-    const call = httpsCallable<typeof input, { requestId: string }>(fb.functions, 'requestSafetyReport')
-    try {
-      const result = await call(input)
-      return result.data.requestId
-    } catch (error) {
-      throw new Error(
-        `The safety report service isn't available yet (${error instanceof Error ? error.message : 'unknown error'}). ` +
-          'The screening team needs to deploy the requestSafetyReport function.',
-      )
-    }
-  },
-  subscribeReportRequest(requestId, callback) {
-    return onSnapshot(
-      doc(fb.db, 'reportRequests', requestId),
-      (snapshot) => callback(snapshot.exists() ? toRequest(snapshot.id, snapshot.data({ serverTimestamps: 'estimate' })) : null),
-      () => callback(null),
-    )
-  },
-  async getSafetyReport(requestId) {
-    const call = httpsCallable<{ requestId: string }, unknown>(fb.functions, 'getSafetyReport')
-    const result = await call({ requestId })
-    const data = result.data as { report?: unknown } | null
-    return data && typeof data === 'object' && 'report' in data ? data.report : data
-  },
-  async listMyReportRequests(uid) {
-    const snapshot = await getDocs(query(collection(fb.db, 'reportRequests'), where('requesterUid', '==', uid)))
-    return snapshot.docs.map((entry) => toRequest(entry.id, entry.data())).sort((a, b) => b.createdAt - a.createdAt)
+  async getScreening(subjectUid) {
+    // Written by the screening Cloud Function (background_check pipeline) when a member signs up.
+    const snapshot = await getDoc(doc(fb.db, 'screenings', subjectUid))
+    if (!snapshot.exists()) return null
+    const data = snapshot.data() as { report?: unknown }
+    return data.report ?? data
   },
 
   async block(uid, otherUid) {

@@ -277,6 +277,10 @@ Use this schema shape:
   "human_review_required": true
 }
 This is an illustrative schema, not a real report. Never populate it with fabricated findings.
+Optional extensions (emitted by background_check, validated as optional by web/src/types/safetyReport.ts):
+- Top-level "tldr": { record_tier, tier_label, headline, key_points[{text, finding_ids}], caveats[] }. record_tier is rule-based: verified_record_requires_attention | reported_conviction_unconfirmed | unresolved_allegations_or_charges | cleared_outcomes_only | no_linked_records | insufficient_information. The UI color-codes by it and never labels anyone "safe".
+- Per finding: "evidence_status" (verified | unverified | inconclusive), "why_unresolved" (plain-language reason, null when verified), "historical_report_only" (bool).
+Every member has a pre-built report (screenings/{uid}, written by the screening Cloud Function after consent at onboarding). Viewers see the TLDR, verified findings, and unresolved findings with a strong or possible identity match; name-only matches are shown only as a count.
 Validation requirements
 Every real finding must contain a source URL.
 Demo fixtures must be explicitly labeled as synthetic or test data.

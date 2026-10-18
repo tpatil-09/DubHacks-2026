@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
-import { FileSearch, LogOut, Trash2 } from 'lucide-react'
+import { useNavigate } from 'react-router'
+import { LogOut, Trash2 } from 'lucide-react'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
 import { Avatar } from '../components/ui/ProfilePhoto'
 import { Modal } from '../components/ui/Modal'
@@ -8,23 +8,11 @@ import { backend, firebaseAvailable, leaveDemoMode } from '../data'
 import { useProfiles } from '../hooks/data'
 import { useSession } from '../store/session'
 import { toast } from '../store/toast'
-import type { ReportRequest } from '../types'
-
-const statusLabels: Record<ReportRequest['status'], string> = {
-  queued: 'Queued',
-  searching: 'Searching',
-  verifying: 'Verifying',
-  analyzing: 'Analyzing',
-  complete: 'Complete',
-  incomplete: 'Incomplete',
-  failed: 'Failed',
-}
 
 export default function Settings() {
   const navigate = useNavigate()
   const { user, account, saveAccount, saveProfile } = useSession()
   const uid = user?.uid
-  const [reports, setReports] = useState<ReportRequest[] | null>(null)
   const [blocked, setBlocked] = useState<string[]>([])
   const blockedProfiles = useProfiles(blocked)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -33,7 +21,6 @@ export default function Settings() {
 
   useEffect(() => {
     if (!uid) return
-    backend().listMyReportRequests(uid).then(setReports).catch(() => setReports([]))
     backend().listBlocked(uid).then(setBlocked).catch(() => setBlocked([]))
   }, [uid])
 
@@ -69,8 +56,8 @@ export default function Settings() {
   }
 
   return (
-    <div className="mx-auto grid max-w-2xl gap-5 pb-10">
-      <h1 className="text-3xl font-bold">Privacy & settings</h1>
+    <div className="grid max-w-3xl gap-5 pb-10">
+      <div className="mb-4"><span className="eyebrow">Account</span><h1 className="mt-4 text-[2.6rem] sm:text-6xl">Privacy & settings.</h1></div>
 
       <section className="gloss-card flex items-center justify-between gap-4 p-5">
         <div>
@@ -87,31 +74,6 @@ export default function Settings() {
         >
           <span className={`absolute top-0.5 size-7 rounded-full bg-white shadow transition-all ${account?.settings.discoverable ?? true ? 'left-7' : 'left-0.5'}`} />
         </button>
-      </section>
-
-      <section className="gloss-card p-5">
-        <h2 className="text-xl font-semibold">My safety reports</h2>
-        <p className="mb-3 text-sm text-ink-soft">Only you can see these.</p>
-        {reports === null ? (
-          <p className="text-sm text-ink-soft">Loading…</p>
-        ) : reports.length === 0 ? (
-          <p className="text-sm text-ink-soft">You haven’t requested any reports.</p>
-        ) : (
-          <ul className="grid gap-2">
-            {reports.map((report) => (
-              <li key={report.id}>
-                <Link to={`/safety/report/${report.id}`} className="flex items-center gap-3 rounded-2xl bg-white/70 p-3 hover:bg-white">
-                  <FileSearch className="size-5 text-lilac-deep" />
-                  <span className="flex-1">
-                    <span className="block font-semibold">{report.subjectName}</span>
-                    <span className="text-xs text-ink-soft">{new Date(report.createdAt).toLocaleString()}</span>
-                  </span>
-                  <span className="rounded-full bg-lilac/40 px-2.5 py-0.5 text-xs font-semibold">{statusLabels[report.status]}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
       </section>
 
       <section className="gloss-card p-5">

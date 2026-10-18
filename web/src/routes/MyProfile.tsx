@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { Settings as SettingsIcon } from 'lucide-react'
+import { MapPin, Settings as SettingsIcon } from 'lucide-react'
 import { AboutFields, BasicsFields, PhotosFields } from '../components/profile/ProfileFields'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
 import { ArcadeCard } from '../components/ui/ArcadeCard'
 import { ProfilePhoto } from '../components/ui/ProfilePhoto'
 import { PersonaBadge } from '../components/ui/Badges'
 import { InterestStickers } from '../components/ui/Sticker'
+import { BackgroundCheck, TierChip } from '../components/safety/BackgroundCheck'
 import { draftFromProfile, validateAbout, validateBasics, validatePhotos, type ProfileDraft } from '../lib/profileValidation'
 import { arcadeVars } from '../lib/colors'
 import { useSession } from '../store/session'
@@ -56,9 +57,9 @@ export default function MyProfile() {
   const age = profile?.age ?? null
 
   return (
-    <div className="mx-auto max-w-2xl pb-10">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">My profile</h1>
+    <div className="max-w-4xl pb-10">
+      <div className="mb-8 flex items-end justify-between gap-4">
+        <div><span className="eyebrow">This is you</span><h1 className="mt-4 text-[2.6rem] sm:text-6xl">My profile.</h1></div>
         <Link to="/settings" className="flex items-center gap-1.5 font-display font-semibold text-ink-soft hover:text-ink">
           <SettingsIcon className="size-5" /> Settings
         </Link>
@@ -75,7 +76,7 @@ export default function MyProfile() {
               setTab(entry.id)
               setError('')
             }}
-            className={`rounded-full border-[3px] border-white px-4 py-1.5 font-display font-semibold ${tab === entry.id ? 'bg-bubblegum shadow-[0_3px_0_#e05a97]' : 'bg-white/70'}`}
+            className={`rounded-xl px-4 py-2 font-semibold transition-colors ${tab === entry.id ? 'bg-blush text-bubblegum' : 'text-ink-soft hover:bg-white hover:text-ink'}`}
           >
             {entry.label}
           </button>
@@ -92,7 +93,8 @@ export default function MyProfile() {
               {profile.displayName}
               {age !== null && <span className="font-medium text-ink-soft">, {age}</span>}
             </h2>
-            {profile.city && <p className="text-ink-soft">📍 {profile.city}</p>}
+            {profile.city && <p className="flex items-center gap-1 text-ink-soft"><MapPin className="size-4 shrink-0" aria-hidden /> {profile.city}</p>}
+            <TierChip uid={profile.uid} size="md" />
             {profile.quiz ? (
               <PersonaBadge personaId={profile.quiz.personaId} />
             ) : (
@@ -106,6 +108,9 @@ export default function MyProfile() {
                 <p className="font-display text-lg">{prompt.answer}</p>
               </div>
             ))}
+          </div>
+          <div className="sm:col-span-2">
+            <BackgroundCheck uid={profile.uid} name={profile.displayName} self />
           </div>
         </div>
       ) : (

@@ -12,6 +12,8 @@ export interface Account {
   onboardingStep: OnboardingStep
   settings: { discoverable: boolean; sounds: boolean }
   createdAt: number
+  /** When the member agreed to the public-records background check shown on their profile. */
+  screeningConsentAt?: number
 }
 
 export type QuizAxis = 'cozyAdventurous' | 'plannerSpontaneous' | 'chattyChill' | 'nightEarly'
@@ -74,32 +76,5 @@ export interface Message {
 }
 
 export type NewMessage = Pick<Message, 'senderId' | 'type' | 'text' | 'game'>
-
-export type ReportStatus =
-  | 'queued'
-  | 'searching'
-  | 'verifying'
-  | 'analyzing'
-  | 'complete'
-  | 'incomplete'
-  | 'failed'
-
-export interface ReportRequest {
-  id: string
-  requesterUid: string
-  subjectUid?: string
-  subjectName: string
-  context?: string
-  status: ReportStatus
-  createdAt: number
-  error?: string
-}
-
-export interface SafetyReportInput {
-  subjectUid?: string
-  subjectName: string
-  context?: string
-  confirmedScope: true
-}
 
 export type UserReportReason = 'harassment' | 'fake' | 'scam' | 'underage' | 'other'

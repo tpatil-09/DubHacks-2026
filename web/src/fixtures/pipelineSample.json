@@ -1,0 +1,97 @@
+{
+  "tldr": {
+    "record_tier": "verified_record_requires_attention",
+    "tier_label": "Verified record requiring attention",
+    "headline": "An official record shows a verified conviction or current registry entry that meets SafeMatch's review rules.",
+    "key_points": [
+      {
+        "text": "An official King County court record shows a 2022 conviction for second-degree assault (domestic violence). Identifiers strongly match and no appeal was found.",
+        "finding_ids": [
+          "f_4702d553525a067e"
+        ]
+      }
+    ],
+    "caveats": [
+      "1 finding(s) could not be reliably linked to this person.",
+      "1 finding(s) concern a different person with the same or a similar name.",
+      "1 source(s), such as registries or court portals, could not be checked.",
+      "Public-source research only; not a certified background check."
+    ],
+    "written_by": "template"
+  },
+  "schema_version": "1.0",
+  "report_id": "r_f7a5b05c08b86030",
+  "generated_at": "2026-10-18T01:52:50+00:00",
+  "is_synthetic": true,
+  "subject": {
+    "name_provided": "Jane Example",
+    "context_provided": "Seattle, WA, age 28-32"
+  },
+  "scope": {
+    "sources_searched": [
+      "https://courts.wa.example/case/22-1-00451",
+      "https://courts.or.example/case/1998-3321",
+      "https://forum.example/thread/4411"
+    ],
+    "sources_not_accessible": [
+      "https://sor.wa.example/search"
+    ],
+    "search_completed": true
+  },
+  "summary": "Verified record requiring attention. An official record shows a verified conviction or current registry entry that meets SafeMatch's review rules.",
+  "findings": [
+    {
+      "finding_id": "f_4702d553525a067e",
+      "description": "An official King County court record shows a 2022 conviction for second-degree assault (domestic violence). Identifiers strongly match and no appeal was found.",
+      "record_type": "criminal_case",
+      "case_status": "conviction",
+      "identity_assessment": "strong_match",
+      "identity_rationale": "Official judgment confirms the conviction; identifiers match; no appeal or reversal found.",
+      "event_date": "2022-11-03",
+      "jurisdiction": "King County Superior Court, WA",
+      "source_url": "https://courts.wa.example/case/22-1-00451",
+      "source_title": "State v. Jane Q. Example",
+      "source_type": "official_record",
+      "retrieved_at": "2026-10-18T01:52:50+00:00",
+      "supporting_excerpt": "Jane Q. Example, DOB 1995, Seattle. Judgment: guilty of assault in the second degree (domestic violence).",
+      "conflicts": [],
+      "limitations": [],
+      "evidence_status": "verified",
+      "why_unresolved": null,
+      "historical_report_only": false
+    },
+    {
+      "finding_id": "f_bd073f2646dc956c",
+      "description": "It was not confirmed on an official court or registry record, and no final outcome was found. The match is by name only, so it may be a different person. An anonymous forum post makes an unverified allegation. No official record was found and the post may concern a different person with the same name.",
+      "record_type": "criminal_case",
+      "case_status": "allegation_only",
+      "identity_assessment": "weak_match",
+      "identity_rationale": "It was not confirmed on an official court or registry record, and no final outcome was found. The match is by name only, so it may be a different person.",
+      "event_date": null,
+      "jurisdiction": null,
+      "source_url": "https://forum.example/thread/4411",
+      "source_title": "forum.example",
+      "source_type": "social_post",
+      "retrieved_at": "2026-10-18T01:52:50+00:00",
+      "supporting_excerpt": "Someone named Jane Example threatened [victim] at a bar, be careful.",
+      "conflicts": [],
+      "limitations": [
+        "Verification status: unverified.",
+        "No police report, charge, or court record located."
+      ],
+      "evidence_status": "unverified",
+      "why_unresolved": "It was not confirmed on an official court or registry record, and no final outcome was found. The match is by name only, so it may be a different person.",
+      "historical_report_only": false
+    }
+  ],
+  "limitations": [
+    "SafeMatch provides a limited summary of accessible public sources. Information may be incomplete or inaccurate, and identity may be uncertain. This is not a formal criminal-history check and cannot guarantee personal safety.",
+    "1 record(s) about other people with the same or a similar name were excluded.",
+    "Public-source research only: covers what the configured search tools could find and open; it is not a certified or comprehensive criminal background check.",
+    "Many court and registry systems are not indexed by web search or require formal requests.",
+    "Source could not be accessed: https://sor.wa.example/search (Registry search requires CAPTCHA; not bypassed.).",
+    "SafeMatch background research is a limited, automated review of publicly accessible sources. It is not a certified, FCRA-compliant, or comprehensive criminal background check, and an absence of findings is not evidence that a person has no record. Findings must be reviewed by a person before any action is taken."
+  ],
+  "errors": [],
+  "human_review_required": true
+}

@@ -16,6 +16,6 @@ export const useTokens = create<TokenState>()(
         set((state) => ({ byUser: { ...state.byUser, [uid]: (state.byUser[uid] ?? 0) + amount } }))
       },
     }),
-    { name: 'vetted:tokens' },
+    { name: 'safematch:tokens' },
   ),
 )

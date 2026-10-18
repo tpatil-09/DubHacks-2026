@@ -1,4 +1,4 @@
-const KEY = 'vetted:lastSeen'
+const KEY = 'safematch:lastSeen'
 
 function read(): Record<string, number> {
   try {

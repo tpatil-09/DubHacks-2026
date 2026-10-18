@@ -17,7 +17,7 @@ export function Toaster() {
             key={toast.id}
             type="button"
             onClick={() => dismiss(toast.id)}
-            className={`pointer-events-auto rounded-full border-[3px] border-white px-5 py-2 font-display font-medium shadow-[0_8px_20px_rgba(59,47,74,.15)] ${tones[toast.tone]}`}
+            className={`pointer-events-auto rounded-xl px-5 py-2.5 font-semibold shadow-[0_12px_28px_-12px_rgba(35,26,27,.45)] ${tones[toast.tone]}`}
             initial={{ y: -30, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -20, opacity: 0 }}
