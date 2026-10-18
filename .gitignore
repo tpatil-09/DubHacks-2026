@@ -4,6 +4,8 @@
 !.env.example
 *.local
 !*.local.example
+.local-credentials.json
+*-credentials.local.json
 .secret.local
 
 # Firebase service account keys
@@ -21,12 +23,15 @@ functions/_pipeline/
 functions/config/
 __pycache__/
 *.pyc
+mongo-functions/node_modules/
 
 # Firebase local tooling
 .firebase/
 firebase-debug.log*
 firestore-debug.log*
 ui-debug.log*
+dataconnect-debug.log*
+pglite-debug.log*
 
 # OS / editor
 .DS_Store

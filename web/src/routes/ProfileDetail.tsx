@@ -40,6 +40,7 @@ export default function ProfileDetail() {
   const age = ageFrom(profile.birthdate)
   const vibe = me?.quiz && profile.quiz ? vibePercent(me.quiz.axes, profile.quiz.axes) : null
   const isMe = profile.uid === myUid
+  const genderLabels: Record<string, string> = { woman: 'Woman', man: 'Man', nonbinary: 'Nonbinary', other: profile.genderOther || 'Other' }
 
   async function decide(type: LikeType) {
     if (!myUid || !profile) return
@@ -121,6 +122,12 @@ export default function ProfileDetail() {
             </div>
           ))}
           <dl className="mt-8 grid gap-4 border-t border-[var(--color-line)] pt-7">
+            {profile.gender && (
+              <div className="flex justify-between gap-4"><dt className="text-ink-soft">Gender</dt><dd className="text-right font-bold">{genderLabels[profile.gender] ?? profile.gender}</dd></div>
+            )}
+            {profile.pronouns && (
+              <div className="flex justify-between gap-4"><dt className="text-ink-soft">Pronouns</dt><dd className="text-right font-bold">{profile.pronouns}</dd></div>
+            )}
             {profile.city && (
               <div className="flex justify-between gap-4"><dt className="text-ink-soft">Lives in</dt><dd className="font-bold">{profile.city}</dd></div>
             )}

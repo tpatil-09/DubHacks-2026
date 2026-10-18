@@ -1,7 +1,6 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
 import { connectAuthEmulator, getAuth } from 'firebase/auth'
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore'
-import { connectFunctionsEmulator, getFunctions } from 'firebase/functions'
 import { connectStorageEmulator, getStorage } from 'firebase/storage'
 
 const config = {
@@ -28,7 +27,6 @@ const app = hasConfig
 export const auth = app ? getAuth(app) : undefined
 export const db = app ? getFirestore(app) : undefined
 export const storage = app ? getStorage(app) : undefined
-export const functions = app ? getFunctions(app) : undefined
 
 if (app && import.meta.env.DEV && import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'true') {
   // This guard ensures each emulator is connected only once during Vite HMR.
@@ -37,7 +35,6 @@ if (app && import.meta.env.DEV && import.meta.env.VITE_USE_FIREBASE_EMULATORS ==
   if (!globalState[emulatorMarker]) {
     connectAuthEmulator(auth!, 'http://127.0.0.1:9099', { disableWarnings: true })
     connectFirestoreEmulator(db!, '127.0.0.1', 8080)
-    connectFunctionsEmulator(functions!, '127.0.0.1', 5001)
     connectStorageEmulator(storage!, '127.0.0.1', 9199)
     globalState[emulatorMarker] = true
   }

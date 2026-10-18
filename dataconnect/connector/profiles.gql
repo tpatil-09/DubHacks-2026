@@ -1,0 +1,15 @@
+query ListSyntheticDemoProfiles @auth(level: USER) {
+  demoProfiles(where: {isDemo: {eq: true}}) {
+    uid
+    displayName
+    age
+    gender
+    city
+    bio
+    interests
+    photos
+    demoLike_on_person {
+      likes
+    }
+  }
+}

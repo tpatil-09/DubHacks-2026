@@ -1,0 +1,12 @@
+specVersion: "v1"
+serviceId: "vetted"
+location: "us-west1"
+schema:
+  source: "schema"
+  datasource:
+    postgresql:
+      database: "vetted"
+      cloudSql:
+        instanceId: "vetted"
+connectorDirs:
+  - "connector"

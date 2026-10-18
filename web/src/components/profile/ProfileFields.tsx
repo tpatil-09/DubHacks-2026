@@ -19,13 +19,22 @@ const genders = [
   { id: 'woman', label: 'Woman' },
   { id: 'man', label: 'Man' },
   { id: 'nonbinary', label: 'Nonbinary' },
+  { id: 'other', label: 'Other' },
 ]
 
 const lookingFor = [
   { id: 'women', label: 'Women' },
   { id: 'men', label: 'Men' },
   { id: 'nonbinary', label: 'Nonbinary people' },
+  { id: 'other', label: 'Other' },
 ]
+
+const relationshipOptions = [
+  { id: 'long_term', label: 'A long-term relationship' },
+  { id: 'casual', label: 'Something casual' },
+  { id: 'friends', label: 'New friends' },
+  { id: 'open', label: 'Open to seeing where it goes' },
+] as const
 
 function ChoicePill({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: string }) {
   return (
@@ -81,11 +90,14 @@ export function BasicsFields({ draft, onChange }: FieldsProps) {
         <legend className="label-arcade">I am a…</legend>
         <div className="flex flex-wrap gap-2">
           {genders.map((gender) => (
-            <ChoicePill key={gender.id} selected={draft.gender === gender.id} onClick={() => onChange({ gender: gender.id })}>
+            <ChoicePill key={gender.id} selected={draft.gender === gender.id} onClick={() => onChange({ gender: gender.id, genderOther: gender.id === 'other' ? draft.genderOther : '' })}>
               {gender.label}
             </ChoicePill>
           ))}
         </div>
+        {draft.gender === 'other' && (
+          <input aria-label="Describe your gender" className="input-arcade mt-3" maxLength={60} placeholder="A word or phrase that feels right (up to 60 characters)" value={draft.genderOther ?? ''} onChange={(event) => onChange({ genderOther: event.target.value })} />
+        )}
       </fieldset>
       <fieldset>
         <legend className="label-arcade">I’d like to meet…</legend>
@@ -96,12 +108,50 @@ export function BasicsFields({ draft, onChange }: FieldsProps) {
             </ChoicePill>
           ))}
         </div>
+        {draft.interestedIn.includes('other') && (
+          <input aria-label="Describe who you would like to meet" className="input-arcade mt-3" maxLength={60} placeholder="Tell us who you’d like to meet" value={draft.interestedInOther ?? ''} onChange={(event) => onChange({ interestedInOther: event.target.value })} />
+        )}
       </fieldset>
+      <div>
+        <label htmlFor="pronouns" className="label-arcade">Pronouns <span className="font-normal text-ink-soft">(optional)</span></label>
+        <input id="pronouns" className="input-arcade" maxLength={40} placeholder="e.g. she/her" value={draft.pronouns ?? ''} onChange={(event) => onChange({ pronouns: event.target.value })} />
+      </div>
       <div>
         <label htmlFor="city" className="label-arcade">Location <span className="font-normal text-ink-soft">(city or region)</span></label>
         <input id="city" className="input-arcade" autoComplete="address-level2" maxLength={LIMITS.city} placeholder="Seattle, WA" required value={draft.city} onChange={(event) => onChange({ city: event.target.value })} />
         <p className="mt-1 text-xs text-ink-soft">Enter a city or region only, not a street address or precise location.</p>
       </div>
+    </div>
+  )
+}
+
+export function PreferencesFields({ draft, onChange }: FieldsProps) {
+  const range = draft.ageRange ?? { min: 18, max: 99 }
+  return (
+    <div className="grid gap-6">
+      <fieldset>
+        <legend className="label-arcade">What are you hoping to find? <span className="font-normal text-ink-soft">(optional)</span></legend>
+        <div className="flex flex-wrap gap-2">
+          {relationshipOptions.map((option) => (
+            <ChoicePill key={option.id} selected={draft.relationshipIntent === option.id} onClick={() => onChange({ relationshipIntent: draft.relationshipIntent === option.id ? undefined : option.id })}>
+              {option.label}
+            </ChoicePill>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend className="label-arcade">Preferred age range</legend>
+        <p className="mb-3 text-sm text-ink-soft">We’ll use this along with each person’s preferences to suggest compatible profiles.</p>
+        <div className="grid grid-cols-2 gap-4">
+          <label className="text-sm font-semibold">From
+            <input aria-label="Minimum preferred age" className="input-arcade mt-1" type="number" min={18} max={120} value={range.min} onChange={(event) => onChange({ ageRange: { ...range, min: Number(event.target.value) || 18 } })} />
+          </label>
+          <label className="text-sm font-semibold">To
+            <input aria-label="Maximum preferred age" className="input-arcade mt-1" type="number" min={18} max={120} value={range.max} onChange={(event) => onChange({ ageRange: { ...range, max: Number(event.target.value) || 18 } })} />
+          </label>
+        </div>
+      </fieldset>
+      <p className="rounded-2xl bg-butter/60 p-4 text-sm text-ink-soft">We ask for a city or region only. We don’t collect GPS coordinates or a street address.</p>
     </div>
   )
 }

@@ -1,0 +1,98 @@
+extend type Query {
+  """
+  ✨ Look up a single `DemoProfile` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  demoProfile(
+    """
+    The key used to identify the object.
+    """
+    key: DemoProfile_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DemoProfile_FirstRow
+  ): DemoProfile @fdc_generated(from: "DemoProfile", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `DemoReport` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  demoReport(
+    """
+    The key used to identify the object.
+    """
+    key: DemoReport_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DemoReport_FirstRow
+  ): DemoReport @fdc_generated(from: "DemoReport", purpose: QUERY_SINGLE)
+  """
+  ✨ List `DemoProfile` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  demoProfiles(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: DemoProfile_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [DemoProfile_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: DemoProfile_Having
+  ): [DemoProfile!]! @fdc_generated(from: "DemoProfile", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `DemoReport` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  demoReports(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: DemoReport_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [DemoReport_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: DemoReport_Having
+  ): [DemoReport!]! @fdc_generated(from: "DemoReport", purpose: QUERY_MULTIPLE)
+}

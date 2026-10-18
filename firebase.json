@@ -6,18 +6,22 @@
   },
   "firestore": { "rules": "firebase/firestore.rules", "indexes": "firebase/firestore.indexes.json" },
   "storage": { "rules": "firebase/storage.rules" },
-  "functions": {
-    "source": "functions",
-    "runtime": "python312",
-    "codebase": "default",
-    "ignore": ["venv", ".venv", "__pycache__", "*.pyc", ".secret.local"]
-  },
+  "functions": [
+    {
+      "source": "functions",
+      "runtime": "python312",
+      "codebase": "default",
+      "ignore": ["venv", ".venv", "__pycache__", "*.pyc", ".secret.local"]
+    }
+  ],
+  "dataconnect": { "source": "dataconnect" },
   "emulators": {
     "auth": { "port": 9099 },
     "firestore": { "port": 8080 },
     "functions": { "port": 5001 },
     "hosting": { "port": 5000 },
     "storage": { "port": 9199 },
+    "dataconnect": { "port": 9399, "dataDir": ".firebase/dataconnect-data" },
     "ui": { "enabled": true, "port": 4000 },
     "singleProjectMode": true
   }

@@ -78,11 +78,10 @@ export default function Discover() {
     <div className="pb-6">
       <header className="flex items-start justify-between gap-6">
         <div>
-          <span className="eyebrow">A little chemistry, a lot of possibility</span>
-          <h1 className="mt-4 text-[2.6rem] sm:text-6xl">Meet your next spark.</h1>
-          <p className="mt-4 text-lg text-ink-soft">A new face. A fresh start. A little possibility.</p>
+          <h1 className="text-[2.6rem] sm:text-6xl">Meet your next spark.</h1>
+          <p className="mt-4 text-lg text-ink-soft">Find your match, or play a game for a fun match. Check their background check before you meet.</p>
         </div>
-        <p className="mt-16 hidden shrink-0 items-center gap-2 text-ink-soft sm:flex">
+        <p className="mt-5 hidden shrink-0 items-center gap-2 text-ink-soft sm:flex">
           <MapPin className="size-5" aria-hidden /> {me?.city ? `Near ${me.city.split(',')[0]}` : 'Near you'}
         </p>
       </header>

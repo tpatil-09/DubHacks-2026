@@ -230,6 +230,7 @@ export const demoBackend: Backend = {
       draft.signedIn = false
     })
   },
+  async migrateLegacyData() {},
 
   async getAccount(uid) {
     return state.accounts[uid] ?? null

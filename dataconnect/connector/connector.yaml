@@ -1,0 +1,6 @@
+specVersion: "v1"
+connectorId: "vetted"
+generate:
+  javascriptSdk:
+    outputDir: "../../web/src/generated/dataconnect"
+    package: "@vetted/dataconnect-generated"
