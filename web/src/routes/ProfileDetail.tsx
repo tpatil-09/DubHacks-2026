@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router'
-import { Ban, ChevronLeft, Flag, Heart, X } from 'lucide-react'
+import { Ban, ChevronLeft, Flag, Heart, MapPin, X } from 'lucide-react'
 import { ArcadeCard } from '../components/ui/ArcadeCard'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
 import { ProfilePhoto } from '../components/ui/ProfilePhoto'
@@ -95,7 +95,7 @@ export default function ProfileDetail() {
               </h1>
               {profile.isDemo && <DemoTag />}
             </div>
-            {profile.city && <p className="text-ink-soft">📍 {profile.city}</p>}
+            {profile.city && <p className="flex items-center gap-1 text-ink-soft"><MapPin className="size-4 shrink-0" aria-hidden /> {profile.city}</p>}
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <a href="#background-check" aria-label="Jump to background check"><TierChip uid={profile.uid} size="md" /></a>
               <PersonaBadge personaId={profile.quiz?.personaId} />

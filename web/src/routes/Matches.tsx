@@ -20,7 +20,8 @@ export default function Matches() {
 
   return (
     <div className="pb-8">
-      <h1 className="mb-1 text-3xl font-bold">Matches</h1>
+      <span className="eyebrow">Your people</span>
+      <h1 className="mb-1 text-4xl">Matches</h1>
       <p className="mb-6 text-ink-soft">Your co-op crew. Tap a card to chat.</p>
       {loading ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">

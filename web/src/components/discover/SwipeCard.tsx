@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Link } from 'react-router'
+import { MapPin } from 'lucide-react'
 import { animate, motion, useMotionValue, useReducedMotion, useTransform, type PanInfo } from 'motion/react'
 import { ProfilePhoto } from '../ui/ProfilePhoto'
 import { InterestStickers, DemoTag } from '../ui/Sticker'
@@ -67,7 +68,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
         {/* Front */}
         <div className="gloss-card absolute inset-0 overflow-hidden p-2.5 [backface-visibility:hidden]">
           <div className="relative h-full overflow-hidden rounded-[18px]">
-            <ProfilePhoto src={profile.photos[0]} alt={`${profile.displayName}'s photo`} className="h-full w-full" emojiSize="text-[9rem]" />
+            <ProfilePhoto src={profile.photos[0]} alt={`${profile.displayName}'s photo`} className="h-full w-full" emojiSize="text-[6.5rem] -translate-y-[45%] sm:translate-y-0 sm:text-[9rem]" />
             <span className="holo-sheen" aria-hidden />
             <div className="absolute left-3 top-3 flex flex-wrap gap-2">
               <TierChip uid={profile.uid} />
@@ -84,7 +85,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
                 {profile.displayName}
                 {age !== null && <span className="font-medium text-ink-soft">, {age}</span>}
               </h2>
-              {profile.city && <p className="text-sm text-ink-soft">📍 {profile.city}</p>}
+              {profile.city && <p className="flex items-center gap-1 text-sm text-ink-soft"><MapPin className="size-3.5 shrink-0" aria-hidden /> {profile.city}</p>}
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <PersonaBadge personaId={profile.quiz?.personaId} />
                 {vibe !== null && <VibeMeter percent={vibe} />}

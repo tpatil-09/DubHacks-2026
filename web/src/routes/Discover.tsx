@@ -76,7 +76,7 @@ export default function Discover() {
   return (
     <div className="mx-auto flex max-w-[440px] flex-col items-center gap-5 pb-6">
       <div className="w-full">
-        <h1 className="text-3xl font-bold">Discover</h1>
+        <div><span className="eyebrow">Today’s profiles</span><h1 className="text-4xl">Discover</h1></div>
         {!me?.quiz && (
           <p className="text-sm text-ink-soft">
             <Link to="/arcade/quiz" className="font-semibold text-bubblegum-deep underline-offset-2 hover:underline">Take the vibe quiz</Link> to see your vibe % with everyone.

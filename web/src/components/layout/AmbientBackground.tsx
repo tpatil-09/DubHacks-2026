@@ -1,21 +1,21 @@
 import type { CSSProperties } from 'react'
+import { Capsule } from '../ui/Capsule'
+import type { PastelColor } from '../../lib/colors'
 
-const shapes = [
-  { emoji: '💗', top: '8%', left: '6%', size: 34, dur: 28, delay: 0 },
-  { emoji: '⭐', top: '18%', left: '88%', size: 30, dur: 24, delay: -6 },
-  { emoji: '☁️', top: '42%', left: '3%', size: 44, dur: 34, delay: -12 },
-  { emoji: '🪙', top: '64%', left: '92%', size: 28, dur: 26, delay: -3 },
-  { emoji: '✨', top: '82%', left: '10%', size: 26, dur: 22, delay: -9 },
-  { emoji: '💜', top: '30%', left: '70%', size: 22, dur: 30, delay: -15 },
-  { emoji: '☁️', top: '88%', left: '74%', size: 40, dur: 36, delay: -20 },
-  { emoji: '🍬', top: '94%', left: '42%', size: 22, dur: 32, delay: -5 },
+// Drifting gachapon capsules are the brand's background motif.
+const capsules: { color: PastelColor; top: string; left: string; size: number; dur: number; delay: number }[] = [
+  { color: 'bubblegum', top: '14%', left: '93%', size: 40, dur: 28, delay: 0 },
+  { color: 'butter', top: '6%', left: '62%', size: 30, dur: 24, delay: -6 },
+  { color: 'mint', top: '95%', left: '42%', size: 36, dur: 34, delay: -12 },
+  { color: 'lilac', top: '64%', left: '94%', size: 34, dur: 26, delay: -3 },
+  { color: 'sky', top: '90%', left: '70%', size: 28, dur: 32, delay: -9 },
+  { color: 'peach', top: '40%', left: '86%', size: 26, dur: 30, delay: -15 },
 ]
 
 const blobs = [
-  { color: '#ffd2e3', top: '-8%', left: '-10%', size: 420 },
-  { color: '#e3fbf1', top: '55%', left: '70%', size: 380 },
-  { color: '#f0ecff', top: '35%', left: '-15%', size: 340 },
-  { color: '#fff8dc', top: '-10%', left: '65%', size: 300 },
+  { color: '#ffd2e3', top: '-12%', left: '-12%', size: 460 },
+  { color: '#e3fbf1', top: '60%', left: '72%', size: 400 },
+  { color: '#fff3d1', top: '-14%', left: '62%', size: 320 },
 ]
 
 export function AmbientBackground({ calm = false }: { calm?: boolean }) {
@@ -31,25 +31,19 @@ export function AmbientBackground({ calm = false }: { calm?: boolean }) {
             left: blob.left,
             width: blob.size,
             height: blob.size,
-            opacity: calm ? 0.5 : 0.85,
+            opacity: calm ? 0.35 : 0.6,
             '--dur': `${40 + index * 6}s`,
           } as CSSProperties}
         />
       ))}
       {!calm &&
-        shapes.map((shape, index) => (
+        capsules.map((capsule, index) => (
           <span
             key={index}
-            className="ambient-shape absolute select-none opacity-60"
-            style={{
-              top: shape.top,
-              left: shape.left,
-              fontSize: shape.size,
-              '--dur': `${shape.dur}s`,
-              '--delay': `${shape.delay}s`,
-            } as CSSProperties}
+            className="ambient-shape absolute opacity-90 drop-shadow-[0_6px_10px_rgba(59,47,74,0.10)]"
+            style={{ top: capsule.top, left: capsule.left, '--dur': `${capsule.dur}s`, '--delay': `${capsule.delay}s` } as CSSProperties}
           >
-            {shape.emoji}
+            <Capsule color={capsule.color} size={capsule.size} />
           </span>
         ))}
     </div>

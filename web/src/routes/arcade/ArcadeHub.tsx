@@ -24,8 +24,9 @@ export default function ArcadeHub() {
       <div className="mb-6 flex items-center gap-4">
         <Mascot mood="excited" size={90} />
         <div>
-          <h1 className="text-4xl font-bold">Fun match</h1>
-          <p className="text-ink-soft">Totally optional: play a quick game to find people on your wavelength, or just keep swiping.</p>
+          <span className="eyebrow">Optional</span>
+          <h1 className="text-4xl">Fun match</h1>
+          <p className="text-ink-soft">Play a quick game to find people on your wavelength, or just keep swiping.</p>
         </div>
       </div>
 
