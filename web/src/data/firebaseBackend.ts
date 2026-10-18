@@ -25,7 +25,8 @@ import {
 } from 'firebase/firestore'
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { auth, db, storage } from '../lib/firebase'
-import type { Account, GameAnswers, Match, Message, NewMessage, Profile, QuizResult, UserReportReason, WyrChoice } from '../types'
+import type { Account, GameAnswers, Match, Message, NewMessage, PaperAirplane, PaperDesign, Profile, QuizResult, UserReportReason, WyrChoice } from '../types'
+import { assertDesign, cleanNote } from '../games/paperAirplane/papers'
 import { matchIdFor, type Backend } from './backend'
 import { filterDiscover } from './discoverFilter'
 import { ageFrom } from '../lib/age'
@@ -67,6 +68,24 @@ function profileFrom(value: unknown, uid?: string): Profile | null {
     uid: String(data.uid ?? uid),
     updatedAt: typeof data.updatedAt === 'number' ? data.updatedAt : Date.now(),
   } as Profile
+}
+
+function toPlane(id: string, data: Record<string, unknown>): PaperAirplane {
+  const replyData = data.reply as { fromUid?: string; text?: string; createdAt?: unknown } | undefined
+  return {
+    id,
+    fromUid: String(data.fromUid ?? ''),
+    design: data.design as PaperDesign,
+    text: String(data.text ?? ''),
+    createdAt: typeof data.createdAt === 'number' ? data.createdAt : Date.now(),
+    reply: replyData?.text
+      ? {
+          fromUid: String(replyData.fromUid ?? ''),
+          text: String(replyData.text),
+          createdAt: typeof replyData.createdAt === 'number' ? replyData.createdAt : Date.now(),
+        }
+      : undefined,
+  }
 }
 
 function matchFrom(id: string, data: Record<string, unknown>): Match {
@@ -321,6 +340,65 @@ export const firebaseBackend: Backend = {
     return result
   },
 
+  async throwPaperAirplane(fromUid, design: PaperDesign, text) {
+    const note = cleanNote(text)
+    assertDesign(design)
+    const [profilesSnap, blocked] = await Promise.all([
+      getDocs(query(collection(fb.db, 'profiles'), where('discoverable', '==', true), limit(100))),
+      blockedUids(fromUid),
+    ])
+    const candidates = profilesSnap.docs.map((entry) => entry.id).filter((id) => id !== fromUid && !blocked.has(id))
+    if (candidates.length === 0) throw new Error('Nobody is around to catch a plane right now.')
+    const toUid = candidates[Math.floor(Math.random() * candidates.length)]
+    const id = crypto.randomUUID()
+    const payload = { fromUid, design, text: note, createdAt: Date.now() }
+    const planeRef = doc(fb.db, 'paperPlanes', id)
+    await setDoc(planeRef, payload)
+    try {
+      await setDoc(doc(fb.db, 'paperInboxes', toUid, 'planes', id), { ...payload, toUid, planeId: id })
+    } catch (error) {
+      await deleteDoc(planeRef).catch(() => undefined)
+      throw error
+    }
+  },
+  subscribeAirplanes(uid, callback) {
+    let sent: PaperAirplane[] = []
+    let inbox: PaperAirplane[] = []
+    const emit = () => callback({
+      sent: [...sent].sort((a, b) => b.createdAt - a.createdAt),
+      inbox: [...inbox].sort((a, b) => b.createdAt - a.createdAt),
+    })
+    const stopSent = onSnapshot(
+      query(collection(fb.db, 'paperPlanes'), where('fromUid', '==', uid)),
+      (snapshot) => {
+        sent = snapshot.docs.map((entry) => toPlane(entry.id, entry.data()))
+        emit()
+      },
+      () => emit(),
+    )
+    const stopInbox = onSnapshot(
+      collection(fb.db, 'paperInboxes', uid, 'planes'),
+      (snapshot) => {
+        inbox = snapshot.docs.map((entry) => toPlane(entry.id, entry.data()))
+        emit()
+      },
+      () => emit(),
+    )
+    return () => {
+      stopSent()
+      stopInbox()
+    }
+  },
+  async replyToAirplane(uid, planeId, text) {
+    const note = cleanNote(text)
+    const inboxRef = doc(fb.db, 'paperInboxes', uid, 'planes', planeId)
+    const inbox = await getDoc(inboxRef)
+    if (!inbox.exists() || inbox.data().reply) throw new Error('That airplane isn’t yours to answer.')
+    const reply = { fromUid: uid, text: note, createdAt: Date.now() }
+    await updateDoc(inboxRef, { reply })
+    await updateDoc(doc(fb.db, 'paperPlanes', planeId), { reply })
+  },
+
   async getGameAnswers(uid) {
     const snapshot = await getDoc(doc(fb.db, 'gameAnswers', uid))
     return (snapshot.data() as Record<string, GameAnswers> | undefined) ?? {}
@@ -396,13 +474,15 @@ export const firebaseBackend: Backend = {
   async deleteMyData(uid) {
     own(uid, 'deleting your data')
     const db = fb.db
-    const [profile, outgoingLikes, incomingLikes, matches, outgoingBlocks, reports] = await Promise.all([
+    const [profile, outgoingLikes, incomingLikes, matches, outgoingBlocks, reports, sentPlanes, inboxPlanes] = await Promise.all([
       getDoc(profileRef(uid)),
       getDocs(query(collection(db, 'likes'), where('fromUid', '==', uid))),
       getDocs(query(collection(db, 'likes'), where('toUid', '==', uid))),
       getDocs(query(collection(db, 'matches'), where('users', 'array-contains', uid))),
       getDocs(query(collection(db, 'blocks'), where('blockerUid', '==', uid))),
       getDocs(query(collection(db, 'userReports'), where('reporterUid', '==', uid))),
+      getDocs(query(collection(db, 'paperPlanes'), where('fromUid', '==', uid))),
+      getDocs(collection(db, 'paperInboxes', uid, 'planes')),
     ])
     const photos = (profile.exists() ? profile.data().photos as string[] : []) ?? []
     await Promise.all(photos.filter((photo) => photo.startsWith('https://')).map((photo) => deleteObject(ref(fb.storage, photo)).catch(() => undefined)))
@@ -413,7 +493,7 @@ export const firebaseBackend: Backend = {
     batch.delete(doc(db, 'quizResults', uid))
     batch.delete(doc(db, 'wyrAnswers', uid))
     batch.delete(doc(db, 'gameAnswers', uid))
-    for (const snapshot of [...outgoingLikes.docs, ...incomingLikes.docs, ...outgoingBlocks.docs, ...reports.docs]) batch.delete(snapshot.ref)
+    for (const snapshot of [...outgoingLikes.docs, ...incomingLikes.docs, ...outgoingBlocks.docs, ...reports.docs, ...sentPlanes.docs, ...inboxPlanes.docs]) batch.delete(snapshot.ref)
     for (const match of matches.docs) batch.update(match.ref, { status: 'closed' })
     await batch.commit()
     await firebaseSignOut(fb.auth)

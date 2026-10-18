@@ -3,6 +3,7 @@ import { quizQuestions } from './quiz/questions'
 import { scoreQuiz, quizAxes } from './quiz/scoring'
 import { personaFor, personas } from './quiz/personas'
 import { nextWyrPrompt, wyrPrompts } from './wouldYouRather/prompts'
+import { cleanNote, paperPatterns, rollPapers } from './paperAirplane/papers'
 import { vibePercent } from '../lib/vibe'
 
 const pickEvery = (pick: (options: (typeof quizQuestions)[number]['options']) => string) =>
@@ -57,6 +58,21 @@ describe('vibePercent', () => {
       { cozyAdventurous: 0, plannerSpontaneous: 0, chattyChill: 0, nightEarly: 0 },
       { cozyAdventurous: 100, plannerSpontaneous: 100, chattyChill: 100, nightEarly: 100 },
     )).toBe(0)
+  })
+})
+
+describe('paper airplanes', () => {
+  it('deals three sheets with different colors and patterns', () => {
+    const sheets = rollPapers()
+    expect(sheets).toHaveLength(3)
+    expect(new Set(sheets.map((sheet) => sheet.color)).size).toBe(3)
+    expect(new Set(sheets.map((sheet) => sheet.pattern)).size).toBe(3)
+    for (const sheet of sheets) expect(paperPatterns).toContain(sheet.pattern)
+  })
+
+  it('rejects a blank note and keeps a real one', () => {
+    expect(() => cleanNote('   ')).toThrow()
+    expect(cleanNote('  hi there  ')).toBe('hi there')
   })
 })
 

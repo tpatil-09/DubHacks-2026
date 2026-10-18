@@ -5,6 +5,7 @@ import { backend } from '../../data'
 import { wyrPrompts } from '../../games/wouldYouRather/prompts'
 import { personaById } from '../../games/quiz/personas'
 import { buzzQuizzes, isComplete, matchPuzzles, scoreBuzzQuiz, type FunGame } from '../../games/fun/games'
+import { useAirplanes } from '../../hooks/data'
 import type { GameAnswers } from '../../types'
 import { pastel, type PastelColor } from '../../lib/colors'
 import { useSession } from '../../store/session'
@@ -14,6 +15,8 @@ export default function ArcadeHub() {
   const profile = useSession((state) => state.profile)
   const [wyrCount, setWyrCount] = useState<number | null>(null)
   const [played, setPlayed] = useState<Record<string, GameAnswers>>({})
+  const { inbox } = useAirplanes(uid)
+  const planesWaiting = inbox.filter((plane) => !plane.reply).length
 
   useEffect(() => {
     if (!uid) return
@@ -47,6 +50,15 @@ export default function ArcadeHub() {
           body="Crank the capsule machine for a dilemma, then see which of your matches picked the same."
           meta={wyrCount === null ? '…' : `${wyrCount} of ${wyrPrompts.length} answered`}
         />
+        <FeaturedGame
+          to="/arcade/paper-airplane"
+          color="sky"
+          className="md:col-span-2"
+          kicker="Paper airplane"
+          title="Throw a paper airplane"
+          body="Pick a sheet, write a note, and send it to someone random. You only learn who caught it if they write back."
+          meta={planesWaiting > 0 ? `${planesWaiting} landed for you` : 'A note for a stranger'}
+        />
       </div>
 
       <div className="mt-14 grid gap-12 lg:grid-cols-2 lg:gap-10">
@@ -74,13 +86,14 @@ interface FeaturedGameProps {
   title: string
   body: string
   meta: ReactNode
+  className?: string
 }
 
-function FeaturedGame({ to, color, kicker, title, body, meta }: FeaturedGameProps) {
+function FeaturedGame({ to, color, kicker, title, body, meta, className = '' }: FeaturedGameProps) {
   return (
     <Link
       to={to}
-      className="group flex flex-col rounded-[var(--radius-card)] p-6 transition-colors sm:p-7"
+      className={`group flex flex-col rounded-[var(--radius-card)] p-6 transition-colors sm:p-7 ${className}`}
       style={{ background: pastel[color].soft }}
     >
       <span className="text-sm font-semibold" style={{ color: pastel[color].deep }}>{kicker}</span>

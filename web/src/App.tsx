@@ -17,6 +17,7 @@ const ArcadeHub = lazy(() => import('./routes/arcade/ArcadeHub'))
 const Quiz = lazy(() => import('./routes/arcade/Quiz'))
 const WouldYouRather = lazy(() => import('./routes/arcade/WouldYouRather'))
 const FunGame = lazy(() => import('./routes/arcade/FunGame'))
+const PaperAirplane = lazy(() => import('./routes/arcade/PaperAirplane'))
 const Matches = lazy(() => import('./routes/Matches'))
 const Chat = lazy(() => import('./routes/Chat'))
 const MyProfile = lazy(() => import('./routes/MyProfile'))
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
               { path: '/arcade/quiz', element: page(<Quiz />) },
               { path: '/arcade/would-you-rather', element: page(<WouldYouRather />) },
               { path: '/arcade/play/:gameId', element: page(<FunGame />) },
+              { path: '/arcade/paper-airplane', element: page(<PaperAirplane />) },
               { path: '/matches', element: page(<Matches />) },
               { path: '/chat/:matchId', element: page(<Chat />) },
               { path: '/me', element: page(<MyProfile />) },

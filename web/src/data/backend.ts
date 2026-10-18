@@ -6,6 +6,8 @@ import type {
   Message,
   NewMessage,
   Profile,
+  PaperAirplane,
+  PaperDesign,
   QuizResult,
   SessionUser,
   UserReportReason,
@@ -47,6 +49,14 @@ export interface Backend {
   getWyrAnswers(uid: string): Promise<Record<string, WyrChoice>>
   saveWyrAnswer(uid: string, promptId: string, choice: WyrChoice): Promise<void>
   getWyrAnswersFor(uids: string[]): Promise<Record<string, Record<string, WyrChoice>>>
+
+  /**
+   * Throws a note to a random discoverable member. The caller never learns who caught it.
+   * `subscribeAirplanes` hides the catcher until they reply.
+   */
+  throwPaperAirplane(fromUid: string, design: PaperDesign, text: string): Promise<void>
+  subscribeAirplanes(uid: string, callback: (planes: { inbox: PaperAirplane[]; sent: PaperAirplane[] }) => void): Unsubscribe
+  replyToAirplane(uid: string, planeId: string, text: string): Promise<void>
 
   /** Fun quizzes and match puzzles, keyed by game id. */
   getGameAnswers(uid: string): Promise<Record<string, GameAnswers>>
