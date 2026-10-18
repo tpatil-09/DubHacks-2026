@@ -62,6 +62,8 @@ Settings are read from the process environment first, then `background_check/.en
 | `OUTPUT_DIR` | no | `./output` | |
 | `AGENT_TIMEOUT_SECONDS` | no | `1200` | per Claude Code session |
 | `VERIFY_EXCERPTS_WITH_FETCH` | no | `true` | Python-side excerpt grounding |
+| `RECORDS_PROVIDERS` | no | `courtlistener` | official-records APIs to query (`none` to disable) |
+| `COURTLISTENER_API_TOKEN` | recommended | – | CourtListener API token (free; 5/min, 50/hour, 125/day) |
 
 No other API keys are needed. **Cost note:** a live run makes 3+ Claude Code sessions (one Investigator, one Verifier per 5 findings, one Synthesizer) with up to ~40 Investigator searches plus up to 40 per Verifier batch. That counts against your Claude plan's usage limits. Observed runs took 3–6 minutes per person.
 
@@ -91,12 +93,30 @@ Exit codes: `0` ok, `1` invalid report, `2` config or input error. A live stage 
 ```bash
 pytest tests/unit -v          # models, config, rules, guards, agents, providers, SSRF
 pytest tests/integration -v   # full mocked pipeline + CLI subprocess runs
-pytest tests/evaluation -v    # 11 synthetic scenarios with declared expected outcomes + record tiers
+pytest tests/evaluation -v    # 14 synthetic scenarios with declared expected outcomes + record tiers
 pytest -m live -v -s          # LIVE: real Claude Code + web search (opt-in; also RUN_LIVE=1)
 pytest                        # everything except live
 ```
 
 Synthetic scenarios (`tests/fixtures/scenarios/`) cover a verified conviction, a same-name unrelated person, an unverified accusation, a dismissed charge, conflicting sources, no results, an inaccessible registry, a search-provider error, an Investigator agent failure, an exonerated (vacated) conviction, and a mixed demo report used by `--mock`. Several scenarios deliberately make the mock model **over-claim** (for example, "verified" on a name-only match) to prove that the guards hold.
+
+## Records sources (official APIs)
+
+Web search can't reach most official records: state sex-offender registries and county court portals are interactive forms, and the national registry site (NSOPW) has no public developer API. So the pipeline also calls the **CourtListener** API directly, in Python, before the agents run. Each name-matching record becomes a candidate finding of type `official_court_record`, with a link. The Verifier then judges identity and the exact case outcome, as it does for everything else.
+
+courtlistener.com blocks automated page loads, so the agents can't open those links themselves. Instead, Python fetches the **full opinion text through the API** for up to 3 opinions per person. It keeps the passages that matter, up to about 3,000 characters: the opening, sentences about the outcome (affirmed, reversed, vacated, new trial, sentenced), identity details such as age or county, and the closing judgment. These passages go to the Verifier as `official_text_passages`. Each record shows `full_text_status` (`retrieved`, `summary_only`, `not_fetched` or `failed`).
+
+| Provider | What it covers | What it doesn't | Setup |
+|---|---|---|---|
+| **CourtListener** (Free Law Project, REST API v4, free) | Federal and **state appellate opinions** (criminal appeals name the defendant) and federal criminal dockets (PACER/RECAP) | State trial-court cases that were never appealed; sex-offender registries | Free account, then the token at courtlistener.com/profile/api-token goes in `COURTLISTENER_API_TOKEN`. Free accounts allow **5 requests/minute, 50/hour and 125/day**. Each person search uses up to 5 requests (2 searches plus up to 3 opinion texts), so roughly 25 people a day. Free Law Project memberships raise the limits. |
+
+How records are handled:
+- **Name matching:** a record is kept only if the first and last name appear together ("First [Middle] Last" or "Last, First"). A shared surname in a caption like "Syed v. Lee" isn't enough.
+- **Criminal only:** dockets are limited to criminal cases, so bankruptcy and civil filings are dropped. Opinions must be criminal appeals (State/People/Commonwealth/United States captions, or criminal terms in the opinion).
+- **Trusted, not assumed:** API records skip the "is the quote on the page" check, because Python fetched them straight from the source. Every identity rule still applies, so an official record with only a name match is never more than a weak match and never raises a flag.
+- **Rate limits:** requests are spaced about 12.5 s apart to stay under 5/minute, and a `429` waits for the server's `Retry-After`. If the hourly or daily quota runs out, the search stops and the report says so.
+- **Failures:** if the API fails, the report is marked `partial`, never "clear".
+- **Registries:** these aren't checked directly. Every report says so and points to nsopw.gov. Paid aggregator APIs (for example Checkr Trust, built for dating apps) could add registry coverage later through the same `RecordsProvider` interface.
 
 ## Output files
 
@@ -239,6 +259,7 @@ src/safematch/
   prompts/{investigator,verifier,synthesizer}.md
   providers/llm.py               ClaudeCLIProvider, MockLLMProvider, complete_structured
   providers/search.py            optional TavilySearchProvider, MockSearchProvider
+  providers/records.py           CourtListenerProvider, MockRecordsProvider (official records API)
   providers/source_retrieval.py  SafeFetcher (SSRF-safe), FixtureFetcher
   agents/{investigator,verifier,synthesizer}.py
   rules/safety_flags.py          deterministic R1–R7

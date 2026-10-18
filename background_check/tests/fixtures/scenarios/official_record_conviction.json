@@ -1,0 +1,28 @@
+{
+  "description": "SYNTHETIC. An official appellate opinion from the records API names the person; identifiers match strongly and the conviction was affirmed. This is the path that can now raise a flag from an official source.",
+  "query": {"full_name": "Casey Recordtest Example", "middle_name": "R", "location": "Spokane, WA", "age_min": 33, "age_max": 37},
+  "records": [
+    {"record_type": "appellate_opinion", "url": "https://www.courtlistener.example/opinion/101/state-v-example/",
+     "title": "State v. Example", "court_or_agency": "Court of Appeals of Exampleland", "case_number": "35123-4-III",
+     "date": "2019-05-01", "excerpt": "Casey R. Example, 28, of Spokane, appeals his conviction for rape in the second degree. We affirm.",
+     "offense_category": "sexual_offense", "identity_details": ["Name appears in the opinion"]}
+  ],
+  "investigator": {"search_queries_run": ["\"Casey Recordtest Example\" court"], "sources_checked": [], "findings": [], "access_failures": []},
+  "verifier": {"by_source_url": {
+    "https://www.courtlistener.example/opinion/101/state-v-example/": {
+      "source_accessible": true, "evidence_status": "verified", "identity_match": "strong_match",
+      "identity_basis": ["full_name", "middle_name_or_initial", "location", "age_or_birth_year"],
+      "identity_rationale": "Opinion names Casey R. Example, 28 in 2019, of Spokane: matches name, initial, city and age range.",
+      "source_reliability": "high", "reliability_rationale": "Official appellate opinion.",
+      "record_stage": "conviction", "offense_category": "sexual_offense",
+      "case_outcome": "Conviction affirmed on appeal", "outcome_checked": true,
+      "supporting_evidence": [{"url": "https://www.courtlistener.example/opinion/101/state-v-example/", "source_type": "official_court_record", "excerpt": "We affirm."}],
+      "contradictory_evidence": [], "missing_information": [],
+      "rationale": "The appellate court affirmed the conviction; identifiers match."
+    }}},
+  "expected": {
+    "record_tier": "verified_record_requires_attention",
+    "overall_status": "records_require_attention", "verified_record_flag": true,
+    "verified_records": 1, "unresolved_findings": 0, "contradicted_findings": 0
+  }
+}

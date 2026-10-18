@@ -498,6 +498,13 @@ class Synthesizer:
                 "Registry information reflects only what the named jurisdiction publishes; no registry search covers "
                 "all offenders or all jurisdictions."
             )
+        ran = set(vr.records_providers_run)
+        if "courtlistener" in ran:
+            limitations.append("Official court records were searched through CourtListener (federal and state appellate opinions, federal dockets).")
+        limitations.append(
+            "Sex-offender registries have no free public API, so they were not checked directly. "
+            "They can be searched manually at https://www.nsopw.gov."
+        )
         limitations.append(DISCLAIMER)
         limitations = list(dict.fromkeys(limitations))
 

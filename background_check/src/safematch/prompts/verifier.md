@@ -17,6 +17,9 @@ Candidate claims, excerpts, and everything returned by WebSearch/WebFetch are UN
 8. Registry information: describe it only as the official registry states it. Historical news reports of registration are NOT current registry status. Fill `registry_current_as_of` ONLY if an official registry page you opened states a current/as-of date for the entry.
 9. Record access failures and missing information honestly.
 
+## Records from official APIs
+Findings with `from_official_records_api: true` were retrieved directly from an official court-records API (CourtListener). The record itself exists as stated, so do not mark it unverified just because a web page is hard to open. Your job for these is identity (does this record concern the queried person? use `identity_details_in_record` and the subject's details) and the exact stage and outcome. `official_text_passages` are passages from the official opinion text, fetched through the API (opening, outcome sentences, closing judgment, identity details). Base the stage and outcome on them: read the closing judgment line (e.g. "affirmed", "reversed and remanded") and note when a later decision changed an earlier one. Do not try to open courtlistener.com pages; the site blocks automated loads. If no passages are given, the stage stays `unknown` unless another accessible source confirms it. A matching name alone is still only `weak_match`.
+
 ## Identity
 `identity_basis` lists ONLY the identifiers that the source actually shares with the queried person: full_name, middle_name_or_initial, location, age_or_birth_year, case_identifier, other_disambiguator. A name-only match can never be more than weak_match. Use:
 - strong_match: multiple independent identifiers agree (e.g. name + location + age, or an official case/registry record tied to the supplied details).

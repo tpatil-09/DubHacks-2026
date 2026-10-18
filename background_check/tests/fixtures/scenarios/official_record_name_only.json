@@ -1,0 +1,26 @@
+{
+  "description": "SYNTHETIC. The records API returns an appellate opinion for the same name, but nothing else matches. An official source alone must not raise a flag.",
+  "query": {"full_name": "Jordan Recordtest Sample", "location": "Boise, ID", "age_min": 25, "age_max": 29},
+  "records": [
+    {"record_type": "appellate_opinion", "url": "https://www.courtlistener.example/opinion/202/people-v-sample/",
+     "title": "People v. Sample", "court_or_agency": "Court of Appeal of Otherstate", "case_number": "B2",
+     "date": "2008-03-01", "excerpt": "Defendant Jordan Sample was convicted of assault.",
+     "offense_category": "other_serious_violent", "identity_details": ["Name appears in the opinion"]}
+  ],
+  "investigator": {"search_queries_run": [], "sources_checked": [], "findings": [], "access_failures": []},
+  "verifier": {"by_source_url": {
+    "https://www.courtlistener.example/opinion/202/people-v-sample/": {
+      "source_accessible": true, "evidence_status": "verified", "identity_match": "possible_match",
+      "identity_basis": ["full_name"], "source_reliability": "high", "record_stage": "conviction",
+      "offense_category": "other_serious_violent", "case_outcome": "Convicted", "outcome_checked": true,
+      "supporting_evidence": [{"url": "https://www.courtlistener.example/opinion/202/people-v-sample/", "source_type": "official_court_record"}],
+      "contradictory_evidence": [], "missing_information": ["No age or location in the opinion."],
+      "rationale": "Same name only; no other identifiers."
+    }}},
+  "expected": {
+    "record_tier": "no_linked_records",
+    "overall_status": "findings_require_review", "verified_record_flag": false,
+    "verified_records": 0, "unresolved_findings": 1, "contradicted_findings": 0,
+    "finding_identity": "weak_match"
+  }
+}

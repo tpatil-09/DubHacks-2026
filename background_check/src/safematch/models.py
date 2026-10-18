@@ -170,7 +170,12 @@ class RetrievedVia(str, Enum):
     claude_code_websearch = "claude_code_websearch"
     claude_code_webfetch = "claude_code_webfetch"
     tavily = "tavily"
+    courtlistener = "courtlistener"
     fixture = "fixture"
+
+
+# Records that come straight from an official-records API (not from a model reading a web page).
+API_RECORD_SOURCES = frozenset({RetrievedVia.courtlistener})
 
 
 # ------------------------------------------------------------------------ query
@@ -191,7 +196,7 @@ class SearchScope(Strict):
 
 
 class PersonQuery(Strict):
-    """Voluntarily supplied search information. No DOB or home address required."""
+    """Voluntarily supplied search information. No date of birth or home address."""
 
     full_name: str = Field(min_length=3, max_length=120)
     middle_name: Optional[str] = Field(default=None, max_length=60)
@@ -243,6 +248,9 @@ class Provenance(Strict):
     agent: str
     retrieved_via: RetrievedVia
     search_query: Optional[str] = None
+    from_records_api: bool = Field(
+        default=False, description="True when the record came directly from an official-records API (not from web content)"
+    )
     retrieved_at: str = Field(default_factory=utc_now)
 
 
@@ -268,6 +276,34 @@ class CandidateFinding(Strict):
     provenance: Provenance
 
 
+class OfficialRecord(Strict):
+    """A record returned directly by an official-records API (CourtListener)."""
+
+    provider: RetrievedVia
+    record_type: str = Field(description="appellate_opinion | federal_docket")
+    url: str
+    title: str
+    court_or_agency: Optional[str] = None
+    jurisdiction: Optional[str] = None
+    case_number: Optional[str] = None
+    date: Optional[str] = None
+    excerpt: Optional[str] = Field(default=None, max_length=1200)
+    offense: Optional[str] = None
+    offense_category: OffenseCategory = OffenseCategory.unknown
+    record_stage: RecordStage = RecordStage.unknown
+    disposition: Optional[str] = None
+    registry_as_of: Optional[str] = None
+    identity_details: List[str] = Field(default_factory=list)
+    source_id: Optional[str] = Field(default=None, description="Provider's id for the document (CourtListener opinion id)")
+    text_passages: List[str] = Field(
+        default_factory=list, description="Relevant passages from the official full text (outcome, holding, identity)"
+    )
+    full_text_status: Optional[str] = Field(
+        default=None, description="retrieved | summary_only | not_fetched | failed (official full text via the API)"
+    )
+    retrieved_at: str = Field(default_factory=utc_now)
+
+
 class InvestigatorResult(Strict):
     stage: str = "investigator"
     mode: PipelineMode
@@ -276,6 +312,8 @@ class InvestigatorResult(Strict):
     search_queries_run: List[str] = Field(default_factory=list)
     sources_checked: List[SourceDocument] = Field(default_factory=list)
     candidate_findings: List[CandidateFinding] = Field(default_factory=list)
+    official_records: List[OfficialRecord] = Field(default_factory=list)
+    records_providers_run: List[str] = Field(default_factory=list)
     retrieval_errors: List[RetrievalError] = Field(default_factory=list)
     limitations: List[str] = Field(default_factory=list)
     started_at: str = Field(default_factory=utc_now)
@@ -340,6 +378,7 @@ class VerifierResult(Strict):
     search_queries_run: List[str] = Field(default_factory=list)
     sources_checked: List[SourceDocument] = Field(default_factory=list)
     findings: List[VerifiedFinding] = Field(default_factory=list)
+    records_providers_run: List[str] = Field(default_factory=list)
     retrieval_errors: List[RetrievalError] = Field(default_factory=list)
     limitations: List[str] = Field(default_factory=list)
     started_at: str = Field(default_factory=utc_now)
