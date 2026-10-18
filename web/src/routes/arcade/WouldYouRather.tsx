@@ -72,9 +72,10 @@ export default function WouldYouRather() {
   const agreeing = prompt && choice ? partnerIds.filter((id) => partnerAnswers[id]?.[prompt.id] === choice) : []
 
   return (
-    <div className="mx-auto max-w-3xl pb-10">
-      <h1 className="text-3xl font-bold">Would You Rather</h1>
-      <p className="mb-6 text-ink-soft">Crank the machine, crack a capsule, pick a side.</p>
+    <div className="max-w-4xl pb-10">
+      <span className="eyebrow">Fun match</span>
+      <h1 className="mt-4 text-[2.6rem] sm:text-5xl">Would you rather…</h1>
+      <p className="mb-10 mt-4 text-lg text-ink-soft">Crank the machine, crack a capsule, pick a side.</p>
 
       <div className="grid items-start gap-8 md:grid-cols-[auto_1fr]">
         <GachaponMachine onDispense={dispense} disabled={!!prompt && !choice} />

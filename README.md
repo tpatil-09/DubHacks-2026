@@ -1,6 +1,6 @@
-# Vetted
+# SafeMatch
 
-Vetted is a cozy pastel arcade dating app prototype: collectible profile cards, a compatibility quiz, Would You Rather capsules in chat, and optional private safety reports. It is built with React + TypeScript + Vite and runs 100% on Firebase (Hosting, Auth, Firestore, Storage, Cloud Functions).
+SafeMatch is a dating app prototype where every profile comes with a background check, so people can relax and have fun dating. Use it like a regular swipe-and-chat dating app, or play optional games (a compatibility quiz and Would You Rather capsules) for a fun match. Each member's public-records check comes from the `background_check/` pipeline and appears on their profile, color coded by result, with a TLDR, verified and unresolved findings, and links to the sources. It is built with React + TypeScript + Vite and runs 100% on Firebase (Hosting, Auth, Firestore, Storage, Cloud Functions).
 
 ## Run the web app
 
@@ -10,7 +10,7 @@ From `web/`, run `npm install` and `npm run dev`.
 
 ### Demo mode (no Firebase needed)
 
-If `web/.env` has no Firebase config, or `VITE_DEMO_MODE=true`, the app runs in demo mode. Click **Try demo mode** on the sign-in screen. Everything is stored in this browser's localStorage and uses fictional demo profiles (marked with a 🧪 Demo tag) that like you back, reply in chat, and answer game capsules. Safety reports in demo mode use clearly labeled synthetic fixtures with `example.com` sources; names that aren't demo profiles always return "live search is not available in demo mode".
+If `web/.env` has no Firebase config, or `VITE_DEMO_MODE=true`, the app runs in demo mode. Click **Try demo mode** on the sign-in screen. Everything is stored in this browser's localStorage and uses fictional demo profiles (marked with a 🧪 Demo tag) that like you back, reply in chat, and answer game capsules. In demo mode every demo profile has a pre-built, clearly labeled synthetic background check (`web/src/fixtures/demoReports.ts`, `example.com` sources) covering each result tier.
 
 To reset demo data, sign out and clear the site's localStorage.
 
@@ -29,7 +29,7 @@ During onboarding, users enter a self-reported age (18+) and a city or region. T
 | `VITE_USE_FIREBASE_EMULATORS` | `true` connects to local emulators (dev only) |
 | `VITE_DEMO_MODE` | `true` forces demo mode even when Firebase is configured |
 
-Safety reports call the `requestSafetyReport` and `getSafetyReport` Cloud Functions owned by the screening team. Until those are deployed, the request screen shows a friendly "service isn't available yet" error in Firebase mode. Report status is read from `reportRequests/{id}`, which only the requester can read and only Functions can write.
+Background checks are read from `screenings/{uid}`. The screening Cloud Function writes that document: it runs the `background_check` pipeline after the member consents during onboarding and stores its `report.json`. Any signed-in member can read it, but only Functions can write it. Until a member's check exists, their profile shows "Background check in progress". The UI shows only findings linked to the person; name-only matches appear as a count.
 
 ## Checks
 

@@ -21,7 +21,7 @@ export function ProfilePhoto({ src, alt, className = '', emojiSize = 'text-7xl' 
       className={`grid place-items-center ${className}`}
       style={{ background: `radial-gradient(circle at 30% 25%, #fff 0%, ${color.soft} 30%, ${color.bg} 100%)` }}
     >
-      <span className={`${emojiSize} drop-shadow-[0_6px_6px_rgba(59,47,74,.18)]`} aria-hidden>
+      <span className={`${emojiSize} drop-shadow-[0_6px_6px_rgba(35,26,27,.18)]`} aria-hidden>
         {emoji}
       </span>
     </div>
@@ -30,7 +30,7 @@ export function ProfilePhoto({ src, alt, className = '', emojiSize = 'text-7xl' 
 
 export function Avatar({ src, alt, size = 48 }: { src: string | undefined; alt: string; size?: number }) {
   return (
-    <div className="shrink-0 overflow-hidden rounded-full border-[3px] border-white shadow-[0_3px_8px_rgba(59,47,74,.15)]" style={{ width: size, height: size }}>
+    <div className="shrink-0 overflow-hidden rounded-full ring-2 ring-white" style={{ width: size, height: size }}>
       <ProfilePhoto src={src} alt={alt} className="h-full w-full" emojiSize={size > 56 ? 'text-3xl' : 'text-xl'} />
     </div>
   )

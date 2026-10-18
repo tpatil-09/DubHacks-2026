@@ -33,8 +33,8 @@ function ChoicePill({ selected, onClick, children }: { selected: boolean; onClic
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`rounded-full border-[3px] px-4 py-2 font-display font-medium transition ${
-        selected ? 'border-white bg-bubblegum shadow-[inset_0_2px_4px_rgba(255,255,255,.7),0_4px_0_#e05a97]' : 'border-blush bg-white hover:border-bubblegum/50'
+      className={`rounded-xl border px-4 py-2 font-semibold transition ${
+        selected ? 'border-bubblegum bg-blush text-bubblegum' : 'border-[var(--color-line)] bg-white hover:border-bubblegum/50'
       }`}
     >
       {children}
@@ -56,7 +56,7 @@ export function BasicsFields({ draft, onChange }: FieldsProps) {
       <div>
         <label htmlFor="age" className="label-arcade">Age</label>
         <input id="age" type="number" inputMode="numeric" min={18} max={120} step={1} required className="input-arcade" value={draft.age || ''} onChange={(event) => onChange({ age: Number(event.target.value) || 0 })} />
-        <p className="mt-1 text-xs text-ink-soft">Your age appears on your profile. Vetted is for adults 18 and older.</p>
+        <p className="mt-1 text-xs text-ink-soft">Your age appears on your profile. SafeMatch is for adults 18 and older.</p>
       </div>
       <fieldset>
         <legend className="label-arcade">I am a…</legend>
@@ -129,10 +129,10 @@ export function PhotosFields({ draft, onChange }: FieldsProps) {
     <div className="grid gap-5">
       <div className="grid grid-cols-3 gap-3">
         {draft.photos.map((photo, index) => (
-          <div key={`${photo.slice(0, 40)}-${index}`} className="group relative aspect-[3/4] overflow-hidden rounded-2xl border-4 border-white shadow-md">
+          <div key={`${photo.slice(0, 40)}-${index}`} className="group relative aspect-[3/4] overflow-hidden rounded-xl border border-[var(--color-line)] bg-white">
             <ProfilePhoto src={photo} alt={`Photo ${index + 1}`} className="h-full w-full" emojiSize="text-5xl" />
             {index === 0 && (
-              <span className="absolute left-1.5 top-1.5 rounded-full bg-butter px-2 py-0.5 font-display text-xs font-semibold">Cover</span>
+              <span className="absolute left-1.5 top-1.5 rounded-md bg-white px-2 py-0.5 text-xs font-bold shadow-sm">Cover</span>
             )}
             <div className="absolute inset-x-1.5 bottom-1.5 flex justify-between gap-1">
               {index > 0 ? (
@@ -163,9 +163,9 @@ export function PhotosFields({ draft, onChange }: FieldsProps) {
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="grid aspect-[3/4] place-items-center rounded-2xl border-4 border-dashed border-bubblegum/40 bg-white/60 text-ink-soft transition hover:border-bubblegum hover:text-ink"
+            className="grid aspect-[3/4] place-items-center rounded-xl border-2 border-dashed border-[var(--color-line)] bg-white text-ink-soft transition hover:border-bubblegum hover:text-bubblegum"
           >
-            <span className="flex flex-col items-center gap-1 font-display font-semibold">
+            <span className="flex flex-col items-center gap-1 font-semibold">
               <Camera className="size-7" aria-hidden /> Add photo
             </span>
           </button>
@@ -175,7 +175,7 @@ export function PhotosFields({ draft, onChange }: FieldsProps) {
       {error && <p role="alert" className="rounded-2xl bg-peach/40 p-3 text-sm">{error}</p>}
 
       {draft.photos.length === 0 && (
-        <div className="rounded-2xl border-2 border-white bg-white/60 p-4">
+        <div className="rounded-xl border border-[var(--color-line)] bg-white p-4">
           <p className="label-arcade">Or pick a cute avatar</p>
           <div className="mb-3 flex gap-2">
             {avatarColors.map((color) => (
@@ -185,7 +185,7 @@ export function PhotosFields({ draft, onChange }: FieldsProps) {
                 aria-label={`${color} background`}
                 aria-pressed={avatarColor === color}
                 onClick={() => setAvatarColor(color)}
-                className={`size-8 rounded-full border-[3px] ${avatarColor === color ? 'border-ink' : 'border-white'}`}
+                className={`size-8 rounded-full ring-offset-2 ${avatarColor === color ? 'ring-2 ring-ink' : ''}`}
                 style={{ background: pastel[color].bg }}
               />
             ))}
@@ -196,7 +196,7 @@ export function PhotosFields({ draft, onChange }: FieldsProps) {
                 key={emoji}
                 type="button"
                 onClick={() => onChange({ photos: [...draft.photos, `avatar:${emoji}:${avatarColor}`] })}
-                className="grid size-12 place-items-center rounded-2xl border-[3px] border-white text-2xl shadow-sm transition hover:-translate-y-0.5"
+                className="grid size-12 place-items-center rounded-xl text-2xl transition hover:-translate-y-0.5"
                 style={{ background: pastel[avatarColor].soft }}
                 aria-label={`Add ${emoji} avatar`}
               >
@@ -259,10 +259,10 @@ export function AboutFields({ draft, onChange }: FieldsProps) {
       <fieldset className="grid gap-4">
         <legend className="label-arcade">Prompts</legend>
         {prompts.map((prompt, index) => (
-          <div key={index} className="rounded-2xl border-2 border-white bg-white/70 p-3">
+          <div key={index} className="rounded-xl border border-[var(--color-line)] bg-white p-3">
             <select
               aria-label={`Prompt ${index + 1} question`}
-              className="mb-2 w-full rounded-xl bg-blush px-3 py-2 font-display font-semibold"
+              className="mb-2 w-full rounded-lg bg-blush px-3 py-2 font-semibold"
               value={prompt.question}
               onChange={(event) => setPrompt(index, { question: event.target.value })}
             >

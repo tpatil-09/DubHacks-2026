@@ -23,7 +23,7 @@ export function GameShareCard({ message, myUid, partnerUid, partnerName, onAnswe
   ]
 
   return (
-    <div className="w-72 max-w-full rounded-[22px] border-4 border-white bg-gradient-to-br from-lilac/60 via-white to-blush p-4 shadow-[0_8px_20px_rgba(157,140,240,.25)]">
+    <div className="w-72 max-w-full rounded-2xl border border-[var(--color-line)] bg-white p-4 shadow-[0_12px_32px_-20px_rgba(35,26,27,.3)]">
       <div className="mb-2 flex items-center gap-2">
         <Capsule color="bubblegum" size={28} open />
         <p className="font-display text-sm font-bold tracking-wide text-ink-soft">WOULD YOU RATHER</p>

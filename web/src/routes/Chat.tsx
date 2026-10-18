@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { motion } from 'motion/react'
-import { Ban, ChevronLeft, Ellipsis, Flag, HeartCrack, ScanSearch, Send, User } from 'lucide-react'
+import { Ban, ChevronLeft, Ellipsis, Flag, HeartCrack, Send, ShieldCheck, User } from 'lucide-react'
 import { Avatar } from '../components/ui/ProfilePhoto'
 import { PersonaBadge } from '../components/ui/Badges'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
@@ -151,8 +151,8 @@ export default function Chat() {
               ) : (
                 <p
                   title={new Date(message.createdAt).toLocaleString()}
-                  className={`max-w-[78%] whitespace-pre-wrap break-words rounded-[20px] border-[3px] border-white px-4 py-2 shadow-sm ${
-                    mine ? 'rounded-br-md bg-sky' : 'rounded-bl-md bg-blush'
+                  className={`max-w-[78%] whitespace-pre-wrap break-words rounded-2xl px-4 py-2.5 ${
+                    mine ? 'rounded-br-md bg-bubblegum text-white' : 'rounded-bl-md border border-[var(--color-line)] bg-white'
                   }`}
                 >
                   {message.text}
@@ -179,7 +179,7 @@ export default function Chat() {
         <button
           type="button"
           onClick={() => setGamePrompt(nextWyrPrompt(new Set()))}
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-lilac text-xl shadow-[inset_0_2px_4px_rgba(255,255,255,.8),0_3px_0_#9d8cf0]"
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-butter text-xl"
           aria-label="Send a Would You Rather capsule"
         >
           🎰
@@ -202,7 +202,7 @@ export default function Chat() {
       <Modal open={menuOpen} onClose={() => setMenuOpen(false)} title="Chat options">
         <div className="grid gap-2">
           <MenuItem icon={<User className="size-5" />} label="View profile" onClick={() => navigate(`/profile/${partnerUid}`)} />
-          <MenuItem icon={<ScanSearch className="size-5" />} label="Request safety report" onClick={() => navigate(`/safety/request/${partnerUid}`)} />
+          <MenuItem icon={<ShieldCheck className="size-5" />} label="Background check" onClick={() => navigate(`/profile/${partnerUid}#background-check`)} />
           <MenuItem icon={<HeartCrack className="size-5" />} label="Unmatch" onClick={unmatch} />
           <MenuItem icon={<Ban className="size-5" />} label="Block" onClick={() => { setMenuOpen(false); setModal('block') }} />
           <MenuItem icon={<Flag className="size-5" />} label="Report" onClick={() => { setMenuOpen(false); setModal('report') }} />

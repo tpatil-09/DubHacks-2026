@@ -6,8 +6,6 @@ import type {
   NewMessage,
   Profile,
   QuizResult,
-  ReportRequest,
-  SafetyReportInput,
   SessionUser,
   UserReportReason,
   WyrChoice,
@@ -46,11 +44,11 @@ export interface Backend {
   saveWyrAnswer(uid: string, promptId: string, choice: WyrChoice): Promise<void>
   getWyrAnswersFor(uids: string[]): Promise<Record<string, Record<string, WyrChoice>>>
 
-  requestSafetyReport(uid: string, input: SafetyReportInput): Promise<string>
-  subscribeReportRequest(requestId: string, callback: (request: ReportRequest | null) => void): Unsubscribe
-  /** Returns the raw report.json object; the UI validates it. */
-  getSafetyReport(requestId: string): Promise<unknown>
-  listMyReportRequests(uid: string): Promise<ReportRequest[]>
+  /**
+   * The member's background check, produced by the background_check pipeline when they join.
+   * Returns the raw report.json object (the UI validates it), or null while it is still running.
+   */
+  getScreening(subjectUid: string): Promise<unknown>
 
   block(uid: string, otherUid: string): Promise<void>
   unblock(uid: string, otherUid: string): Promise<void>

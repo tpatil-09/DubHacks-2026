@@ -2,7 +2,6 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import { motion } from 'motion/react'
 import { Capsule } from '../../components/ui/Capsule'
-import { Mascot } from '../../components/ui/Mascot'
 import { PersonaBadge } from '../../components/ui/Badges'
 import { backend } from '../../data'
 import { wyrPrompts } from '../../games/wouldYouRather/prompts'
@@ -21,11 +20,11 @@ export default function ArcadeHub() {
 
   return (
     <div className="pb-8">
-      <div className="mb-6 flex items-center gap-4">
-        <Mascot mood="excited" size={90} />
+      <div className="mb-10">
         <div>
-          <h1 className="text-4xl font-bold">The Arcade</h1>
-          <p className="text-ink-soft">Play to earn tokens and find people on your wavelength.</p>
+          <span className="eyebrow">Totally optional</span>
+          <h1 className="mt-4 text-[2.6rem] sm:text-6xl">Find a fun match.</h1>
+          <p className="mt-4 text-lg text-ink-soft">Play a quick game to find people on your wavelength, or just keep swiping.</p>
         </div>
       </div>
 
@@ -68,7 +67,7 @@ function GameCard({ to, color, emoji, title, subtitle, cta, footer }: GameCardPr
     <motion.div whileHover={{ y: -4, rotate: -0.5 }} transition={{ type: 'spring', stiffness: 300, damping: 18 }}>
       <Link to={to} className="gloss-card group flex h-full flex-col gap-4 p-6">
         <div className="flex items-start justify-between">
-          <span className="text-6xl drop-shadow-[0_6px_6px_rgba(59,47,74,.15)]" aria-hidden>{emoji}</span>
+          <span className="text-6xl drop-shadow-[0_6px_6px_rgba(35,26,27,.15)]" aria-hidden>{emoji}</span>
           <Capsule color={color} size={44} className="transition-transform group-hover:rotate-12" />
         </div>
         <div>

@@ -110,6 +110,10 @@ def _finding(f: ReportFinding) -> Dict[str, Any]:
         "supporting_excerpt": f.excerpt,
         "conflicts": conflicts,
         "limitations": list(dict.fromkeys(limitations)),
+        # Optional extensions used by the SafeMatch UI (claude.md section 7 notes them).
+        "evidence_status": f.evidence_status.value,
+        "why_unresolved": f.why_unresolved,
+        "historical_report_only": f.historical_report_only,
     }
 
 
@@ -201,7 +205,18 @@ FRONTEND_REPORT_SCHEMA: Dict[str, Any] = {
                 "supporting_excerpt": _NULLABLE_STR,
                 "conflicts": {"type": "array", "items": {"type": "string"}},
                 "limitations": {"type": "array", "items": {"type": "string"}},
+                "evidence_status": {"enum": ["verified", "unverified", "inconclusive"]},
+                "why_unresolved": _NULLABLE_STR,
+                "historical_report_only": {"type": "boolean"},
             }}},
+        "tldr": {"type": "object", "required": ["record_tier", "tier_label", "headline", "key_points", "caveats"],
+                 "properties": {"record_tier": {"enum": [
+                     "verified_record_requires_attention", "reported_conviction_unconfirmed",
+                     "unresolved_allegations_or_charges", "cleared_outcomes_only", "no_linked_records",
+                     "insufficient_information"]},
+                     "tier_label": {"type": "string"}, "headline": {"type": "string"},
+                     "key_points": {"type": "array", "items": {"type": "object", "required": ["text", "finding_ids"]}},
+                     "caveats": {"type": "array", "items": {"type": "string"}}}},
         "limitations": {"type": "array", "items": {"type": "string"}},
         "errors": {"type": "array", "items": {"type": "string"}},
         "human_review_required": {"type": "boolean"},

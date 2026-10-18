@@ -12,7 +12,7 @@ interface CapsuleProps {
 /** Glossy two-tone gachapon capsule. */
 export function Capsule({ color = 'bubblegum', size = 64, className = '', open = false, style }: CapsuleProps) {
   const half = size / 2
-  const gloss = 'inset 0 4px 8px rgb(255 255 255 / .8), inset 0 -4px 8px rgb(59 47 74 / .12)'
+  const gloss = 'inset 0 4px 8px rgb(255 255 255 / .8), inset 0 -4px 8px rgb(35 26 27 / .12)'
   return (
     <div className={`${/\b(absolute|fixed)\b/.test(className) ? '' : 'relative'} ${className}`} style={{ width: size, height: size, ...style }} aria-hidden>
       <div

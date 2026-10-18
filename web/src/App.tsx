@@ -18,8 +18,6 @@ const Quiz = lazy(() => import('./routes/arcade/Quiz'))
 const WouldYouRather = lazy(() => import('./routes/arcade/WouldYouRather'))
 const Matches = lazy(() => import('./routes/Matches'))
 const Chat = lazy(() => import('./routes/Chat'))
-const RequestReport = lazy(() => import('./routes/safety/RequestReport'))
-const ReportResults = lazy(() => import('./routes/safety/ReportResults'))
 const MyProfile = lazy(() => import('./routes/MyProfile'))
 const Settings = lazy(() => import('./routes/Settings'))
 
@@ -50,8 +48,6 @@ const router = createBrowserRouter([
               { path: '/arcade/would-you-rather', element: page(<WouldYouRather />) },
               { path: '/matches', element: page(<Matches />) },
               { path: '/chat/:matchId', element: page(<Chat />) },
-              { path: '/safety/request/:uid', element: page(<RequestReport />) },
-              { path: '/safety/report/:requestId', element: page(<ReportResults />) },
               { path: '/me', element: page(<MyProfile />) },
               { path: '/settings', element: page(<Settings />) },
             ],

@@ -5,21 +5,18 @@ import type {
   Message,
   Profile,
   QuizResult,
-  ReportRequest,
-  ReportStatus,
   SessionUser,
   WyrChoice,
 } from '../types'
-import type { SafetyReport } from '../types/safetyReport'
 import { demoLikesYou, demoProfiles, demoReplies, demoWyrAnswers } from '../fixtures/demoProfiles'
-import { buildDemoReport } from '../fixtures/demoReports'
+import { buildScreeningReport } from '../fixtures/demoReports'
 import { matchIdFor, type Backend } from './backend'
 import { filterDiscover } from './discoverFilter'
 
 // In-browser backend backed by localStorage. Used when Firebase isn't configured
 // or the player picks "Try demo mode". Demo profiles reply and play automatically.
 
-const STORAGE_KEY = 'vetted:demo:v1'
+const STORAGE_KEY = 'safematch:demo:v1'
 const DEMO_UID = 'demo-you'
 
 interface DemoState {
@@ -31,8 +28,6 @@ interface DemoState {
   messages: Record<string, Message[]>
   quizResults: Record<string, QuizResult>
   wyr: Record<string, Record<string, WyrChoice>>
-  reportRequests: Record<string, ReportRequest>
-  reports: Record<string, SafetyReport>
   blocks: Record<string, string[]>
   userReports: { from: string; about: string; reason: string; details: string; at: number }[]
 }
@@ -74,8 +69,6 @@ function freshState(): DemoState {
     },
     quizResults: {},
     wyr,
-    reportRequests: {},
-    reports: {},
     blocks: {},
     userReports: [],
   }
@@ -86,7 +79,12 @@ let state: DemoState = load()
 function load(): DemoState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw) as DemoState
+    if (raw) {
+      const saved = JSON.parse(raw) as DemoState
+      // Keep demo profiles in sync with the seed data (e.g. new demo photos) without resetting the player's progress.
+      for (const profile of demoProfiles) saved.profiles[profile.uid] = { ...saved.profiles[profile.uid], ...profile }
+      return saved
+    }
   } catch {
     // Corrupt or unavailable storage: start fresh.
   }
@@ -116,7 +114,7 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 let idCounter = 0
 const newId = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${(idCounter++).toString(36)}`
 
-const sessionUser = (): SessionUser => ({ uid: DEMO_UID, email: 'demo@vetted.test', displayName: 'Demo Player' })
+const sessionUser = (): SessionUser => ({ uid: DEMO_UID, email: 'demo@safematch.test', displayName: 'Demo Player' })
 
 function pushMessage(matchId: string, message: Omit<Message, 'id' | 'matchId' | 'createdAt'>) {
   commit((draft) => {
@@ -153,31 +151,6 @@ function scheduleDemoGameAnswer(matchId: string, messageId: string, partnerUid: 
       )
     })
   }, 1800)
-}
-
-function runDemoPipeline(requestId: string) {
-  const steps: [number, ReportStatus][] = [[600, 'searching'], [1800, 'verifying'], [3000, 'analyzing'], [4200, 'complete']]
-  for (const [delay, status] of steps) {
-    setTimeout(() => {
-      commit((draft) => {
-        const request = draft.reportRequests[requestId]
-        if (!request) return
-        if (status === 'complete') {
-          const report = buildDemoReport({
-            reportId: requestId,
-            subjectUid: request.subjectUid,
-            nameProvided: request.subjectName,
-            context: request.context,
-          })
-          draft.reports[requestId] = report
-          const finalStatus: ReportStatus = report.scope.search_completed && report.errors.length === 0 ? 'complete' : 'incomplete'
-          draft.reportRequests[requestId] = { ...request, status: finalStatus }
-        } else {
-          draft.reportRequests[requestId] = { ...request, status }
-        }
-      })
-    }, delay)
-  }
 }
 
 export const demoBackend: Backend = {
@@ -341,40 +314,16 @@ export const demoBackend: Backend = {
     return Object.fromEntries(uids.map((uid) => [uid, state.wyr[uid] ?? {}]))
   },
 
-  async requestSafetyReport(uid, input) {
-    if (!input.confirmedScope) throw new Error('Please confirm you understand the limits of this report.')
-    const id = newId('report')
-    commit((draft) => {
-      draft.reportRequests[id] = {
-        id,
-        requesterUid: uid,
-        subjectUid: input.subjectUid,
-        subjectName: input.subjectName.trim(),
-        context: input.context?.trim() || undefined,
-        status: 'queued',
-        createdAt: Date.now(),
-      }
+  async getScreening(subjectUid) {
+    // Every demo member already has a background check (synthetic, pre-built).
+    const profile = state.profiles[subjectUid]
+    if (!profile) return null
+    const age = profile.age ? `age ${profile.age}` : ''
+    return buildScreeningReport({
+      subjectUid,
+      nameProvided: profile.displayName,
+      context: [profile.city, age].filter(Boolean).join(', ') || undefined,
     })
-    runDemoPipeline(id)
-    return id
-  },
-  subscribeReportRequest(requestId, callback) {
-    return subscribe(() => {
-      const request = state.reportRequests[requestId]
-      callback(request && request.requesterUid === DEMO_UID ? request : null)
-    })
-  },
-  async getSafetyReport(requestId) {
-    const request = state.reportRequests[requestId]
-    if (!request || request.requesterUid !== DEMO_UID) throw new Error('Report not found.')
-    const report = state.reports[requestId]
-    if (!report) throw new Error('This report is not ready yet.')
-    return report
-  },
-  async listMyReportRequests(uid) {
-    return Object.values(state.reportRequests)
-      .filter((request) => request.requesterUid === uid)
-      .sort((a, b) => b.createdAt - a.createdAt)
   },
 
   async block(uid, otherUid) {

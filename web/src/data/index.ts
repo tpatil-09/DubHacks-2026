@@ -3,7 +3,7 @@ import type { Backend } from './backend'
 import { demoBackend } from './demoBackend'
 import { firebaseBackend } from './firebaseBackend'
 
-const MODE_KEY = 'vetted:mode'
+const MODE_KEY = 'safematch:mode'
 
 /** True when real Firebase config is present and demo mode isn't forced by env. */
 export const firebaseAvailable = missingFirebaseConfig.length === 0 && import.meta.env.VITE_DEMO_MODE !== 'true'

@@ -1,29 +1,35 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream: #fff8f3;
-  --color-blush: #ffe4ee;
-  --color-bubblegum: #ff7eb6;
-  --color-bubblegum-deep: #e05a97;
-  --color-peach: #ff9e7d;
-  --color-peach-deep: #e47c5a;
-  --color-mint: #6ee7b7;
-  --color-mint-deep: #3fbf8f;
-  --color-lilac: #c4b5fd;
-  --color-lilac-deep: #9d8cf0;
-  --color-butter: #fde68a;
-  --color-butter-deep: #e8c34a;
-  --color-sky: #a5d8ff;
-  --color-sky-deep: #74b4e8;
-  --color-pearl: #f7f5fb;
-  --color-sage: #cfe3d4;
-  --color-ink: #3b2f4a;
-  --color-ink-soft: #6b5e7b;
+  /* Warm off-white, near-black brown, coral accent, sunny yellow, teal. */
+  --color-cream: #fcf7f6;
+  --color-blush: #fde4e2;
+  --color-bubblegum: #e5484d;
+  --color-bubblegum-deep: #c9363b;
+  --color-peach: #f6b9a3;
+  --color-peach-deep: #d9805f;
+  --color-mint: #5cc4b6;
+  --color-mint-deep: #1f8c7f;
+  --color-lilac: #d9cff5;
+  --color-lilac-deep: #8f7fd6;
+  --color-butter: #fbe27a;
+  --color-butter-deep: #e6c548;
+  --color-sky: #c7e3f6;
+  --color-sky-deep: #5e9dcb;
+  --color-pearl: #f6f1f0;
+  --color-sage: #dcebe6;
+  --color-coral: #f9c9c4;
+  --color-coral-deep: #b42318;
+  --color-ink: #231a1b;
+  --color-ink-soft: #6f6466;
+  --color-line: rgb(35 26 27 / .1);
 
-  --font-display: "Fredoka", ui-rounded, system-ui, sans-serif;
-  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
+  /* Titles: bold Playfair Display. Everything else: Plus Jakarta Sans. */
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
 
-  --radius-card: 24px;
+  --radius-card: 16px;
 }
 
 :root {
@@ -38,158 +44,124 @@
 
 html { scroll-padding: 5rem 0 8rem; }
 @media (min-width: 64rem) { html { scroll-padding: 1rem 0; } }
-body { margin: 0; min-width: 320px; min-height: 100dvh; }
-h1, h2, h3, .font-display { font-family: var(--font-display); }
+body { margin: 0; min-width: 320px; min-height: 100dvh; background: var(--color-cream); }
+.font-display { font-weight: 600; }
+h1, h2, h3, .font-title { font-family: var(--font-serif); font-weight: 800; letter-spacing: -0.012em; line-height: 1.06; }
+h1, h2 { text-wrap: balance; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 
 :focus-visible {
-  outline: 3px solid var(--color-bubblegum);
+  outline: 2px solid var(--color-bubblegum);
   outline-offset: 3px;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 @layer components {
-  /* Chunky glossy arcade button. Color comes from --btn-bg / --btn-lip. */
+  /* Solid pill button. Color comes from --btn-bg / --btn-text. */
   .btn-arcade {
     --btn-bg: var(--color-bubblegum);
-    --btn-lip: var(--color-bubblegum-deep);
-    --btn-text: var(--color-ink);
+    --btn-text: #fff;
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: .5rem;
     border-radius: 9999px;
-    font-family: var(--font-display);
-    font-weight: 600;
+    font-family: var(--font-sans);
+    font-weight: 700;
     color: var(--btn-text);
     background: var(--btn-bg);
-    box-shadow:
-      inset 0 3px 6px rgb(255 255 255 / .75),
-      inset 0 -4px 8px rgb(59 47 74 / .10),
-      0 6px 0 var(--btn-lip),
-      0 10px 18px rgb(59 47 74 / .14);
-    transform: translateY(0);
-    transition: transform 80ms ease, box-shadow 80ms ease, filter 120ms ease;
-    overflow: hidden;
+    box-shadow: 0 6px 16px -8px rgb(35 26 27 / .35);
+    transition: transform 90ms ease, filter 120ms ease, box-shadow 120ms ease;
     user-select: none;
   }
-  .btn-arcade::before {
-    content: "";
-    position: absolute;
-    inset: 3px 12% auto;
-    height: 42%;
-    border-radius: 9999px;
-    background: linear-gradient(to bottom, rgb(255 255 255 / .7), rgb(255 255 255 / 0));
-    pointer-events: none;
-  }
-  .btn-arcade:hover:not(:disabled) { filter: brightness(1.04) saturate(1.05); }
-  .btn-arcade:active:not(:disabled), .btn-arcade[data-pressed="true"] {
-    transform: translateY(4px);
-    box-shadow:
-      inset 0 3px 6px rgb(255 255 255 / .6),
-      inset 0 -2px 6px rgb(59 47 74 / .12),
-      0 2px 0 var(--btn-lip),
-      0 4px 8px rgb(59 47 74 / .12);
-  }
-  .btn-arcade:disabled { opacity: .55; filter: grayscale(.25); }
+  .btn-arcade:hover:not(:disabled) { filter: brightness(.97); box-shadow: 0 8px 20px -8px rgb(35 26 27 / .4); }
+  .btn-arcade:active:not(:disabled), .btn-arcade[data-pressed="true"] { transform: scale(.96); }
+  .btn-arcade:disabled { opacity: .5; }
 
-  /* Glossy panel used by cards, sheets, docks. */
+  /* Round action buttons (pass / star / like). */
+  .btn-circle {
+    display: inline-grid;
+    place-items: center;
+    border-radius: 9999px;
+    background: #fff;
+    border: 1px solid var(--color-line);
+    box-shadow: 0 10px 24px -12px rgb(35 26 27 / .35);
+    transition: transform 90ms ease, box-shadow 120ms ease;
+  }
+  .btn-circle:hover { box-shadow: 0 14px 28px -12px rgb(35 26 27 / .45); }
+  .btn-circle:active { transform: scale(.94); }
+  .btn-circle-primary { background: var(--color-bubblegum); border-color: transparent; color: #fff; }
+
+  /* Flat card. */
   .gloss-card {
     position: relative;
     border-radius: var(--radius-card);
-    background: linear-gradient(160deg, #fff 0%, #fffaf7 55%, #fff1f6 100%);
-    box-shadow:
-      inset 0 2px 4px rgb(255 255 255 / .9),
-      inset 0 -3px 8px rgb(59 47 74 / .05),
-      0 3px 0 rgb(59 47 74 / .06),
-      0 18px 40px rgb(224 90 151 / .12);
-    border: 2px solid rgb(255 255 255 / .9);
+    background: #fff;
+    border: 1px solid var(--color-line);
+    box-shadow: 0 12px 32px -20px rgb(35 26 27 / .3);
   }
 
-  /* Puffy die-cut sticker. */
+  /* Small flat chip. */
   .sticker {
     display: inline-flex;
     align-items: center;
     gap: .35rem;
-    padding: .3rem .75rem;
-    border-radius: 9999px;
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: .875rem;
+    padding: .3rem .65rem;
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: .8125rem;
     color: var(--color-ink);
     background: var(--sticker-bg, var(--color-blush));
-    border: 3px solid #fff;
-    box-shadow:
-      inset 0 2px 3px rgb(255 255 255 / .8),
-      inset 0 -2px 4px rgb(59 47 74 / .08),
-      0 3px 8px rgb(59 47 74 / .14);
-    transform: rotate(var(--tilt, 0deg));
-    transition: transform 160ms cubic-bezier(.3, 1.6, .5, 1);
     white-space: nowrap;
   }
-  .sticker:hover { transform: rotate(calc(var(--tilt, 0deg) * -1)) scale(1.06); }
 
-  /* Frosted glass used by the safety report (calm mode). */
   .frost {
-    background: rgb(255 255 255 / .72);
-    backdrop-filter: blur(18px) saturate(1.1);
-    -webkit-backdrop-filter: blur(18px) saturate(1.1);
-    border: 1px solid rgb(255 255 255 / .9);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgb(59 47 74 / .08);
-  }
-
-  .holo-sheen {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(
-      115deg,
-      transparent 20%,
-      rgb(255 255 255 / .55) 40%,
-      rgb(196 181 253 / .25) 48%,
-      rgb(165 216 255 / .2) 54%,
-      transparent 70%
-    );
-    background-size: 250% 250%;
-    mix-blend-mode: soft-light;
+    background: #fff;
+    border: 1px solid var(--color-line);
+    border-radius: 16px;
+    box-shadow: 0 12px 32px -20px rgb(35 26 27 / .3);
   }
 
   .input-arcade {
     width: 100%;
-    border-radius: 16px;
-    border: 2px solid #f3dbe6;
+    border-radius: 12px;
+    border: 1px solid rgb(35 26 27 / .16);
     background: #fff;
-    padding: .7rem 1rem;
+    padding: .75rem 1rem;
     color: var(--color-ink);
-    box-shadow: inset 0 2px 4px rgb(59 47 74 / .05);
     transition: border-color 120ms, box-shadow 120ms;
   }
   .input-arcade:focus {
     outline: none;
     border-color: var(--color-bubblegum);
-    box-shadow: 0 0 0 4px rgb(255 126 182 / .2);
+    box-shadow: 0 0 0 3px rgb(229 72 77 / .15);
   }
   .label-arcade {
     display: block;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: .9rem;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: .875rem;
     margin-bottom: .35rem;
   }
+
+  /* Small uppercase label above headings and sections. */
+  .eyebrow {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+  }
+
+  .hairline { border-color: var(--color-line); }
 }
 
-/* Ambient floating background shapes */
-@keyframes float-drift {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  33% { transform: translate3d(14px, -22px, 0) rotate(8deg); }
-  66% { transform: translate3d(-12px, 10px, 0) rotate(-6deg); }
-}
-.ambient-shape { animation: float-drift var(--dur, 26s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
-
+/* Game-only capsule motion */
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
@@ -207,13 +179,13 @@ button:disabled { cursor: not-allowed; }
   to { background-position: 200% 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #fbe9f0 25%, #fff5f9 50%, #fbe9f0 75%);
+  background: linear-gradient(90deg, #f4ebea 25%, #fbf6f5 50%, #f4ebea 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite linear;
   border-radius: 16px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ambient-shape, .animate-bob, .animate-blink, .skeleton { animation: none !important; }
-  .sticker, .btn-arcade { transition: none; }
+  .animate-bob, .animate-blink, .skeleton { animation: none !important; }
+  .btn-arcade, .btn-circle { transition: none; }
 }

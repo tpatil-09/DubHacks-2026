@@ -30,6 +30,8 @@ def test_every_scenario_produces_a_valid_frontend_report(name, settings, tmp_pat
             assert src.record_stage == RecordStage.conviction
         assert src.identity_match.value != "mismatch"
         assert src.evidence_status.value != "contradicted"
+        assert f["evidence_status"] == src.evidence_status.value
+        assert (f["why_unresolved"] is None) == (src.evidence_status.value == "verified")
 
 
 def test_other_people_and_contradicted_claims_are_excluded_and_counted(settings, tmp_path):
