@@ -119,7 +119,6 @@ function GameList({ title, blurb, games, played }: { title: string; blurb: strin
 
 function GameRow({ game, answers }: { game: FunGame; answers: GameAnswers | undefined }) {
   const done = isComplete(game, answers)
-  const name = game.kind === 'quiz' ? game.name : game.title
   const detail = game.kind === 'quiz' ? `${game.questions.length} questions` : `Pick ${game.pick} of ${game.options.length}`
   const status = done && answers ? (game.kind === 'quiz' ? `You got ${scoreBuzzQuiz(game, answers).title}` : 'Picks saved') : null
 
@@ -129,8 +128,8 @@ function GameRow({ game, answers }: { game: FunGame; answers: GameAnswers | unde
         {game.emoji}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-semibold">{name}</span>
-        <span className="block truncate text-sm text-ink-soft">{status ?? detail}</span>
+        <span className="block text-balance font-semibold leading-snug">{game.title}</span>
+        <span className="mt-0.5 block truncate text-sm text-ink-soft">{status ?? detail}</span>
       </span>
       {done && <span className="hidden text-xs font-semibold text-ink-soft sm:inline">See twins</span>}
       <ChevronRight className="size-5 shrink-0 text-ink-soft transition-transform group-hover:translate-x-0.5" aria-hidden />
