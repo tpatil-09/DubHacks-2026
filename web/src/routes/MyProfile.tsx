@@ -1,0 +1,122 @@
+import { useState } from 'react'
+import { Link } from 'react-router'
+import { Settings as SettingsIcon } from 'lucide-react'
+import { AboutFields, BasicsFields, PhotosFields } from '../components/profile/ProfileFields'
+import { ArcadeButton } from '../components/ui/ArcadeButton'
+import { ArcadeCard } from '../components/ui/ArcadeCard'
+import { ProfilePhoto } from '../components/ui/ProfilePhoto'
+import { PersonaBadge } from '../components/ui/Badges'
+import { InterestStickers } from '../components/ui/Sticker'
+import { draftFromProfile, validateAbout, validateBasics, validatePhotos, type ProfileDraft } from '../lib/profileValidation'
+import { arcadeVars } from '../lib/colors'
+import { useSession } from '../store/session'
+import { toast } from '../store/toast'
+
+type Tab = 'preview' | 'basics' | 'photos' | 'about'
+
+const tabs: { id: Tab; label: string }[] = [
+  { id: 'preview', label: 'Preview' },
+  { id: 'basics', label: 'Basics' },
+  { id: 'photos', label: 'Photos' },
+  { id: 'about', label: 'About' },
+]
+
+export default function MyProfile() {
+  const profile = useSession((state) => state.profile)
+  const saveProfile = useSession((state) => state.saveProfile)
+  const [tab, setTab] = useState<Tab>('preview')
+  const [draft, setDraft] = useState<ProfileDraft>(() => draftFromProfile(profile))
+  const [error, setError] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  async function save() {
+    const problem = validateBasics(draft) ?? validatePhotos(draft) ?? validateAbout(draft)
+    if (problem) {
+      setError(problem)
+      return
+    }
+    setSaving(true)
+    try {
+      await saveProfile({
+        ...draft,
+        displayName: draft.displayName.trim(),
+        bio: draft.bio.trim(),
+        city: draft.city.trim(),
+        prompts: draft.prompts.filter((prompt) => prompt.answer.trim()),
+      })
+      toast('Profile saved ✨', 'success')
+      setTab('preview')
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not save.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const age = profile?.age ?? null
+
+  return (
+    <div className="mx-auto max-w-2xl pb-10">
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">My profile</h1>
+        <Link to="/settings" className="flex items-center gap-1.5 font-display font-semibold text-ink-soft hover:text-ink">
+          <SettingsIcon className="size-5" /> Settings
+        </Link>
+      </div>
+
+      <div className="mb-5 flex gap-2 overflow-x-auto" role="tablist">
+        {tabs.map((entry) => (
+          <button
+            key={entry.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === entry.id}
+            onClick={() => {
+              setTab(entry.id)
+              setError('')
+            }}
+            className={`rounded-full border-[3px] border-white px-4 py-1.5 font-display font-semibold ${tab === entry.id ? 'bg-bubblegum shadow-[0_3px_0_#e05a97]' : 'bg-white/70'}`}
+          >
+            {entry.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'preview' && profile ? (
+        <div className="grid gap-5 sm:grid-cols-[1fr_1.2fr]">
+          <ArcadeCard tilt className="p-2.5">
+            <ProfilePhoto src={profile.photos[0]} alt="Your cover photo" className="aspect-[3/4] w-full rounded-[18px]" />
+          </ArcadeCard>
+          <div className="flex flex-col gap-3">
+            <h2 className="text-3xl font-bold">
+              {profile.displayName}
+              {age !== null && <span className="font-medium text-ink-soft">, {age}</span>}
+            </h2>
+            {profile.city && <p className="text-ink-soft">📍 {profile.city}</p>}
+            {profile.quiz ? (
+              <PersonaBadge personaId={profile.quiz.personaId} />
+            ) : (
+              <Link to="/arcade/quiz" className="btn-arcade h-10 w-fit px-4 text-sm" style={arcadeVars('lilac')}>Take the vibe quiz</Link>
+            )}
+            <p>{profile.bio}</p>
+            <InterestStickers ids={profile.interests} />
+            {profile.prompts.map((prompt) => (
+              <div key={prompt.question} className="gloss-card p-3">
+                <p className="font-display text-sm font-semibold text-ink-soft">{prompt.question}</p>
+                <p className="font-display text-lg">{prompt.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="gloss-card p-6">
+          {tab === 'basics' && <BasicsFields draft={draft} onChange={(patch) => setDraft({ ...draft, ...patch })} />}
+          {tab === 'photos' && <PhotosFields draft={draft} onChange={(patch) => setDraft((current) => ({ ...current, ...patch }))} />}
+          {tab === 'about' && <AboutFields draft={draft} onChange={(patch) => setDraft({ ...draft, ...patch })} />}
+          {error && <p role="alert" className="mt-5 rounded-2xl bg-peach/40 p-3 text-sm">{error}</p>}
+          <ArcadeButton className="mt-6 w-full" size="lg" onClick={save} loading={saving}>Save changes</ArcadeButton>
+        </div>
+      )}
+    </div>
+  )
+}

@@ -1,0 +1,68 @@
+import type {
+  Account,
+  LikeType,
+  Match,
+  Message,
+  NewMessage,
+  Profile,
+  QuizResult,
+  ReportRequest,
+  SafetyReportInput,
+  SessionUser,
+  UserReportReason,
+  WyrChoice,
+} from '../types'
+
+export type Unsubscribe = () => void
+
+/** Everything the UI needs from the backend. Implemented by the Firebase and demo backends. */
+export interface Backend {
+  kind: 'firebase' | 'demo'
+
+  onAuthChange(callback: (user: SessionUser | null) => void): Unsubscribe
+  signInWithGoogle(): Promise<void>
+  signInWithEmail(email: string, password: string, createAccount: boolean): Promise<void>
+  signInDemo(): Promise<void>
+  signOut(): Promise<void>
+
+  getAccount(uid: string): Promise<Account | null>
+  saveAccount(uid: string, patch: Partial<Account>): Promise<void>
+  getProfile(uid: string): Promise<Profile | null>
+  saveProfile(uid: string, patch: Partial<Profile>): Promise<void>
+  uploadPhoto(uid: string, file: Blob): Promise<string>
+
+  listDiscover(uid: string): Promise<Profile[]>
+  /** Records a like/pass. Returns the match id when the like is mutual. */
+  setLike(uid: string, targetUid: string, type: LikeType): Promise<{ matchId?: string }>
+
+  subscribeMatches(uid: string, callback: (matches: Match[]) => void): Unsubscribe
+  unmatch(uid: string, matchId: string): Promise<void>
+  subscribeMessages(matchId: string, callback: (messages: Message[]) => void): Unsubscribe
+  sendMessage(matchId: string, message: NewMessage): Promise<void>
+  answerGameShare(matchId: string, messageId: string, uid: string, choice: WyrChoice): Promise<void>
+
+  saveQuizResult(uid: string, result: QuizResult): Promise<void>
+  getWyrAnswers(uid: string): Promise<Record<string, WyrChoice>>
+  saveWyrAnswer(uid: string, promptId: string, choice: WyrChoice): Promise<void>
+  getWyrAnswersFor(uids: string[]): Promise<Record<string, Record<string, WyrChoice>>>
+
+  requestSafetyReport(uid: string, input: SafetyReportInput): Promise<string>
+  subscribeReportRequest(requestId: string, callback: (request: ReportRequest | null) => void): Unsubscribe
+  /** Returns the raw report.json object; the UI validates it. */
+  getSafetyReport(requestId: string): Promise<unknown>
+  listMyReportRequests(uid: string): Promise<ReportRequest[]>
+
+  block(uid: string, otherUid: string): Promise<void>
+  unblock(uid: string, otherUid: string): Promise<void>
+  listBlocked(uid: string): Promise<string[]>
+  reportUser(uid: string, otherUid: string, reason: UserReportReason, details: string): Promise<void>
+  deleteMyData(uid: string): Promise<void>
+}
+
+export function matchIdFor(a: string, b: string): string {
+  return [a, b].sort().join('_')
+}
+
+export function otherUser(match: Match, uid: string): string {
+  return match.users[0] === uid ? match.users[1] : match.users[0]
+}

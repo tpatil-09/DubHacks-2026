@@ -13,6 +13,7 @@ service-account*.json
 # Dependencies and build output
 node_modules/
 dist/
+.vite/
 functions/lib/
 
 # Firebase local tooling
