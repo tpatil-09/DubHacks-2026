@@ -149,8 +149,10 @@ export const firebaseBackend: Backend = {
   async saveProfile(uid, patch) {
     own(uid, 'updating your profile')
     const privateFields = ['interestedIn', 'interestedInOther', 'ageRange', 'relationshipIntent']
-    const publicPatch = Object.fromEntries(Object.entries(patch).filter(([key]) => !privateFields.includes(key)))
-    const privatePatch = Object.fromEntries(Object.entries(patch).filter(([key]) => privateFields.includes(key)))
+    // Firestore rejects `undefined` values, so drop unset optional fields (e.g. relationshipIntent).
+    const defined = Object.entries(patch).filter(([, value]) => value !== undefined)
+    const publicPatch = Object.fromEntries(defined.filter(([key]) => !privateFields.includes(key)))
+    const privatePatch = Object.fromEntries(defined.filter(([key]) => privateFields.includes(key)))
     const now = Date.now()
     if (Object.keys(publicPatch).length) {
       const age = typeof patch.birthdate === 'string' ? ageFrom(patch.birthdate) : undefined
