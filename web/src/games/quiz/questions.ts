@@ -94,6 +94,7 @@ export const quizQuestions: QuizQuestion[] = [
       { id: 'snuggle', emoji: '🤗', label: 'Snuggle them', scores: { cozyAdventurous: -2, chattyChill: 1 } },
       { id: 'driveway', emoji: '😈', label: "Inconvenience my enemies by blocking their driveway", scores: { cozyAdventurous: 2, plannerSpontaneous: 1 } },
       { id: 'trenchcoat', emoji: '🥸', label: 'Buy a trench coat and sneak them into the movies', scores: { plannerSpontaneous: 2, cozyAdventurous: 1 } },
+      { id: 'angry', emoji: '😠', label: "I don't like ducks", scores: {} },
     ],
   },
 ]
