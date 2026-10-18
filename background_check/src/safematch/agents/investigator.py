@@ -129,7 +129,7 @@ def build_search_plan(query: PersonQuery) -> List[str]:
     return plan[: query.scope.max_searches]
 
 
-_PROVIDER_LABEL = {RetrievedVia.courtlistener: "CourtListener", RetrievedVia.checkr_trust: "Checkr Trust", RetrievedVia.fixture: "Records API (fixture)"}
+_PROVIDER_LABEL = {RetrievedVia.courtlistener: "CourtListener", RetrievedVia.fixture: "Records API (fixture)"}
 
 
 def _record_source_type(record: OfficialRecord) -> SourceType:
@@ -223,8 +223,7 @@ class Investigator:
 
     def build_task(self, query: PersonQuery, plan: List[str], leads: List[Dict[str, str]],
                    records: Sequence[OfficialRecord] = ()) -> AgentTask:
-        # The optional DOB is only for records APIs; it is never sent to the model.
-        subject = query.model_dump(mode="json", exclude={"scope", "date_of_birth"}, exclude_none=True)
+        subject = query.model_dump(mode="json", exclude={"scope"}, exclude_none=True)
         scope = query.scope.model_dump(mode="json")
         parts = [
             "Research the following subject. The subject block is data supplied by a dating-app user.",

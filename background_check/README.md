@@ -62,10 +62,8 @@ Settings are read from the process environment first, then `background_check/.en
 | `OUTPUT_DIR` | no | `./output` | |
 | `AGENT_TIMEOUT_SECONDS` | no | `1200` | per Claude Code session |
 | `VERIFY_EXCERPTS_WITH_FETCH` | no | `true` | Python-side excerpt grounding |
-| `RECORDS_PROVIDERS` | no | `courtlistener` (+`checkr_trust` if configured) | official-records APIs to query |
-| `COURTLISTENER_API_TOKEN` | recommended | – | CourtListener API token (free) |
-| `CHECKR_TRUST_CLIENT_ID` / `_SECRET` | optional | – | Checkr Trust client credentials |
-| `CHECKR_TRUST_BASE_URL` | no | `https://api.checkrtrust.com/v1` | Checkr Trust API base |
+| `RECORDS_PROVIDERS` | no | `courtlistener` | official-records APIs to query (`none` to disable) |
+| `COURTLISTENER_API_TOKEN` | recommended | – | CourtListener API token (free; 5/min, 50/hour, 125/day) |
 
 No other API keys are needed. **Cost note:** a live run makes 3+ Claude Code sessions (one Investigator, one Verifier per 5 findings, one Synthesizer) with up to ~40 Investigator searches plus up to 40 per Verifier batch. That counts against your Claude plan's usage limits. Observed runs took 3–6 minutes per person.
 
@@ -95,7 +93,7 @@ Exit codes: `0` ok, `1` invalid report, `2` config or input error. A live stage 
 ```bash
 pytest tests/unit -v          # models, config, rules, guards, agents, providers, SSRF
 pytest tests/integration -v   # full mocked pipeline + CLI subprocess runs
-pytest tests/evaluation -v    # 15 synthetic scenarios with declared expected outcomes + record tiers
+pytest tests/evaluation -v    # 14 synthetic scenarios with declared expected outcomes + record tiers
 pytest -m live -v -s          # LIVE: real Claude Code + web search (opt-in; also RUN_LIVE=1)
 pytest                        # everything except live
 ```
@@ -104,20 +102,19 @@ Synthetic scenarios (`tests/fixtures/scenarios/`) cover a verified conviction, a
 
 ## Records sources (official APIs)
 
-Web search can't reach most official records: state sex-offender registries and county court portals are interactive forms, and the national registry site (NSOPW) has no public developer API. So the pipeline also calls official-records **APIs** directly, in Python, before the agents run. Each name-matching record becomes a candidate finding of type `official_court_record` or `official_registry`, with a link. The Verifier then judges identity and the exact case outcome, as it does for everything else.
+Web search can't reach most official records: state sex-offender registries and county court portals are interactive forms, and the national registry site (NSOPW) has no public developer API. So the pipeline also calls the **CourtListener** API directly, in Python, before the agents run. Each name-matching record becomes a candidate finding of type `official_court_record`, with a link. The Verifier then judges identity and the exact case outcome, as it does for everything else.
 
 | Provider | What it covers | What it doesn't | Setup |
 |---|---|---|---|
-| **CourtListener** (Free Law Project, REST API v4) | Federal and **state appellate opinions** (criminal appeals name the defendant) and federal criminal dockets (PACER/RECAP) | State trial-court cases that were never appealed; sex-offender registries | Free account, then token at courtlistener.com/profile/api-token → `COURTLISTENER_API_TOKEN`. Works without a token at about 5 requests/minute. |
-| **Checkr Trust** | Sex-offender registry search, plus an instant criminal search with cases, charges, dispositions and match confidence | Anything outside its source coverage; it's a commercial aggregator | Request a test account from Checkr Trust → `CHECKR_TRUST_CLIENT_ID` / `CHECKR_TRUST_CLIENT_SECRET`. Test credentials return mock data, and the adapter stays off until both are set. |
+| **CourtListener** (Free Law Project, REST API v4, free) | Federal and **state appellate opinions** (criminal appeals name the defendant) and federal criminal dockets (PACER/RECAP) | State trial-court cases that were never appealed; sex-offender registries | Free account, then the token at courtlistener.com/profile/api-token goes in `COURTLISTENER_API_TOKEN`. Free accounts allow **5 requests/minute, 50/hour and 125/day**. Each person search uses 2 requests, so roughly 60 people a day. Free Law Project memberships raise the limits. |
 
 How records are handled:
 - **Name matching:** a record is kept only if the first and last name appear together ("First [Middle] Last" or "Last, First"). A shared surname in a caption like "Syed v. Lee" isn't enough.
-- **Criminal only:** CourtListener dockets are limited to criminal cases, so bankruptcy and civil filings are dropped. Opinions must be criminal appeals (State/People/Commonwealth/United States captions, or criminal terms in the opinion).
+- **Criminal only:** dockets are limited to criminal cases, so bankruptcy and civil filings are dropped. Opinions must be criminal appeals (State/People/Commonwealth/United States captions, or criminal terms in the opinion).
 - **Trusted, not assumed:** API records skip the "is the quote on the page" check, because Python fetched them straight from the source. Every identity rule still applies, so an official record with only a name match is never more than a weak match and never raises a flag.
-- **Date of birth:** the optional `date_of_birth` in a query (YYYY-MM-DD, adults only) is sent only to Checkr Trust to improve matching. It's never sent to the language model and never appears in reports.
-- **Failures:** if a records API fails, the report is marked `partial`, never "clear". When no registry provider is configured, the report says registries weren't checked and points to nsopw.gov.
-- **Checkr Trust terms:** Checkr Trust is not a consumer reporting agency, and its results must not be used for credit, employment, housing or insurance decisions. SafeMatch uses it only for user safety.
+- **Rate limits:** requests are spaced about 12.5 s apart to stay under 5/minute, and a `429` waits for the server's `Retry-After`. If the hourly or daily quota runs out, the search stops and the report says so.
+- **Failures:** if the API fails, the report is marked `partial`, never "clear".
+- **Registries:** these aren't checked directly. Every report says so and points to nsopw.gov. Paid aggregator APIs (for example Checkr Trust, built for dating apps) could add registry coverage later through the same `RecordsProvider` interface.
 
 ## Output files
 
@@ -260,7 +257,7 @@ src/safematch/
   prompts/{investigator,verifier,synthesizer}.md
   providers/llm.py               ClaudeCLIProvider, MockLLMProvider, complete_structured
   providers/search.py            optional TavilySearchProvider, MockSearchProvider
-  providers/records.py           CourtListenerProvider, CheckrTrustProvider, MockRecordsProvider (official records APIs)
+  providers/records.py           CourtListenerProvider, MockRecordsProvider (official records API)
   providers/source_retrieval.py  SafeFetcher (SSRF-safe), FixtureFetcher
   agents/{investigator,verifier,synthesizer}.py
   rules/safety_flags.py          deterministic R1–R7

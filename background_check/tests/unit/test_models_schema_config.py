@@ -17,7 +17,7 @@ def test_query_requires_two_part_name_and_rejects_unknown_fields():
     with pytest.raises(ValidationError):
         PersonQuery(full_name="Madonna")
     with pytest.raises(ValidationError):
-        PersonQuery.model_validate({"full_name": "Jane Example", "home_address": "1 Main St"})
+        PersonQuery.model_validate({"full_name": "Jane Example", "date_of_birth": "1990-01-01"})
     with pytest.raises(ValidationError):
         PersonQuery(full_name="Jane Example", age_min=40, age_max=30)
     assert PersonQuery(full_name="  Jane   Example ").full_name == "Jane Example"
@@ -55,12 +55,3 @@ def test_settings_validation(monkeypatch):
     with pytest.raises(ConfigError) as ei:
         Settings(model_provider="claude_cli", claude_code_oauth_token=None).require_live_credentials()
     assert "--mock" in str(ei.value)
-
-
-def test_optional_dob_is_validated_and_adult_only():
-    assert PersonQuery(full_name="Jane Example", date_of_birth="1990-02-03").date_of_birth == "1990-02-03"
-    assert PersonQuery(full_name="Jane Example", date_of_birth="  ").date_of_birth is None
-    with pytest.raises(ValidationError):
-        PersonQuery(full_name="Jane Example", date_of_birth="02/03/1990")
-    with pytest.raises(ValidationError):
-        PersonQuery(full_name="Jane Example", date_of_birth="2020-01-01")

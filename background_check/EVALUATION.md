@@ -83,23 +83,20 @@ This case was added after a run missed a Washington Innocence Project page. That
 
 ---
 
-# Official records APIs (CourtListener + Checkr Trust)
+# Official records API (CourtListener)
 
 **Live CourtListener check** (`pytest -m live -k courtlistener`, no token): a search for a widely reported Maryland appellate case returned 3 distinct official opinions (Syed v. State, 2018; State v. Syed, 2019; Syed v. Lee, 2024), each with a courtlistener.com link. The live test only checks that the integration returns parseable official records.
 
 **Live end-to-end run** (same public case):
 - **Records pipeline:** the 3 CourtListener records entered as `official_court_record` findings (`from_records_api`). The agents built on them and found 13 more sources, 16 findings in total.
 - **Report:** validates against the frontend contract and lists its coverage: CourtListener searched, registries not checked (with a pointer to nsopw.gov).
-- **Status was `partial`:** the federal-docket query hit CourtListener's anonymous rate limit (5 requests/minute). Setting `COURTLISTENER_API_TOKEN` avoids this.
+- **Status was `partial`:** the federal-docket query hit CourtListener's rate limit. A token alone doesn't fix this, because the default for authenticated accounts is also 5 requests/minute (plus 50/hour and 125/day). The provider now spaces requests about 12.5 s apart and honours `Retry-After`. With the token, two back-to-back person searches completed with no throttling errors.
+- **Civil filings:** federal dockets are now kept only with a criminal docket number (`-cr-`). Before this, a civil forfeiture case captioned "United States v. …" slipped through.
 - **Bug found and fixed:**
   - The outcome history read "vacated 2022, **reinstated** on appeal 2023, sentence reduced 2025", so the conviction stands.
   - Guard G4 relabelled these findings "vacated" because the outcome text mentioned a vacatur, which overstated the person's position. The Verifier had correctly said "conviction".
   - G4 now leaves the stage alone when the outcome also reports a reinstatement, and adds a note to confirm the current status. Regression test added.
 - **No flag:** identity stayed at `possible_match` (name and city), so no flag fired, as intended.
-
-**Checkr Trust:**
-- The adapter is built against the published OpenAPI spec (`/_spec/v1.json`): OAuth2 client credentials at `POST /accounts/token`, then `POST /checks` with `check_type` set to `sex_offender_registry` or `instant_criminal`.
-- It's tested with mocked responses only. Live testing needs test-account credentials from Checkr Trust.
 
 **Synthetic scenarios added:**
 
@@ -107,5 +104,4 @@ This case was added after a run missed a Washington Innocence Project page. That
 |---|---|
 | Official conviction with a strong identity match | flag |
 | Official record, name-only match | no flag |
-| Checkr registry hit | registry flag |
 | Records API outage | `partial` |

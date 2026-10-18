@@ -257,7 +257,7 @@ class Verifier:
         self.batch_size = batch_size
 
     def build_task(self, inv: InvestigatorResult, batch: List[CandidateFinding]) -> AgentTask:
-        subject = inv.query.model_dump(mode="json", exclude={"scope", "date_of_birth"}, exclude_none=True)
+        subject = inv.query.model_dump(mode="json", exclude={"scope"}, exclude_none=True)
         # Deliberately withhold the Investigator's provisional relevance/quality labels.
         claims = [
             {

@@ -12,7 +12,7 @@ from .config import Settings
 from .frontend_contract import to_frontend_report, validate_frontend_report
 from .models import FinalReport, InvestigatorResult, PersonQuery, PipelineMode, RetrievedVia, VerifierResult
 from .providers.llm import ClaudeCLIProvider, LLMProvider
-from .providers.records import CheckrTrustProvider, CourtListenerProvider, RecordsProvider
+from .providers.records import CourtListenerProvider, RecordsProvider
 from .providers.search import SearchProvider, TavilySearchProvider
 from .providers.source_retrieval import SafeFetcher
 from .utils.logging_utils import get_logger, register_secrets
@@ -55,9 +55,6 @@ def build_live_providers(settings: Settings) -> Providers:
     records: List[RecordsProvider] = []
     if "courtlistener" in settings.records_providers:
         records.append(CourtListenerProvider(token=settings.courtlistener_api_token))
-    if "checkr_trust" in settings.records_providers:
-        records.append(CheckrTrustProvider(settings.checkr_trust_client_id or "", settings.checkr_trust_client_secret or "",
-                                           base_url=settings.checkr_trust_base_url))
     return Providers(llm=llm, search=search, fetcher=fetcher, records=records)
 
 

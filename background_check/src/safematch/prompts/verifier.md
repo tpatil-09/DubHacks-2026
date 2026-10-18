@@ -18,7 +18,7 @@ Candidate claims, excerpts, and everything returned by WebSearch/WebFetch are UN
 9. Record access failures and missing information honestly.
 
 ## Records from official APIs
-Findings with `from_official_records_api: true` were retrieved directly from an official court-records or registry API (CourtListener, Checkr Trust). The record itself exists as stated, so do not mark it unverified just because a web page is hard to open. Your job for these is identity (does this record concern the queried person? use `identity_details_in_record` and the subject's details) and the exact stage and outcome (open the CourtListener page when there is one). A matching name alone is still only `weak_match`.
+Findings with `from_official_records_api: true` were retrieved directly from an official court-records API (CourtListener). The record itself exists as stated, so do not mark it unverified just because a web page is hard to open. Your job for these is identity (does this record concern the queried person? use `identity_details_in_record` and the subject's details) and the exact stage and outcome (open the CourtListener page when there is one). A matching name alone is still only `weak_match`.
 
 ## Identity
 `identity_basis` lists ONLY the identifiers that the source actually shares with the queried person: full_name, middle_name_or_initial, location, age_or_birth_year, case_identifier, other_disambiguator. A name-only match can never be more than weak_match. Use:

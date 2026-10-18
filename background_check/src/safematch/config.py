@@ -15,8 +15,8 @@ from dotenv import dotenv_values
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # background_check/
 SECRET_KEYS = ("CLAUDE_CODE_OAUTH_TOKEN", "ANTHROPIC_API_KEY", "TAVILY_API_KEY", "BRAVE_SEARCH_API_KEY",
-               "COURTLISTENER_API_TOKEN", "CHECKR_TRUST_CLIENT_ID", "CHECKR_TRUST_CLIENT_SECRET")
-RECORDS_PROVIDER_NAMES = ("courtlistener", "checkr_trust")
+               "COURTLISTENER_API_TOKEN")
+RECORDS_PROVIDER_NAMES = ("courtlistener",)
 
 MODEL_PROVIDERS = ("claude_cli", "mock")
 SEARCH_PROVIDERS = ("none", "tavily")
@@ -48,12 +48,9 @@ class Settings:
     claude_cli_path: str = "claude"
     claude_code_oauth_token: Optional[str] = field(default=None, repr=False)
     tavily_api_key: Optional[str] = field(default=None, repr=False)
-    # Official-records APIs. CourtListener works without a token at a low rate limit; Checkr Trust needs credentials.
+    # Official-records APIs. CourtListener works without a token at a low rate limit.
     records_providers: tuple = ("courtlistener",)
     courtlistener_api_token: Optional[str] = field(default=None, repr=False)
-    checkr_trust_client_id: Optional[str] = field(default=None, repr=False)
-    checkr_trust_client_secret: Optional[str] = field(default=None, repr=False)
-    checkr_trust_base_url: str = "https://api.checkrtrust.com/v1"
 
     def require_live_credentials(self) -> None:
         if self.model_provider == "claude_cli" and not self.claude_code_oauth_token:
@@ -63,12 +60,9 @@ class Settings:
             )
         if self.search_provider == "tavily" and not self.tavily_api_key:
             raise ConfigError("SEARCH_PROVIDER=tavily but TAVILY_API_KEY is not set")
-        if "checkr_trust" in self.records_providers and not (self.checkr_trust_client_id and self.checkr_trust_client_secret):
-            raise ConfigError("RECORDS_PROVIDERS includes checkr_trust but CHECKR_TRUST_CLIENT_ID / CHECKR_TRUST_CLIENT_SECRET are not set")
 
     def secret_values(self) -> list:
-        return [s for s in (self.claude_code_oauth_token, self.tavily_api_key, self.courtlistener_api_token,
-                            self.checkr_trust_client_id, self.checkr_trust_client_secret) if s]
+        return [s for s in (self.claude_code_oauth_token, self.tavily_api_key, self.courtlistener_api_token) if s]
 
 
 def load_settings(overrides: Optional[Dict[str, str]] = None, read_env_files: bool = True) -> Settings:
@@ -100,10 +94,7 @@ def load_settings(overrides: Optional[Dict[str, str]] = None, read_env_files: bo
     except ValueError as exc:
         raise ConfigError("AGENT_TIMEOUT_SECONDS must be an integer") from exc
 
-    checkr_id, checkr_secret = get("CHECKR_TRUST_CLIENT_ID"), get("CHECKR_TRUST_CLIENT_SECRET")
-    # Default: CourtListener always (free), Checkr Trust only when its credentials exist.
-    default_records = "courtlistener" + (",checkr_trust" if checkr_id and checkr_secret else "")
-    raw_records = (get("RECORDS_PROVIDERS", default_records) or "").lower()
+    raw_records = (get("RECORDS_PROVIDERS", "courtlistener") or "").lower()
     records_providers = tuple(x.strip() for x in raw_records.split(",") if x.strip() and x.strip() != "none")
     unknown = [x for x in records_providers if x not in RECORDS_PROVIDER_NAMES]
     if unknown:
@@ -121,7 +112,4 @@ def load_settings(overrides: Optional[Dict[str, str]] = None, read_env_files: bo
         tavily_api_key=get("TAVILY_API_KEY"),
         records_providers=records_providers,
         courtlistener_api_token=get("COURTLISTENER_API_TOKEN"),
-        checkr_trust_client_id=checkr_id,
-        checkr_trust_client_secret=checkr_secret,
-        checkr_trust_base_url=get("CHECKR_TRUST_BASE_URL", "https://api.checkrtrust.com/v1") or "https://api.checkrtrust.com/v1",
     )
