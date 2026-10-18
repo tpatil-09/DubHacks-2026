@@ -58,14 +58,14 @@ export function GachaponMachine({ onDispense, disabled }: GachaponMachineProps) 
       </div>
 
       {/* Body */}
-      <div className="relative -mt-2 rounded-[32px] border-[6px] border-white bg-gradient-to-b from-bubblegum to-bubblegum-deep px-5 pb-6 pt-5 shadow-[inset_0_6px_10px_rgba(255,255,255,.6),0_8px_0_#c94784,0_20px_30px_rgba(224,90,151,.3)]">
+      <div className="relative -mt-2 rounded-[32px] border-[6px] border-white bg-gradient-to-b from-bubblegum to-bubblegum-deep px-5 pb-6 pt-5 shadow-[inset_0_6px_10px_rgba(255,255,255,.45),0_8px_0_#a92a2f,0_20px_30px_rgba(229,72,77,.28)]">
         <div className="flex items-center justify-between">
           <motion.button
             type="button"
             onClick={crank}
             disabled={disabled || !!dropping}
             aria-label="Turn the crank"
-            className="relative grid size-20 place-items-center rounded-full border-[5px] border-white bg-butter shadow-[inset_0_4px_6px_rgba(255,255,255,.8),0_5px_0_#e8c34a] disabled:opacity-80"
+            className="relative grid size-20 place-items-center rounded-full border-[5px] border-white bg-butter shadow-[inset_0_4px_6px_rgba(255,255,255,.8),0_5px_0_#e6c548] disabled:opacity-80"
             animate={{ rotate: turns * 360 }}
             transition={{ type: 'spring', stiffness: 80, damping: 12 }}
             whileTap={{ scale: 0.92 }}

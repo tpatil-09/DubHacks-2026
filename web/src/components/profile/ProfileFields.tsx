@@ -33,8 +33,8 @@ function ChoicePill({ selected, onClick, children }: { selected: boolean; onClic
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`rounded-full border-[3px] px-4 py-2 font-display font-medium transition ${
-        selected ? 'border-white bg-bubblegum shadow-[inset_0_2px_4px_rgba(255,255,255,.7),0_4px_0_#e05a97]' : 'border-blush bg-white hover:border-bubblegum/50'
+      className={`rounded-xl border px-4 py-2 font-semibold transition ${
+        selected ? 'border-bubblegum bg-blush text-bubblegum' : 'border-[var(--color-line)] bg-white hover:border-bubblegum/50'
       }`}
     >
       {children}

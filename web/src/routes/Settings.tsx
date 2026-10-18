@@ -56,8 +56,8 @@ export default function Settings() {
   }
 
   return (
-    <div className="mx-auto grid max-w-2xl gap-5 pb-10">
-      <div><span className="eyebrow">Account</span><h1 className="text-4xl">Privacy & settings</h1></div>
+    <div className="grid max-w-3xl gap-5 pb-10">
+      <div className="mb-4"><span className="eyebrow">Account</span><h1 className="mt-4 text-[2.6rem] sm:text-6xl">Privacy & settings.</h1></div>
 
       <section className="gloss-card flex items-center justify-between gap-4 p-5">
         <div>

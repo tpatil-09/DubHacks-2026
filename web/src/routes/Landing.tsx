@@ -1,44 +1,39 @@
 import { Link } from 'react-router'
 import { motion } from 'motion/react'
-import { ArrowRight } from 'lucide-react'
-import { AmbientBackground } from '../components/layout/AmbientBackground'
-import { Mascot } from '../components/ui/Mascot'
-import { Capsule } from '../components/ui/Capsule'
-import type { PastelColor } from '../lib/colors'
+import { ArrowRight, Asterisk, Heart, MapPin, ShieldCheck, X } from 'lucide-react'
 
-const steps: { color: PastelColor; title: string; body: string }[] = [
-  { color: 'bubblegum', title: 'Make your profile', body: 'Photos, interests, and a bio that sounds like you.' },
-  { color: 'mint', title: 'Background checks, built in', body: 'Every profile shows a color-coded summary of public records, with links to the sources.' },
-  { color: 'lilac', title: 'Swipe, or play for a fun match', body: 'Date the classic way, or try a quick quiz and Would You Rather to find your wavelength.' },
+const steps = [
+  { title: 'Make your profile', body: 'Photos, interests, and a bio that sounds like you.' },
+  { title: 'Background checks, built in', body: 'Every profile shows a color-coded summary of public records, with links to the sources.' },
+  { title: 'Swipe, or play for a fun match', body: 'Date the classic way, or try a quick quiz and Would You Rather to find your wavelength.' },
 ]
 
 export default function Landing() {
   return (
-    <div className="relative min-h-dvh overflow-hidden">
-      <AmbientBackground />
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <span className="flex items-center gap-2 font-serif text-2xl font-semibold tracking-tight">
-          <img src="/favicon.svg" alt="" className="size-8" /> SafeMatch
+    <div className="min-h-dvh bg-cream">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
+        <span className="flex items-center gap-1.5 text-xl font-extrabold tracking-tight">
+          <Asterisk className="size-6 text-bubblegum" strokeWidth={2.75} aria-hidden /> SafeMatch
         </span>
-        <Link to="/login" className="text-sm font-semibold text-ink-soft underline-offset-4 hover:text-ink hover:underline">
+        <Link to="/login" className="font-semibold text-ink-soft hover:text-ink">
           Sign in
         </Link>
       </header>
 
-      <main className="mx-auto grid max-w-6xl items-center gap-12 px-6 pb-20 pt-10 md:grid-cols-[1.25fr_.75fr] md:pt-16">
+      <main className="mx-auto grid max-w-6xl items-center gap-14 px-6 pb-20 pt-8 md:grid-cols-[1.15fr_.85fr] md:pt-14">
         <section>
-          <span className="eyebrow mb-5">Dating, minus the worry</span>
-          <h1 className="text-[3.25rem] leading-[0.98] sm:text-7xl">
+          <span className="eyebrow">Dating, minus the worry</span>
+          <h1 className="mt-5 text-[3.1rem] sm:text-7xl">
             Have fun dating.
             <br />
-            We do the <em className="accent text-bubblegum-deep">homework.</em>
+            We do the <span className="text-bubblegum">homework.</span>
           </h1>
-          <p className="mt-6 max-w-[34rem] text-lg leading-relaxed text-ink-soft">
+          <p className="mt-6 max-w-[33rem] text-lg leading-8 text-ink-soft">
             Every SafeMatch profile comes with a background check of public records, so you can spend less time worrying and
             more time enjoying the date. Swipe like any dating app, or play a game for a fun match.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-5">
-            <Link to="/login" className="btn-arcade h-13 gap-2 px-7 text-base">
+            <Link to="/login" className="btn-arcade h-14 gap-2 px-8 text-base">
               Start matching <ArrowRight className="size-4" aria-hidden />
             </Link>
             <span className="text-sm text-ink-soft">Free while in beta</span>
@@ -46,16 +41,33 @@ export default function Landing() {
         </section>
 
         <motion.div
-          className="relative mx-auto grid place-items-center"
-          initial={{ scale: 0.85, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 18 }}
+          className="mx-auto w-full max-w-sm"
+          initial={{ y: 16, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 180, damping: 22 }}
+          aria-label="Example profile card"
         >
-          <div className="absolute size-72 rounded-full bg-gradient-to-br from-blush via-lilac/40 to-sky/50 blur-2xl" aria-hidden />
-          <Mascot mood="excited" size={230} className="relative" />
-          <Capsule color="mint" size={56} className="animate-bob absolute -left-6 top-6" />
-          <Capsule color="butter" size={44} className="animate-bob absolute -right-4 top-20 [animation-delay:-1s]" />
-          <Capsule color="lilac" size={50} className="animate-bob absolute bottom-2 right-2 [animation-delay:-2s]" />
+          <div className="relative aspect-[19/22] overflow-hidden rounded-2xl shadow-[0_28px_56px_-28px_rgba(35,26,27,.55)]" style={{ background: 'radial-gradient(circle at 30% 25%, #fff 0%, #fdede6 30%, #f6b9a3 100%)' }}>
+            <span className="absolute inset-0 grid -translate-y-[16%] place-items-center text-[8rem]" aria-hidden>🦊</span>
+            <span className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-lg bg-white px-3.5 py-2 text-sm font-bold shadow-[0_6px_16px_-8px_rgba(35,26,27,.5)]">
+              <ShieldCheck className="size-4 text-mint-deep" strokeWidth={2.5} aria-hidden /> No records linked
+            </span>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent px-6 pb-6 pt-24 text-white">
+              <p className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90"><span className="size-2 rounded-full bg-mint" aria-hidden /> 92% vibe match</p>
+              <p className="text-4xl font-extrabold tracking-tight">Maya <span className="font-medium">27</span></p>
+              <p className="mt-2 flex items-center gap-2 text-white/90"><MapPin className="size-5" aria-hidden /> Seattle, WA</p>
+              <div className="mt-4 flex gap-2">
+                {['Ceramics', 'Ramen', 'Mario Kart'].map((tag) => (
+                  <span key={tag} className="rounded-lg bg-white/20 px-3 py-1.5 text-sm font-semibold backdrop-blur-sm">{tag}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="mt-7 flex justify-center gap-6" aria-hidden>
+            <span className="btn-circle size-16"><X className="size-7 text-ink-soft" strokeWidth={1.75} /></span>
+            <span className="btn-circle btn-circle-primary size-20"><Heart className="size-8" fill="currentColor" /></span>
+          </div>
+          <p className="mt-3 text-center text-xs text-ink-soft">Example profile</p>
         </motion.div>
       </main>
 
@@ -63,25 +75,16 @@ export default function Landing() {
         <p id="how-it-works" className="eyebrow mb-6">How it works</p>
         <ol className="grid border-t border-[var(--color-line)] sm:grid-cols-3">
           {steps.map((step, index) => (
-            <motion.li
-              key={step.title}
-              className="flex gap-4 border-b border-[var(--color-line)] py-6 sm:border-b-0 sm:pr-8 sm:[&:not(:first-child)]:border-l sm:[&:not(:first-child)]:pl-8"
-              initial={{ y: 24, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.08, type: 'spring', stiffness: 260, damping: 24 }}
-            >
-              <Capsule color={step.color} size={40} className="mt-1 shrink-0" />
-              <div>
-                <h3 className="text-2xl font-medium">{step.title}</h3>
-                <p className="mt-1.5 leading-relaxed text-ink-soft">{step.body}</p>
-              </div>
-            </motion.li>
+            <li key={step.title} className="border-b border-[var(--color-line)] py-7 sm:border-b-0 sm:pr-8 sm:[&:not(:first-child)]:border-l sm:[&:not(:first-child)]:pl-8">
+              <span className="text-sm font-bold text-bubblegum">0{index + 1}</span>
+              <h3 className="mt-2 text-2xl">{step.title}</h3>
+              <p className="mt-2 leading-relaxed text-ink-soft">{step.body}</p>
+            </li>
           ))}
         </ol>
       </section>
 
-      <footer className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2 border-t border-[var(--color-line)] px-6 py-6 text-xs text-ink-soft">
+      <footer className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2 border-t border-[var(--color-line)] px-6 py-6 text-sm text-ink-soft">
         <span>© 2026 SafeMatch · A DubHacks prototype</span>
         <span>Background checks summarize public sources and can’t guarantee safety.</span>
       </footer>

@@ -4,9 +4,22 @@ import { reportTier, tierStyles, visibleFindings, type SafetyReport } from '../.
 import { FindingCard, RequiredNotice, toneForTier } from './SafetyParts'
 
 /** Small color-coded result chip for cards and headers. */
-export function TierChip({ uid, size = 'sm' }: { uid: string; size?: 'sm' | 'md' }) {
+export function TierChip({ uid, size = 'sm', variant = 'chip' }: { uid: string; size?: 'sm' | 'md'; variant?: 'chip' | 'badge' }) {
   const screening = useScreening(uid)
   if (screening.status === 'loading') return null
+  if (variant === 'badge' && screening.status === 'ready') {
+    // White badge over a photo, like a "Verified" label; the icon carries the tier color.
+    const tier = reportTier(screening.report)
+    const tone = toneForTier(tier)
+    const Icon = tone.icon
+    return (
+      <span className="inline-flex items-center gap-2 rounded-lg bg-white px-3.5 py-2 text-sm font-bold text-ink shadow-[0_6px_16px_-8px_rgba(35,26,27,.5)]" title={screening.report.tldr?.tier_label}>
+        <Icon className={`size-4 ${tone.text}`} strokeWidth={2.5} aria-hidden />
+        <span className="sr-only">Background check: </span>
+        {tierStyles[tier].short}
+      </span>
+    )
+  }
   if (screening.status !== 'ready') {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-white bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-ink-soft">

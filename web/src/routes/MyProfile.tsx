@@ -57,9 +57,9 @@ export default function MyProfile() {
   const age = profile?.age ?? null
 
   return (
-    <div className="mx-auto max-w-2xl pb-10">
-      <div className="mb-4 flex items-center justify-between">
-        <div><span className="eyebrow">You</span><h1 className="text-4xl">My profile</h1></div>
+    <div className="max-w-4xl pb-10">
+      <div className="mb-8 flex items-end justify-between gap-4">
+        <div><span className="eyebrow">This is you</span><h1 className="mt-4 text-[2.6rem] sm:text-6xl">My profile.</h1></div>
         <Link to="/settings" className="flex items-center gap-1.5 font-display font-semibold text-ink-soft hover:text-ink">
           <SettingsIcon className="size-5" /> Settings
         </Link>
@@ -76,7 +76,7 @@ export default function MyProfile() {
               setTab(entry.id)
               setError('')
             }}
-            className={`rounded-full border-[3px] border-white px-4 py-1.5 font-display font-semibold ${tab === entry.id ? 'bg-bubblegum shadow-[0_3px_0_#e05a97]' : 'bg-white/70'}`}
+            className={`rounded-xl px-4 py-2 font-semibold transition-colors ${tab === entry.id ? 'bg-blush text-bubblegum' : 'text-ink-soft hover:bg-white hover:text-ink'}`}
           >
             {entry.label}
           </button>

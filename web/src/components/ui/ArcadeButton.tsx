@@ -28,11 +28,11 @@ export function ArcadeButton({
   style,
   ...rest
 }: ArcadeButtonProps) {
-  const vars = { '--btn-bg': pastel[color].bg, '--btn-lip': pastel[color].deep, ...style } as CSSProperties
+  const vars = { '--btn-bg': pastel[color].bg, '--btn-text': pastel[color].text, ...style } as CSSProperties
   return (
     <button
       type={type}
-      className={`btn-arcade ${sizes[size]} ${className}`}
+      className={`btn-arcade ${sizes[size]} ${color === 'white' ? 'ring-1 ring-[var(--color-line)]' : ''} ${className}`}
       style={vars}
       disabled={disabled || loading}
       aria-busy={loading || undefined}

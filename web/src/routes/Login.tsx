@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react'
+import { Asterisk } from 'lucide-react'
 import { Link } from 'react-router'
 import { AmbientBackground } from '../components/layout/AmbientBackground'
 import { ArcadeButton } from '../components/ui/ArcadeButton'
-import { Mascot } from '../components/ui/Mascot'
 import { backend, enterDemoMode, firebaseAvailable } from '../data'
 
 function friendlyAuthError(error: unknown): string {
@@ -44,14 +44,11 @@ export default function Login() {
     <div className="relative grid min-h-dvh place-items-center px-4 py-10">
       <AmbientBackground />
       <div className="w-full max-w-md">
-        <Link to="/" className="mx-auto mb-16 flex w-fit items-center gap-2 font-display text-3xl font-bold tracking-tight">
-          <img src="/favicon.svg" alt="" className="size-10" /> SafeMatch
+        <Link to="/" className="mx-auto mb-8 flex w-fit items-center gap-1.5 text-2xl font-extrabold tracking-tight">
+          <Asterisk className="size-7 text-bubblegum" strokeWidth={2.75} aria-hidden /> SafeMatch
         </Link>
-        <div className="gloss-card p-7">
-          <div className="-mt-20 mb-2 flex justify-center">
-            <Mascot mood="happy" size={110} />
-          </div>
-          <h1 className="text-center text-3xl font-bold">{creatingAccount ? 'Create your account' : 'Welcome back'}</h1>
+        <div className="gloss-card p-8">
+          <h1 className="text-center text-3xl">{creatingAccount ? 'Create your account' : 'Welcome back'}</h1>
           <p className="mt-1 text-center text-ink-soft">Sign in to start matching. Every profile comes with a background check.</p>
 
           {firebaseAvailable ? (

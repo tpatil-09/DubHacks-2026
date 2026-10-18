@@ -179,7 +179,7 @@ export default function Chat() {
         <button
           type="button"
           onClick={() => setGamePrompt(nextWyrPrompt(new Set()))}
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-lilac text-xl shadow-[inset_0_2px_4px_rgba(255,255,255,.8),0_3px_0_#9d8cf0]"
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-butter text-xl"
           aria-label="Send a Would You Rather capsule"
         >
           🎰

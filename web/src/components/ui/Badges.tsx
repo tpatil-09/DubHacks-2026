@@ -11,20 +11,19 @@ export function PersonaBadge({ personaId, size = 'sm' }: { personaId: string | u
   if (size === 'lg') {
     return (
       <div
-        className="relative inline-flex flex-col items-center gap-2 overflow-hidden rounded-[28px] border-4 border-white px-8 py-6 text-center shadow-[0_16px_40px_rgba(157,140,240,.35)]"
-        style={{ background: `linear-gradient(135deg, ${color.soft}, ${color.bg} 60%, #fff 120%)` }}
+        className="relative inline-flex flex-col items-center gap-2 overflow-hidden rounded-2xl px-8 py-6 text-center"
+        style={{ background: color.soft }}
       >
-        <span className="holo-sheen" aria-hidden />
         <span className="text-6xl" aria-hidden>{persona.emoji}</span>
-        <span className="font-display text-2xl font-semibold">{persona.name}</span>
+        <span className="text-2xl font-extrabold tracking-tight">{persona.name}</span>
         <span className="max-w-[16rem] text-sm text-ink-soft">{persona.tagline}</span>
       </div>
     )
   }
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full border-2 border-white px-2.5 py-0.5 font-display text-xs font-semibold shadow-sm"
-      style={{ background: color.bg }}
+      className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold"
+      style={{ background: color.soft }}
       title={persona.tagline}
     >
       <span aria-hidden>{persona.emoji}</span>
@@ -36,15 +35,15 @@ export function PersonaBadge({ personaId, size = 'sm' }: { personaId: string | u
 export function VibeMeter({ percent }: { percent: number }) {
   return (
     <div className="flex items-center gap-2" aria-label={`${percent}% vibe match, just for fun`}>
-      <div className="h-3 w-24 overflow-hidden rounded-full border-2 border-white bg-blush shadow-inner">
+      <div className="h-2 w-24 overflow-hidden rounded-full bg-blush">
         <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-lilac via-bubblegum to-peach"
+          className="h-full rounded-full bg-bubblegum"
           initial={{ width: 0 }}
           animate={{ width: `${percent}%` }}
           transition={{ type: 'spring', stiffness: 120, damping: 20 }}
         />
       </div>
-      <span className="font-display text-sm font-semibold">{percent}% vibe</span>
+      <span className="text-sm font-semibold">{percent}% vibe</span>
     </div>
   )
 }
@@ -58,7 +57,7 @@ export function TokenCounter() {
       initial={{ scale: 1.3 }}
       animate={{ scale: 1 }}
       transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-      className="inline-flex items-center gap-1.5 rounded-full border-[3px] border-white bg-butter px-3 py-1 font-display font-semibold shadow-[inset_0_2px_3px_rgba(255,255,255,.8),0_3px_0_#e8c34a]"
+      className="inline-flex items-center gap-1.5 rounded-full bg-butter px-3 py-1 text-sm font-bold"
       aria-label={`${count} arcade tokens`}
     >
       <span aria-hidden>🪙</span>

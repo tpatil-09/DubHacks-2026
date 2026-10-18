@@ -9,7 +9,6 @@ import { quizQuestions } from '../../games/quiz/questions'
 import { axisLabels, quizAxes, scoreQuiz } from '../../games/quiz/scoring'
 import { personaFor } from '../../games/quiz/personas'
 import { arcadeVars } from '../../lib/colors'
-import { celebrate } from '../../lib/confetti'
 import { useSession } from '../../store/session'
 import { useTokens } from '../../store/tokens'
 import { toast } from '../../store/toast'
@@ -47,7 +46,6 @@ export default function Quiz() {
       setResult({ axes, personaId: persona.id })
       setTimeout(() => {
         setRevealed(true)
-        celebrate()
       }, 900)
     } catch (cause) {
       toast(cause instanceof Error ? cause.message : 'Could not save your result.', 'error')

@@ -7,7 +7,6 @@ import { ArcadeButton } from '../components/ui/ArcadeButton'
 import { Capsule } from '../components/ui/Capsule'
 import { Mascot } from '../components/ui/Mascot'
 import { draftFromProfile, validateAbout, validateBasics, validatePhotos, type ProfileDraft } from '../lib/profileValidation'
-import { celebrate } from '../lib/confetti'
 import { useSession } from '../store/session'
 import type { OnboardingStep } from '../types'
 import type { PastelColor } from '../lib/colors'
@@ -70,7 +69,6 @@ export default function Onboarding() {
     try {
       await saveProfile({ discoverable: account?.settings.discoverable ?? true })
       await saveAccount({ onboardingStep: 'complete', screeningConsentAt: Date.now() })
-      celebrate()
       navigate(takeQuiz ? '/arcade/quiz' : '/discover', { replace: true })
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not save. Try again.')
@@ -101,7 +99,7 @@ export default function Onboarding() {
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             <p className="font-display text-sm font-semibold text-ink-soft">Step {index + 1} of {steps.length}</p>
-            <h1 className="text-3xl font-bold">{step.title}</h1>
+            <h1 className="mt-2 text-4xl">{step.title}</h1>
             <p className="mb-6 text-ink-soft">{step.subtitle}</p>
 
             {step.id === 'basics' && <BasicsFields draft={draft} onChange={update} />}

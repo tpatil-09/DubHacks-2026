@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import { Ban, ChevronLeft, Flag, Heart, MapPin, X } from 'lucide-react'
-import { ArcadeCard } from '../components/ui/ArcadeCard'
-import { ArcadeButton } from '../components/ui/ArcadeButton'
 import { ProfilePhoto } from '../components/ui/ProfilePhoto'
 import { DemoTag, InterestStickers } from '../components/ui/Sticker'
 import { PersonaBadge, VibeMeter } from '../components/ui/Badges'
@@ -60,17 +58,31 @@ export default function ProfileDetail() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl pb-8">
-      <button type="button" onClick={() => navigate(-1)} className="mb-3 flex items-center gap-1 font-display font-semibold text-ink-soft hover:text-ink">
+    <div className="pb-8">
+      <button type="button" onClick={() => navigate(-1)} className="mb-6 flex items-center gap-1 font-semibold text-ink-soft hover:text-ink">
         <ChevronLeft className="size-5" /> Back
       </button>
-      <div className="grid gap-6 md:grid-cols-[1fr_1.1fr]">
-        <div>
-          <ArcadeCard tilt className="overflow-hidden p-2.5">
-            <ProfilePhoto src={profile.photos[photoIndex]} alt={`${profile.displayName}'s photo ${photoIndex + 1}`} className="aspect-[3/4] w-full rounded-[18px]" emojiSize="text-[8rem]" />
-          </ArcadeCard>
+      <div className="grid gap-12 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] lg:gap-16">
+        <div className="min-w-0">
+          <div className="relative overflow-hidden rounded-2xl shadow-[0_28px_56px_-28px_rgba(35,26,27,.55)]">
+            <ProfilePhoto src={profile.photos[photoIndex]} alt={`${profile.displayName}'s photo ${photoIndex + 1}`} className="aspect-[4/5] sm:aspect-[19/20] w-full" emojiSize="text-[6rem] -translate-y-[62%] sm:text-[10rem] sm:-translate-y-[18%]" />
+            <div className="absolute left-5 top-5 flex flex-wrap gap-2">
+              <a href="#background-check" aria-label="Jump to background check"><TierChip uid={profile.uid} variant="badge" /></a>
+              {profile.isDemo && <DemoTag />}
+            </div>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent px-6 pb-6 pt-24 text-white sm:px-8 sm:pb-8">
+              {vibe !== null && (
+                <p className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90"><span className="size-2 rounded-full bg-mint" aria-hidden /> {vibe}% vibe match</p>
+              )}
+              <h1 className="text-4xl text-white sm:text-5xl">
+                {profile.displayName}
+                {age !== null && <span className="ml-2 font-medium">{age}</span>}
+              </h1>
+              {profile.city && <p className="mt-2 flex items-center gap-2 text-lg text-white/90"><MapPin className="size-5 shrink-0" aria-hidden /> {profile.city}</p>}
+            </div>
+          </div>
           {profile.photos.length > 1 && (
-            <div className="mt-3 flex justify-center gap-2" role="tablist" aria-label="Photos">
+            <div className="mt-4 flex justify-center gap-2" role="tablist" aria-label="Photos">
               {profile.photos.map((photo, index) => (
                 <button
                   key={`${photo.slice(0, 30)}-${index}`}
@@ -79,63 +91,59 @@ export default function ProfileDetail() {
                   aria-selected={photoIndex === index}
                   aria-label={`Photo ${index + 1}`}
                   onClick={() => setPhotoIndex(index)}
-                  className={`h-3 rounded-full transition-all ${photoIndex === index ? 'w-8 bg-bubblegum' : 'w-3 bg-white'}`}
+                  className={`h-2 rounded-full transition-all ${photoIndex === index ? 'w-7 bg-bubblegum' : 'w-2 bg-ink/20'}`}
                 />
               ))}
             </div>
           )}
+          {!isMe && (
+            <div className="mt-10 flex justify-center gap-7">
+              <button type="button" className="btn-circle size-[4.5rem]" aria-label={`Pass on ${profile.displayName}`} onClick={() => decide('pass')} disabled={busy}>
+                <X className="size-8 text-ink-soft" strokeWidth={1.75} />
+              </button>
+              <button type="button" className="btn-circle btn-circle-primary size-[5.5rem]" aria-label={`Like ${profile.displayName}`} onClick={() => decide('like')} disabled={busy}>
+                <Heart className="size-9" fill="currentColor" />
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col gap-4">
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-4xl font-bold">
-                {profile.displayName}
-                {age !== null && <span className="font-medium text-ink-soft">, {age}</span>}
-              </h1>
-              {profile.isDemo && <DemoTag />}
-            </div>
-            {profile.city && <p className="flex items-center gap-1 text-ink-soft"><MapPin className="size-4 shrink-0" aria-hidden /> {profile.city}</p>}
-            <div className="mt-2 flex flex-wrap items-center gap-3">
-              <a href="#background-check" aria-label="Jump to background check"><TierChip uid={profile.uid} size="md" /></a>
-              <PersonaBadge personaId={profile.quiz?.personaId} />
-              {vibe !== null && <VibeMeter percent={vibe} />}
-            </div>
-          </div>
-
-          <p className="text-lg">{profile.bio}</p>
-          <InterestStickers ids={profile.interests} />
+        <div className="min-w-0">
+          <span className="eyebrow">The little things</span>
+          <h2 className="mt-8 text-4xl sm:text-[3.4rem]">Get to know {profile.displayName}.</h2>
+          <p className="mt-6 text-lg leading-8 text-ink-soft">{profile.bio}</p>
+          <div className="mt-6"><InterestStickers ids={profile.interests} /></div>
           {profile.prompts.map((prompt) => (
-            <div key={prompt.question} className="gloss-card p-4">
-              <p className="font-display text-sm font-semibold text-ink-soft">{prompt.question}</p>
-              <p className="font-display text-xl">{prompt.answer}</p>
+            <div key={prompt.question} className="mt-8 border-t border-[var(--color-line)] pt-8">
+              <span className="eyebrow">{prompt.question.replace(/…$/, '')}</span>
+              <p className="mt-4 text-[1.75rem] font-bold leading-snug tracking-tight">“{prompt.answer}”</p>
             </div>
           ))}
-
+          <dl className="mt-8 grid gap-4 border-t border-[var(--color-line)] pt-7">
+            {profile.city && (
+              <div className="flex justify-between gap-4"><dt className="text-ink-soft">Lives in</dt><dd className="font-bold">{profile.city}</dd></div>
+            )}
+            {profile.quiz && (
+              <div className="flex items-center justify-between gap-4"><dt className="text-ink-soft">Vibe type</dt><dd><PersonaBadge personaId={profile.quiz.personaId} /></dd></div>
+            )}
+            {vibe !== null && (
+              <div className="flex items-center justify-between gap-4"><dt className="text-ink-soft">In sync with you</dt><dd><VibeMeter percent={vibe} /></dd></div>
+            )}
+          </dl>
           {!isMe && (
-            <>
-              <div className="mt-2 flex gap-4">
-                <ArcadeButton color="peach" className="flex-1" onClick={() => decide('pass')} disabled={busy} icon={<X className="size-5" />}>
-                  Pass
-                </ArcadeButton>
-                <ArcadeButton className="flex-1" onClick={() => decide('like')} loading={busy} icon={<Heart className="size-5" fill="currentColor" />}>
-                  Like
-                </ArcadeButton>
-              </div>
-              <div className="flex gap-4 text-sm">
-                <button type="button" onClick={() => setModal('block')} className="flex items-center gap-1 text-ink-soft hover:text-ink">
-                  <Ban className="size-4" /> Block
-                </button>
-                <button type="button" onClick={() => setModal('report')} className="flex items-center gap-1 text-ink-soft hover:text-ink">
-                  <Flag className="size-4" /> Report
-                </button>
-              </div>
-            </>
+            <div className="mt-8 flex gap-5 text-sm">
+              <button type="button" onClick={() => setModal('block')} className="flex items-center gap-1.5 text-ink-soft hover:text-ink">
+                <Ban className="size-4" /> Block
+              </button>
+              <button type="button" onClick={() => setModal('report')} className="flex items-center gap-1.5 text-ink-soft hover:text-ink">
+                <Flag className="size-4" /> Report
+              </button>
+            </div>
           )}
         </div>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-16 border-t border-[var(--color-line)] pt-12">
         <BackgroundCheck uid={profile.uid} name={profile.displayName} self={isMe} />
       </div>
 

@@ -1,8 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import '@fontsource-variable/fraunces/full.css'
-import '@fontsource-variable/fraunces/full-italic.css'
-import '@fontsource-variable/hanken-grotesk/index.css'
+import '@fontsource-variable/plus-jakarta-sans/index.css'
+import '@fontsource-variable/plus-jakarta-sans/wght-italic.css'
 import App from './App'
 import './style.css'
 
