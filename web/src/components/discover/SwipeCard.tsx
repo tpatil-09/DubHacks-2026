@@ -6,6 +6,7 @@ import { ProfilePhoto } from '../ui/ProfilePhoto'
 import { InterestStickers, DemoTag } from '../ui/Sticker'
 import { interestById } from '../../lib/interests'
 import { TierChip } from '../safety/BackgroundCheck'
+import { ageFrom } from '../../lib/age'
 import type { LikeType, Profile } from '../../types'
 
 export interface SwipeCardHandle {
@@ -46,7 +47,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(function Sw
     else animate(x, 0, { type: 'spring', stiffness: 400, damping: 25 })
   }
 
-  const age = profile.age
+  const age = ageFrom(profile.birthdate)
 
   return (
     <motion.div

@@ -12,6 +12,7 @@ import { demoLikesYou, demoProfiles, demoReplies, demoWyrAnswers } from '../fixt
 import { buildScreeningReport } from '../fixtures/demoReports'
 import { matchIdFor, type Backend } from './backend'
 import { filterDiscover } from './discoverFilter'
+import { ageFrom } from '../lib/age'
 
 // In-browser backend backed by localStorage. Used when Firebase isn't configured
 // or the player picks "Try demo mode". Demo profiles reply and play automatically.
@@ -204,7 +205,7 @@ export const demoBackend: Backend = {
     const defaults: Profile = {
       uid,
       displayName: '',
-      age: 0,
+      birthdate: '',
       gender: '',
       interestedIn: [],
       city: '',
@@ -318,7 +319,8 @@ export const demoBackend: Backend = {
     // Every demo member already has a background check (synthetic, pre-built).
     const profile = state.profiles[subjectUid]
     if (!profile) return null
-    const age = profile.age ? `age ${profile.age}` : ''
+    const years = ageFrom(profile.birthdate)
+    const age = years ? `age ${years}` : ''
     return buildScreeningReport({
       subjectUid,
       nameProvided: profile.displayName,

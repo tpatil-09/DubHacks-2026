@@ -1,13 +1,14 @@
 import type { Profile } from '../types'
+import { ageFrom } from './age'
 
 export type ProfileDraft = Pick<
   Profile,
-  'displayName' | 'age' | 'gender' | 'interestedIn' | 'city' | 'bio' | 'prompts' | 'photos' | 'interests'
+  'displayName' | 'birthdate' | 'gender' | 'interestedIn' | 'city' | 'bio' | 'prompts' | 'photos' | 'interests'
 >
 
 export const emptyDraft: ProfileDraft = {
   displayName: '',
-  age: 0,
+  birthdate: '',
   gender: '',
   interestedIn: [],
   city: '',
@@ -19,11 +20,13 @@ export const emptyDraft: ProfileDraft = {
 
 export const LIMITS = { name: 30, city: 40, bio: 300, promptAnswer: 120, minInterests: 3, maxInterests: 10, maxPhotos: 6 }
 
-export function validateBasics(draft: ProfileDraft): string | null {
+export function validateBasics(draft: ProfileDraft, today: Date = new Date()): string | null {
   if (!draft.displayName.trim()) return 'Add the name you want people to see.'
   if (draft.displayName.trim().length > LIMITS.name) return `Names can be up to ${LIMITS.name} characters.`
-  if (!Number.isInteger(draft.age) || draft.age < 18) return 'You need to be 18 or older to use SafeMatch.'
-  if (draft.age > 120) return 'Please enter an age no greater than 120.'
+  const age = ageFrom(draft.birthdate, today)
+  if (age === null) return 'Add your date of birth.'
+  if (age < 18) return 'You need to be 18 or older to use SafeMatch.'
+  if (age > 120) return 'Please double-check your date of birth.'
   if (!draft.gender) return 'Pick the gender that fits you best.'
   if (draft.interestedIn.length === 0) return 'Pick who you’d like to meet.'
   if (draft.city.trim().length < 2) return 'Add the city or region where you live.'
@@ -50,7 +53,7 @@ export function draftFromProfile(profile: Profile | null): ProfileDraft {
   if (!profile) return { ...emptyDraft }
   return {
     displayName: profile.displayName,
-    age: profile.age,
+    birthdate: profile.birthdate,
     gender: profile.gender,
     interestedIn: profile.interestedIn,
     city: profile.city,

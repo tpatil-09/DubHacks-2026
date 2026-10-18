@@ -47,15 +47,27 @@ export function BasicsFields({ draft, onChange }: FieldsProps) {
     onChange({
       interestedIn: draft.interestedIn.includes(id) ? draft.interestedIn.filter((entry) => entry !== id) : [...draft.interestedIn, id],
     })
+  const today = new Date()
+  const maxDob = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate()).toISOString().slice(0, 10)
+  const minDob = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate()).toISOString().slice(0, 10)
   return (
     <div className="grid gap-5">
       <div>
-        <label htmlFor="displayName" className="label-arcade">Display name</label>
+        <label htmlFor="displayName" className="label-arcade">Full name</label>
         <input id="displayName" className="input-arcade" maxLength={LIMITS.name} value={draft.displayName} onChange={(event) => onChange({ displayName: event.target.value })} />
       </div>
       <div>
-        <label htmlFor="age" className="label-arcade">Age</label>
-        <input id="age" type="number" inputMode="numeric" min={18} max={120} step={1} required className="input-arcade" value={draft.age || ''} onChange={(event) => onChange({ age: Number(event.target.value) || 0 })} />
+        <label htmlFor="birthdate" className="label-arcade">Date of birth</label>
+        <input
+          id="birthdate"
+          type="date"
+          required
+          min={minDob}
+          max={maxDob}
+          className="input-arcade"
+          value={draft.birthdate}
+          onChange={(event) => onChange({ birthdate: event.target.value })}
+        />
         <p className="mt-1 text-xs text-ink-soft">Your age appears on your profile. SafeMatch is for adults 18 and older.</p>
       </div>
       <fieldset>

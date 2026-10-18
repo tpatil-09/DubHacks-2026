@@ -11,6 +11,7 @@ import { BackgroundCheck, TierChip } from '../components/safety/BackgroundCheck'
 import { useProfile } from '../hooks/data'
 import { backend } from '../data'
 import { vibePercent } from '../lib/vibe'
+import { ageFrom } from '../lib/age'
 import { useSession } from '../store/session'
 import { toast } from '../store/toast'
 import type { LikeType } from '../types'
@@ -36,7 +37,7 @@ export default function ProfileDetail() {
   if (loading) return <PageLoader />
   if (!profile) return <EmptyState title="Profile not found" body="This profile is no longer available." mood="thinking" />
 
-  const age = profile.age
+  const age = ageFrom(profile.birthdate)
   const vibe = me?.quiz && profile.quiz ? vibePercent(me.quiz.axes, profile.quiz.axes) : null
   const isMe = profile.uid === myUid
 

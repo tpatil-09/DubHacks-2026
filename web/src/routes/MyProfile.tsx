@@ -9,6 +9,7 @@ import { PersonaBadge } from '../components/ui/Badges'
 import { InterestStickers } from '../components/ui/Sticker'
 import { BackgroundCheck, TierChip } from '../components/safety/BackgroundCheck'
 import { draftFromProfile, validateAbout, validateBasics, validatePhotos, type ProfileDraft } from '../lib/profileValidation'
+import { ageFrom } from '../lib/age'
 import { arcadeVars } from '../lib/colors'
 import { useSession } from '../store/session'
 import { toast } from '../store/toast'
@@ -54,7 +55,7 @@ export default function MyProfile() {
     }
   }
 
-  const age = profile?.age ?? null
+  const age = profile ? ageFrom(profile.birthdate) : null
 
   return (
     <div className="max-w-4xl pb-10">
