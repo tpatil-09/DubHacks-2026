@@ -143,7 +143,12 @@ service cloud.firestore {
           && request.resource.data.text is string
           && request.resource.data.text.size() <= 2000
           && (request.resource.data.senderId == request.auth.uid || request.resource.data.senderId == 'system');
-        allow update, delete: if false;
+        allow update: if false;
+        // A match participant may delete messages in their own match (used by "reset likes &
+        // matches" to clear chat history so a rematch starts fresh). Status-independent so the
+        // chat of a just-closed match can still be cleared.
+        allow delete: if signedIn()
+          && get(/databases/$(database)/documents/matches/$(matchId)).data.users.hasAny([request.auth.uid]);
       }
 
       match /gameAnswers/{answerId} {

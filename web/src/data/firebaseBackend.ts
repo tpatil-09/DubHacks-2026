@@ -29,6 +29,7 @@ import type { Account, GameAnswers, Match, Message, NewMessage, PaperAirplane, P
 import { assertDesign, cleanNote } from '../games/paperAirplane/papers'
 import { matchIdFor, type Backend } from './backend'
 import { filterDiscover } from './discoverFilter'
+import { isRemovedMember } from './removedMembers'
 import { ageFrom } from '../lib/age'
 import { buildScreeningReport } from '../fixtures/demoReports'
 import { legacyNameAndAge } from '../lib/legacyProfile'
@@ -242,14 +243,12 @@ export const firebaseBackend: Backend = {
         // or the match animation fires but nothing shows up on the Matches/chat screens.
         // The security rules only permit updating status/lastMessageAt/lastMessagePreview on an
         // existing match, so reactivate with a targeted update rather than rewriting the doc.
-        // created: false here so we don't post another "You matched!" message — the match
-        // already has its history (and original system message) from when it was first made.
         transaction.update(matchRef(pairId), {
           status: 'active',
           lastMessageAt: now,
           lastMessagePreview: 'You matched! Say hello ✨',
         })
-        return { matched: true, created: false }
+        return { matched: true, created: false, reactivated: true }
       }
       const users = [uid, targetUid].sort() as [string, string]
       transaction.set(matchRef(pairId), {
@@ -261,7 +260,15 @@ export const firebaseBackend: Backend = {
       })
       return { matched: true, created: true }
     })
-    if (result.matched && result.created) {
+    // Post the "You matched!" message for a brand-new match, or for a reactivated match whose
+    // chat has been cleared (e.g. after a reset) so the rematch starts fresh. Skip it when a
+    // reactivated match still has history, to avoid a duplicate "You matched!" line.
+    let postMatchMessage = result.matched && result.created
+    if (result.matched && 'reactivated' in result && result.reactivated) {
+      const existing = await getDocs(query(collection(fb.db, 'matches', pairId, 'messages'), limit(1)))
+      postMatchMessage = existing.empty
+    }
+    if (postMatchMessage) {
       await addDoc(collection(fb.db, 'matches', pairId, 'messages'), {
         matchId: pairId,
         senderId: 'system',
@@ -279,7 +286,10 @@ export const firebaseBackend: Backend = {
       return () => {}
     }
     return onSnapshot(query(collection(fb.db, 'matches'), where('users', 'array-contains', uid), where('status', '==', 'active'), orderBy('lastMessageAt', 'desc')),
-      (snapshot) => callback(snapshot.docs.map((item) => matchFrom(item.id, item.data()))),
+      (snapshot) => callback(snapshot.docs
+        .map((item) => matchFrom(item.id, item.data()))
+        // Never surface a match involving a removed demo member, even if the match doc lingers.
+        .filter((match) => !match.users.some(isRemovedMember))),
       () => callback([]),
     )
   },
@@ -361,7 +371,7 @@ export const firebaseBackend: Backend = {
       getDocs(query(collection(fb.db, 'profiles'), where('discoverable', '==', true), limit(100))),
       blockedUids(fromUid),
     ])
-    const candidates = profilesSnap.docs.map((entry) => entry.id).filter((id) => id !== fromUid && !blocked.has(id))
+    const candidates = profilesSnap.docs.map((entry) => entry.id).filter((id) => id !== fromUid && !blocked.has(id) && !isRemovedMember(id))
     if (candidates.length === 0) throw new Error('Nobody is around to catch a plane right now.')
     const toUid = candidates[Math.floor(Math.random() * candidates.length)]
     const id = crypto.randomUUID()
@@ -428,7 +438,7 @@ export const firebaseBackend: Backend = {
     ])
     const profiles = profilesSnap.docs
       .map((entry) => ({ ...(entry.data() as Profile), uid: entry.id }))
-      .filter((profile) => profile.uid !== uid && !blocked.has(profile.uid))
+      .filter((profile) => profile.uid !== uid && !blocked.has(profile.uid) && !isRemovedMember(profile.uid))
     const entries = await Promise.all(
       profiles.map(async (profile) => ({ profile, answers: (await firebaseBackend.getGameAnswers(profile.uid))[gameId] })),
     )
@@ -436,6 +446,8 @@ export const firebaseBackend: Backend = {
   },
 
   async getScreening(subjectUid) {
+    // Removed demo members (real names) must never have a background check surfaced.
+    if (isRemovedMember(subjectUid)) return null
     const snapshot = await getDoc(doc(fb.db, 'screenings', subjectUid))
     if (snapshot.exists()) {
       const data = snapshot.data() as { report?: unknown }
@@ -523,7 +535,15 @@ export const firebaseBackend: Backend = {
     ])
     const batch = writeBatch(db)
     for (const snapshot of outgoingLikes.docs) batch.delete(snapshot.ref)
-    for (const match of matches.docs) batch.update(match.ref, { status: 'closed' })
+    for (const match of matches.docs) {
+      // Wipe the chat history so a later rematch starts fresh (not showing old messages).
+      // Only active matches are readable; already-closed ones were cleared on a prior reset.
+      if (match.data().status === 'active') {
+        const messages = await getDocs(collection(db, 'matches', match.id, 'messages'))
+        for (const message of messages.docs) batch.delete(message.ref)
+      }
+      batch.update(match.ref, { status: 'closed' })
+    }
     await batch.commit()
   },
 }

@@ -1,5 +1,6 @@
 import type { Profile } from '../types'
 import { ageFrom } from '../lib/age'
+import { isRemovedMember } from './removedMembers'
 
 const genderGroup: Record<string, string> = { woman: 'women', man: 'men', nonbinary: 'nonbinary' }
 
@@ -14,6 +15,7 @@ export function filterDiscover(
   return candidates.filter(
     (profile) =>
       profile.uid !== me?.uid &&
+      !isRemovedMember(profile.uid) &&
       profile.discoverable &&
       !seen.has(profile.uid) &&
       !blocked.has(profile.uid) &&
