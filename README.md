@@ -2,7 +2,7 @@
 
 Havenly is a dating app built with React, TypeScript, and Vite. Firebase Authentication, Cloud Firestore, Storage, and Hosting power the site. Profiles, preferences, likes, matches, messages, games, blocks, and reports are stored in Firestore. Each profile can also show a background-check report from the `background_check/` pipeline with source links, uncertainty, and a human-review boundary. The compatibility quiz, Would You Rather capsules, and safety controls help people get to know and protect themselves.
 
-Devpost: <Devpost: https://devpost.com/software/safematch-2l804o>
+Devpost: https://devpost.com/software/safematch-2l804o
 ## Run the web app
 
 Local app URL: <http://localhost:5173/> (use `localhost`, not `127.0.0.1`: Firebase sign-in only allows `localhost` by default)
